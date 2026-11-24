@@ -99,12 +99,26 @@ export const en = {
     empty: 'No bikes yet. Add them in Strava, then import again.',
   },
 
+  retiredScreen: {
+    title: (n: number, nF: string) => `${nF} ${plural(n, 'pair', 'pairs')}`,
+    titleMuted: (_n: number) => 'retired',
+    bikesOnly: (n: number, nF: string) => `${nF} ${plural(n, 'bike', 'bikes')}`,
+    summary: (km: string) => `${km} in total`,
+    summaryCost: (km: string, cost: string) => `${km} in total · ${cost} per km on average`,
+    shoes: 'Shoes',
+    bikes: 'Bikes',
+    retiredOn: (date: string) => `Retired ${date}`,
+    inUse: (nF: string, unit: string) => `${nF} ${unit} in use`,
+    empty: 'Nothing retired yet. When a pair is worn out, retire it from its page and it moves here.',
+  },
+
   gear: {
     road: 'Road',
     trail: 'Trail',
     nearlyDone: 'Nearly done',
     overLimit: 'Over limit',
     left: 'left',
+    over: 'over',
     perKm: 'per km',
     addPrice: 'Add price',
     ofLimit: (used: string, limit: string) => `${used} of ${limit}`,

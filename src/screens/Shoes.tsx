@@ -9,7 +9,7 @@ import s from './GearList.module.css';
 export function Shoes() {
   const { stats, t, f } = useDataset();
   const lastUsed = useLastUsed();
-  const { rotation, resting, walks, retiredCount } = groupGear(stats.values(), 'shoe');
+  const { rotation, resting, walks, retired } = groupGear(stats.values(), 'shoe');
   const total = rotation.length + resting.length + walks.length;
 
   const grid = (list: GearStats[], withLastUsed = false) => (
@@ -46,9 +46,9 @@ export function Shoes() {
         </ListSection>
       )}
 
-      {retiredCount > 0 && (
+      {retired.length > 0 && (
         <p className={s.retired}>
-          {t.shoes.retired(retiredCount, f.int(retiredCount))}
+          {t.shoes.retired(retired.length, f.int(retired.length))}
           <span aria-hidden="true"> · </span>
           <Link to="/retired">{t.shoes.seeRetired}</Link>
         </p>

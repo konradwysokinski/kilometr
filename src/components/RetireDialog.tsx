@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useStore } from '../app/store';
 import type { GearStats } from '../domain/gear';
-import { daysBetween } from '../lib/dates';
+import { inUseFor } from '../domain/lists';
 import { gearColour } from '../lib/colour';
 import { Avatar } from './Avatar';
 import { WearBar } from './WearBar';
@@ -37,8 +37,7 @@ export function RetireDialog({ shoe, open, onClose, onConfirm }: Props) {
 
   const { wear, terrain, settings } = shoe;
   const end = shoe.lastUsed ?? now;
-  const days = shoe.firstUsed ? Math.max(1, daysBetween(shoe.firstUsed, end)) : 0;
-  const duration = days < 45 ? { n: Math.max(1, Math.round(days / 7)), unit: 'week' as const } : { n: Math.round(days / 30.4), unit: 'month' as const };
+  const duration = inUseFor(shoe.firstUsed ?? now, end);
   const terrainTotal = terrain.roadKm + terrain.trailKm;
   const trailShare = terrainTotal ? terrain.trailKm / terrainTotal : 0;
 

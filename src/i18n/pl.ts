@@ -112,12 +112,26 @@ export const pl: Messages = {
     empty: 'Brak rowerów. Dodaj je w Strava i zaimportuj ponownie.',
   },
 
+  retiredScreen: {
+    title: (n, nF) => `${nF} ${plural(n, 'para', 'pary', 'par')}`,
+    titleMuted: (n) => plural(n, 'wycofana', 'wycofane', 'wycofanych'),
+    bikesOnly: (n, nF) => `${nF} ${plural(n, 'rower', 'rowery', 'rowerów')}`,
+    summary: (km) => `${km} łącznie`,
+    summaryCost: (km, cost) => `${km} łącznie · średnio ${cost} za km`,
+    shoes: 'Buty',
+    bikes: 'Rowery',
+    retiredOn: (date) => `Wycofane ${date}`,
+    inUse: (nF, unit) => `${nF} ${unit} w użyciu`,
+    empty: 'Nic jeszcze nie wycofano. Gdy para się zużyje, wycofaj ją na jej stronie, a trafi tutaj.',
+  },
+
   gear: {
     road: 'Asfalt',
     trail: 'Teren',
     nearlyDone: 'Prawie zużyte',
     overLimit: 'Ponad limit',
     left: 'zostało',
+    over: 'za dużo',
     perKm: 'za km',
     addPrice: 'Dodaj cenę',
     ofLimit: (used, limit) => `${used} z ${limit}`,

@@ -12,7 +12,7 @@ import s from './Bikes.module.css';
 
 export function Bikes() {
   const { stats, t, f } = useDataset();
-  const { rotation, resting, retiredCount } = groupGear(stats.values(), 'bike');
+  const { rotation, resting, retired } = groupGear(stats.values(), 'bike');
   const bikes = [...rotation, ...resting];
   const totalKm = bikes.reduce((sum, b) => sum + b.totalKm, 0);
 
@@ -41,9 +41,9 @@ export function Bikes() {
         </ListSection>
       )}
 
-      {retiredCount > 0 && (
+      {retired.length > 0 && (
         <p className={list.retired}>
-          {t.bikes.retired(retiredCount, f.int(retiredCount))}
+          {t.bikes.retired(retired.length, f.int(retired.length))}
           <span aria-hidden="true"> · </span>
           <Link to="/retired">{t.shoes.seeRetired}</Link>
         </p>

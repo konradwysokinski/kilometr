@@ -1,3 +1,4 @@
+import { daysBetween } from '../lib/dates';
 import { byLastUsed, type GearStats } from './gear';
 import type { Activity, GearKind } from './types';
 
@@ -8,16 +9,16 @@ export interface GearGroups {
   resting: GearStats[];
   /** Retired from running, still counting kilometres. */
   walks: GearStats[];
-  /** Shown on the Retired screen, only counted here. */
-  retiredCount: number;
+  /** Most recently retired first. */
+  retired: GearStats[];
 }
 
 /** Splits one kind of gear into the groups of the Shoes and Bikes screens, most recently used first. */
 export function groupGear(stats: Iterable<GearStats>, kind: GearKind): GearGroups {
-  const groups: GearGroups = { rotation: [], resting: [], walks: [], retiredCount: 0 };
+  const groups: GearGroups = { rotation: [], resting: [], walks: [], retired: [] };
   for (const g of stats) {
     if (g.gear.kind !== kind) continue;
-    if (g.retired) groups.retiredCount++;
+    if (g.retired) groups.retired.push(g);
     else if (g.settings.keepForWalks) groups.walks.push(g);
     else if (g.inRotation) groups.rotation.push(g);
     else groups.resting.push(g);
@@ -25,7 +26,39 @@ export function groupGear(stats: Iterable<GearStats>, kind: GearKind): GearGroup
   groups.rotation.sort(byLastUsed);
   groups.resting.sort(byLastUsed);
   groups.walks.sort(byLastUsed);
+  groups.retired.sort((a, b) => retiredOn(b).getTime() - retiredOn(a).getTime());
   return groups;
+}
+
+/** When an item was retired: the date the user did it, else its last use (Strava's own retired flag has no date). */
+export function retiredOn(g: GearStats): Date {
+  return g.settings.retiredAt ? new Date(g.settings.retiredAt) : (g.lastUsed ?? new Date(0));
+}
+
+export interface Duration {
+  n: number;
+  unit: 'week' | 'month';
+}
+
+/** Time between two dates, in weeks under ~6 weeks, in months after. */
+export function inUseFor(from: Date, to: Date): Duration {
+  const days = Math.max(1, daysBetween(from, to));
+  return days < 45 ? { n: Math.max(1, Math.round(days / 7)), unit: 'week' } : { n: Math.round(days / 30.4), unit: 'month' };
+}
+
+/** Lifetime kilometres on a set of items and the average cost per km of the priced ones. */
+export function lifeTotals(list: GearStats[]): { km: number; costPerKm: number | null } {
+  let km = 0;
+  let pricedKm = 0;
+  let price = 0;
+  for (const g of list) {
+    km += g.totalKm;
+    if (g.settings.price && g.totalKm > 0) {
+      price += g.settings.price;
+      pricedKm += g.totalKm;
+    }
+  }
+  return { km, costPerKm: pricedKm > 0 ? price / pricedKm : null };
 }
 
 export type RideMix = 'road' | 'gravel' | 'mtb';

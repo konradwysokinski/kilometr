@@ -28,3 +28,15 @@
 .retired a {
   font-weight: 500;
 }
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lead {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}

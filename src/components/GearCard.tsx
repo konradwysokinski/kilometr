@@ -50,11 +50,16 @@ export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: st
       )}
 
       <div className={s.meta}>
-        {g.wear && (
-          <span>
-            <strong>{f.km(g.wear.leftKm)}</strong> {t.gear.left}
-          </span>
-        )}
+        {g.wear &&
+          (g.wear.state === 'over' ? (
+            <span>
+              <strong>{f.km(g.totalKm - g.wear.limitKm)}</strong> {t.gear.over}
+            </span>
+          ) : (
+            <span>
+              <strong>{f.km(g.wear.leftKm)}</strong> {t.gear.left}
+            </span>
+          ))}
         {g.costPerKm !== null ? (
           <span>
             <strong>{f.money(g.costPerKm)}</strong> {t.gear.perKm}
