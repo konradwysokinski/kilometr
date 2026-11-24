@@ -21,8 +21,7 @@ const NAV: { to: string; key: 'overview' | 'shoes' | 'bikes' | 'activities' | 'r
 const navClass = ({ isActive }: { isActive: boolean }) => `${s.navRow} ${isActive ? s.active : ''}`;
 
 export function Sidebar() {
-  const { stats, notices, theme, setTheme, t, f } = useDataset();
-  const unread = notices.filter((n) => !n.read).length;
+  const { stats, theme, setTheme, t } = useDataset();
   const all = [...stats.values()];
 
   return (
@@ -42,15 +41,6 @@ export function Sidebar() {
       <GearSection title={t.sidebar.bikes} kind="bike" all={all} />
 
       <div className={`${s.group} ${s.footer}`}>
-        <NavLink to="/notifications" className={navClass}>
-          <Icon name="bell" className={s.navIcon} />
-          <span className={s.grow}>{t.notices.title}</span>
-          {unread > 0 && (
-            <span className={s.count} aria-label={t.notices.unread(unread)}>
-              {f.int(unread)}
-            </span>
-          )}
-        </NavLink>
         <label className={`${s.settingRow} ${s.clickable}`}>
           <Icon name="moon" className={s.navIcon} />
           <span className={s.grow}>{t.sidebar.darkMode}</span>

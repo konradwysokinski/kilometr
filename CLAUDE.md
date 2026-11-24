@@ -68,7 +68,7 @@ Next (not designed yet):
 9. Share card (export an image)
 10. Settings: units, currency, default limits, sync, theme
 11. Dark theme (tokens below are ready; the sidebar already has a "Dark mode" switch)
-12. Notifications (done, simple): after an import or sync, new runs without shoes produce one notice. It shows once as a toast (Sonner, headless `toast.custom`, bottom right, 10 s) and then lives in the list at /notifications (sidebar footer row with unread count). Later notices: gear at 85% of its limit, bike parts due.
+12. Notifications (done, simple): after an import or sync, new runs without shoes produce one notice. It shows once as a toast (Sonner, headless `toast.custom`, top right just below the bell, 10 s) and then lives in the list at /notifications, opened from a bell button in the top-right corner of the content panel on every screen (warn dot when unread). Later notices: gear at 85% of its limit, bike parts due.
 13. Mobile navigation: on phones the sidebar currently stacks above the content and fills the whole first screen. Replace with a compact top bar + hamburger (sidebar as a drawer). Konrad asked for this "for later".
 
 ### Build queue (agreed with Konrad, in this order)

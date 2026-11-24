@@ -8,10 +8,11 @@ export function Notifications() {
   const { notices, markAllRead, t, f } = useStore();
   const navigate = useNavigate();
 
-  // Opening the list counts as reading it.
+  // Opening the list counts as reading it. Re-runs when saved notices finish
+  // loading (direct visit or reload); markAllRead does nothing once all are read.
   useEffect(() => {
     markAllRead();
-  }, [markAllRead]);
+  }, [markAllRead, notices]);
 
   return (
     <>

@@ -17,6 +17,12 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
+  position: relative;
+}
+
+/* Keeps the first row of every screen clear of the notification bell. */
+.panel > :nth-child(2) {
+  padding-right: 52px;
 }
 
 @media (max-width: 640px) {

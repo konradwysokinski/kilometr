@@ -13,7 +13,7 @@
 .toast {
   width: min(380px, calc(100vw - 32px));
   border-color: transparent;
-  box-shadow: var(--shadow-float);
+  box-shadow: 0 0 0 1px rgba(16, 24, 40, 0.06), 0 4px 8px rgba(16, 24, 40, 0.06), 0 16px 40px rgba(16, 24, 40, 0.16);
 }
 
 .dot {

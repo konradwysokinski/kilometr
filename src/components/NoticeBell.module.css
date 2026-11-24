@@ -1,0 +1,39 @@
+.bell {
+  position: absolute;
+  top: 38px;
+  right: 44px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.bell:hover,
+.bell[aria-current='page'] {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+@media (max-width: 640px) {
+  .bell {
+    top: 26px;
+    right: 20px;
+  }
+}
