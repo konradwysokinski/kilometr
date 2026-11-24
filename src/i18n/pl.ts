@@ -105,6 +105,7 @@ export const pl: Messages = {
     restingHint: 'nieużywane od ponad 60 dni',
     mix: { road: 'Szosa', gravel: 'Gravel', mtb: 'MTB' },
     rides: 'Jazdy',
+    longestRide: 'Najdłuższa jazda',
     perRide: (m) => `średnio ${m} na jazdę`,
     parts: 'Części',
     retired: (n, nF) => `${nF} ${plural(n, 'wycofany rower', 'wycofane rowery', 'wycofanych rowerów')}`,

@@ -26,3 +26,32 @@
   line-height: 18px;
   color: var(--ink-muted);
 }
+
+/* Lifetime numbers as a quiet list: label left, value right. */
+.stats {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.statLabel {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.statValue {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  white-space: nowrap;
+}

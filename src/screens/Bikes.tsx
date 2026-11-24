@@ -4,6 +4,7 @@ import { useDataset } from '../app/store';
 import { Avatar } from '../components/Avatar';
 import { ListSection, useLastUsed } from '../components/ListSection';
 import { PartCounters } from '../components/PartCounters';
+import { FEATURES } from '../lib/features';
 import type { GearStats } from '../domain/gear';
 import { activitiesOf } from '../domain/detail';
 import { groupGear, rideMix } from '../domain/lists';
@@ -105,10 +106,12 @@ function BikePanel({ bike, showLastUsed = false }: { bike: GearStats; showLastUs
           ))}
         </dl>
 
-        <div className={s.parts}>
-          <h4 className={s.partsTitle}>{t.bikes.parts}</h4>
-          <PartCounters bike={bike} parts={parts} activities={data.activities} />
-        </div>
+        {FEATURES.bikeParts && (
+          <div className={s.parts}>
+            <h4 className={s.partsTitle}>{t.bikes.parts}</h4>
+            <PartCounters bike={bike} parts={parts} activities={data.activities} />
+          </div>
+        )}
       </div>
 
       {showLastUsed && <p className={s.footnote}>{lastUsed(bike)}</p>}

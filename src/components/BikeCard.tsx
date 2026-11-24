@@ -2,6 +2,7 @@ import { useStore } from '../app/store';
 import type { GearStats } from '../domain/gear';
 import type { Activity, BikePart } from '../domain/types';
 import { Avatar } from './Avatar';
+import { FEATURES } from '../lib/features';
 import { PartCounters } from './PartCounters';
 import s from './BikeCard.module.css';
 
@@ -25,7 +26,22 @@ export function BikeCard({ bike, parts, activities }: Props) {
           <div className={s.caption}>{t.gear.inTotal(f.km(bike.totalKm))}</div>
         </div>
       </div>
-      <PartCounters bike={bike} parts={parts} activities={activities} />
+      {FEATURES.bikeParts ? (
+        <PartCounters bike={bike} parts={parts} activities={activities} />
+      ) : (
+        <dl className={s.stats}>
+          {[
+            [t.bikes.rides, f.int(bike.activityCount)],
+            [t.detail.elevation, f.metres(bike.elevationGain)],
+            [t.bikes.longestRide, f.kmPrecise(bike.longestKm)],
+          ].map(([label, value]) => (
+            <div key={label} className={s.stat}>
+              <dt className={s.statLabel}>{label}</dt>
+              <dd className={s.statValue}>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </section>
   );
 }

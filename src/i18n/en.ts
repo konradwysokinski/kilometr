@@ -92,6 +92,7 @@ export const en = {
     restingHint: 'not ridden in the last 60 days',
     mix: { road: 'Road', gravel: 'Gravel', mtb: 'MTB' },
     rides: 'Rides',
+    longestRide: 'Longest ride',
     perRide: (m: string) => `${m} per ride on average`,
     parts: 'Parts',
     retired: (n: number, nF: string) => `${nF} retired ${plural(n, 'bike', 'bikes')}`,
