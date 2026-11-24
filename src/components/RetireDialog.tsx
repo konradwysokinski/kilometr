@@ -42,13 +42,13 @@ export function RetireDialog({ shoe, open, onClose, onConfirm }: Props) {
   const trailShare = terrainTotal ? terrain.trailKm / terrainTotal : 0;
 
   const stats = [
-    { value: f.int(shoe.activityCount), label: t.retire.runs(shoe.activityCount) },
+    { value: f.int(shoe.activityCount), label: t.retire.activities(shoe.activityCount) },
     { value: f.metres(shoe.elevationGain), label: t.retire.climbed },
     { value: f.kmPrecise(shoe.longestKm), label: t.retire.longest },
     { value: `${f.int(duration.n)} ${t.retire.duration(duration.n, duration.unit)}`, label: t.retire.inRotation },
     { value: shoe.costPerKm !== null ? f.money(shoe.costPerKm) : '—', label: t.retire.perKm },
     terrainTotal === 0
-      ? { value: '—', label: t.retire.onRoad }
+      ? { value: '—', label: t.retire.terrain }
       : trailShare >= 0.5
         ? { value: `${Math.round(trailShare * 100)}%`, label: t.retire.onTrail }
         : { value: `${Math.round((1 - trailShare) * 100)}%`, label: t.retire.onRoad },

@@ -136,8 +136,8 @@
 .terrain {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: -8px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .terrainRow {
@@ -151,6 +151,7 @@
 .terrainBar {
   display: flex;
   gap: 4px;
+  /* same as the wear bar above */
   height: 8px;
 }
 
@@ -158,8 +159,12 @@
   border-radius: var(--radius-pill);
 }
 
+.terrainBar > div {
+  flex-basis: 0;
+  min-width: 8px;
+}
+
 .road {
-  flex: 1;
   background: var(--line-dashed);
 }
 

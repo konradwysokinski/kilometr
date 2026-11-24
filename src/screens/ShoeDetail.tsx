@@ -10,7 +10,7 @@ import { PriceDialog } from '../components/PriceDialog';
 import { RetireDialog } from '../components/RetireDialog';
 import { WearBar } from '../components/WearBar';
 import { activitiesOf, monthlyKm } from '../domain/detail';
-import { km, type GearStats } from '../domain/gear';
+import { isRun, km, type GearStats } from '../domain/gear';
 import { gearColour } from '../lib/colour';
 import s from './ShoeDetail.module.css';
 
@@ -46,6 +46,9 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
     .join(' · ');
 
   const terrainTotal = terrain.roadKm + terrain.trailKm;
+  // Terrain is about runs; a pair used only for walks and hikes has none to show.
+  const hasRuns = activities.some(isRun);
+  const recent = activities.slice(0, RECENT);
   const trailShare = terrainTotal > 0 ? terrain.trailKm / terrainTotal : 0;
   const mostlyTrail = trailShare >= 0.5;
   const chip = !wear
@@ -110,6 +113,33 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
               <> {t.detail.weeksAtPace(shoe.weeksLeft, f.int(Math.max(1, shoe.weeksLeft)))}</>
             )}
           </p>
+
+          {/* Terrain right under the km: the two together say how worn the pair is, and by what. */}
+          {hasRuns && (
+            <div className={s.terrain}>
+              <div className={s.terrainRow}>
+                <span>{t.detail.terrain}</span>
+                <span className={s.muted}>
+                  {terrainTotal === 0
+                    ? t.detail.noTerrain
+                    : t.detail.split(f.km(terrain.trailKm), f.km(terrain.roadKm))}
+                </span>
+              </div>
+              {terrainTotal > 0 && (
+                <div className={s.terrainBar} aria-hidden="true">
+                  {terrain.trailKm > 0 && (
+                    <div
+                      style={{
+                        flexGrow: trailShare,
+                        background: `linear-gradient(90deg, color-mix(in srgb, ${colour} 60%, transparent), ${colour})`,
+                      }}
+                    />
+                  )}
+                  {terrain.roadKm > 0 && <div className={s.road} style={{ flexGrow: 1 - trailShare }} />}
+                </div>
+              )}
+            </div>
+          )}
         </section>
       )}
 
@@ -124,7 +154,7 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
           size="md"
           label={t.detail.elevation}
           value={f.metres(shoe.elevationGain)}
-          sub={t.detail.perRun(f.metres(shoe.activityCount ? shoe.elevationGain / shoe.activityCount : 0))}
+          sub={t.detail.perActivity(f.metres(shoe.activityCount ? shoe.elevationGain / shoe.activityCount : 0))}
         />
         <KpiCard
           size="md"
@@ -144,57 +174,39 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
           size="md"
           label={t.detail.terrain}
           value={
-            terrainTotal === 0
+            !hasRuns || terrainTotal === 0
               ? '—'
               : mostlyTrail
                 ? t.detail.trailPct(Math.round(trailShare * 100))
                 : t.detail.roadPct(Math.round((1 - trailShare) * 100))
           }
           sub={
-            // Older exported runs carry no surface data.
-            terrainTotal === 0
-              ? t.detail.noTerrain
-              : mostlyTrail
-                ? t.detail.offRoad(f.int(terrain.trailKm), f.km(terrainTotal))
-                : t.detail.onRoad(f.int(terrain.roadKm), f.km(terrainTotal))
+            // Older exported runs carry no surface data; walks and hikes have none at all.
+            !hasRuns
+              ? t.detail.noRunsTerrain
+              : terrainTotal === 0
+                ? t.detail.noTerrain
+                : mostlyTrail
+                  ? t.detail.offRoad(f.int(terrain.trailKm), f.km(terrainTotal))
+                  : t.detail.onRoad(f.int(terrain.roadKm), f.km(terrainTotal))
           }
         />
       </section>
-
-      {/* Only worth a bar when the pair has seen both surfaces; the KPI covers 100%. */}
-      {terrain.trailKm > 0 && terrain.roadKm > 0 && (
-        <div className={s.terrain}>
-          <div className={s.terrainRow}>
-            <span>{t.detail.terrain}</span>
-            <span className={s.muted}>{t.detail.split(f.km(terrain.trailKm), f.km(terrain.roadKm))}</span>
-          </div>
-          <div className={s.terrainBar} aria-hidden="true">
-            {terrain.trailKm > 0 && (
-              <div
-                style={{
-                  width: `${trailShare * 100}%`,
-                  background: `linear-gradient(90deg, color-mix(in srgb, ${colour} 60%, transparent), ${colour})`,
-                }}
-              />
-            )}
-            {terrain.roadKm > 0 && <div className={s.road} />}
-          </div>
-        </div>
-      )}
 
       <RetireDialog shoe={shoe} open={retiring} onClose={() => setRetiring(false)} onConfirm={retire} />
       <PriceDialog gear={shoe} open={pricing} onClose={() => setPricing(false)} />
 
       <div className={s.row}>
-        {months.length > 0 && <MonthlyChart bars={months} colour={colour} />}
+        {/* A pair out of use can have twelve empty months; skip the chart then. */}
+        {months.some((m) => m.km > 0) && <MonthlyChart bars={months} colour={colour} />}
 
         <section aria-labelledby="runs-h" className={s.runs}>
           <h2 id="runs-h" className={s.runsTitle}>
-            {t.detail.recent}
+            {recent.length > 0 && recent.every(isRun) ? t.detail.recentRuns : t.detail.recentActivities}
           </h2>
-          {activities.length === 0 && <p className={s.muted}>{t.detail.noRuns}</p>}
+          {activities.length === 0 && <p className={s.muted}>{t.detail.noActivities}</p>}
           <ul className={s.runList}>
-            {activities.slice(0, RECENT).map((a) => (
+            {recent.map((a) => (
               <li key={a.id} className={s.run}>
                 <span className={s.runDate}>{f.dayMonth(new Date(a.startDate))}</span>
                 <span className={s.runName}>{a.name}</span>
