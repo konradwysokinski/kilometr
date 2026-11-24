@@ -1,4 +1,5 @@
-import { handleTokenRequest } from '../../server/stravaToken';
+// '.js': Vercel runs this as plain Node ESM, which needs the extension (TypeScript maps it to .ts).
+import { handleTokenRequest } from '../../server/stravaToken.js';
 
 // Set in Vercel: Project → Settings → Environment Variables (and .env.local for `npm run dev`).
 const env = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env ?? {};
