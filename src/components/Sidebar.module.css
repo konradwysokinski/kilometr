@@ -276,3 +276,12 @@
     height: auto;
   }
 }
+
+/* Runs without shoes: a quiet cue on the Activities row. */
+.warnDot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--warn);
+}

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { NavLink } from 'react-router';
 import { useDataset } from '../app/store';
 import { byLastUsed, type GearStats } from '../domain/gear';
+import { unassignedRuns } from '../domain/overview';
 import type { GearKind } from '../domain/types';
 import { gearColour } from '../lib/colour';
 import { Icon, type IconName } from './Icon';
@@ -21,7 +22,8 @@ const NAV: { to: string; key: 'overview' | 'shoes' | 'bikes' | 'activities' | 'r
 const navClass = ({ isActive }: { isActive: boolean }) => `${s.navRow} ${isActive ? s.active : ''}`;
 
 export function Sidebar() {
-  const { stats, theme, setTheme, t } = useDataset();
+  const { data, stats, now, theme, setTheme, t } = useDataset();
+  const runsWithoutShoes = unassignedRuns(data, now).length;
   const all = [...stats.values()];
 
   return (
@@ -33,6 +35,9 @@ export function Sidebar() {
           <NavLink key={item.to} to={item.to} end className={navClass}>
             <Icon name={item.icon} className={s.navIcon} />
             <span className={s.grow}>{t.nav[item.key]}</span>
+            {item.key === 'activities' && runsWithoutShoes > 0 && (
+              <span className={s.warnDot} role="img" aria-label={t.activities.unassigned} />
+            )}
           </NavLink>
         ))}
       </div>

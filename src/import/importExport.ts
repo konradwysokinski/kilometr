@@ -1,10 +1,11 @@
+import { withAssignments } from '../domain/assign';
 import type { Dataset, GearSettings } from '../domain/types';
 import { readExportZip } from './readZip';
 import { parseStravaExport } from './stravaExport';
 
 /**
  * Builds a dataset from an export .zip. Things the user entered in Kilometr
- * (prices, limits, parts…) survive a re-import because gear keeps its ID.
+ * (prices, limits, parts, picked shoes…) survive a re-import because gear keeps its ID.
  */
 export async function importStravaExport(file: Blob, previous: Dataset | null): Promise<Dataset> {
   const parsed = parseStravaExport(await readExportZip(file));
@@ -14,7 +15,7 @@ export async function importStravaExport(file: Blob, previous: Dataset | null): 
     settings[id] = { nickname, ...settings[id] };
   }
 
-  return {
+  const next: Dataset = {
     source: 'export',
     updatedAt: new Date().toISOString(),
     gear: parsed.gear,
@@ -22,4 +23,6 @@ export async function importStravaExport(file: Blob, previous: Dataset | null): 
     settings,
     parts: previous?.source === 'export' ? previous.parts : [],
   };
+  // Shoes picked in Kilometr stay on their runs, unless the new export has shoes on them.
+  return withAssignments(next, previous?.source === 'export' ? previous.assignments : undefined);
 }

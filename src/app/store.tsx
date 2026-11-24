@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { sampleDataset } from '../data/sample';
+import { withAssignments } from '../domain/assign';
 import { gearStats, type GearStats } from '../domain/gear';
 import type { Dataset, GearSettings } from '../domain/types';
 import { createFormat, detectLocale, MESSAGES, type Locale } from '../i18n';
@@ -16,9 +17,19 @@ const KEY_LOCALE = 'kilometr.locale';
 const DB_DATASET = 'dataset';
 /** Sample data is regenerated on every visit; only what the user changed is stored. */
 const DB_SAMPLE_SETTINGS = 'sample-settings';
+const DB_SAMPLE_ASSIGNMENTS = 'sample-assignments';
 
 const withSettings = (data: Dataset, saved: Record<string, GearSettings> | undefined): Dataset =>
   saved ? { ...data, settings: { ...data.settings, ...saved } } : data;
+
+/** What the user changed on the sample data: settings and picked shoes. */
+async function sampleChanges(): Promise<(d: Dataset) => Dataset> {
+  const [settings, assignments] = await Promise.all([
+    dbGet<Record<string, GearSettings>>(DB_SAMPLE_SETTINGS),
+    dbGet<Record<string, string>>(DB_SAMPLE_ASSIGNMENTS),
+  ]);
+  return (d) => withAssignments(withSettings(d, settings), assignments);
+}
 
 function read(key: string): string | null {
   try {
@@ -106,8 +117,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (source !== 'sample') return;
-    dbGet<Record<string, GearSettings>>(DB_SAMPLE_SETTINGS)
-      .then((saved) => setData((d) => (d?.source === 'sample' ? withSettings(d, saved) : d)))
+    sampleChanges()
+      .then((apply) => setData((d) => (d?.source === 'sample' ? apply(d) : d)))
       .catch(() => undefined)
       .finally(() => setHydrated(true));
   }, [source]);
@@ -150,8 +161,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setHydrated(false);
     setData(sample);
     write(KEY_SOURCE, 'sample');
-    dbGet<Record<string, GearSettings>>(DB_SAMPLE_SETTINGS)
-      .then((saved) => setData((d) => (d?.source === 'sample' ? withSettings(d, saved) : d)))
+    sampleChanges()
+      .then((apply) => setData((d) => (d?.source === 'sample' ? apply(d) : d)))
       .catch(() => undefined)
       .finally(() => setHydrated(true));
     void noticeNewData(sample);
@@ -185,6 +196,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     save.catch(() => undefined); // still works in memory if storage is unavailable
   }, []);
 
+  /** Puts shoes on runs that had none (activity ID → gear ID) and saves the picks locally. */
+  const assignShoes = useCallback((picks: Record<string, string>) => {
+    const d = dataRef.current;
+    if (!d) return;
+    const assignments = { ...d.assignments, ...picks };
+    const next = withAssignments(d, assignments);
+    dataRef.current = next;
+    setData(next);
+    const save = next.source === 'sample' ? dbSet(DB_SAMPLE_ASSIGNMENTS, assignments) : dbSet(DB_DATASET, next);
+    save.catch(() => undefined);
+  }, []);
+
   const updateSettings = useCallback(
     (gearId: string, patch: GearSettings) => patchSettings({ [gearId]: patch }),
     [patchSettings],
@@ -213,11 +236,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      data, ready, stats, now, loadSample, importFile, importState, updateSettings, clear,
+      data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear,
       notices, markToasted, markAllRead,
       theme, setTheme, locale, setLocale, t: MESSAGES[locale], f,
     }),
-    [data, ready, stats, now, loadSample, importFile, importState, updateSettings, clear, notices, markToasted, markAllRead, theme, setTheme, locale, setLocale, f],
+    [data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear, notices, markToasted, markAllRead, theme, setTheme, locale, setLocale, f],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

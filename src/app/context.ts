@@ -23,6 +23,8 @@ export interface Store {
   importFile: (file: Blob) => Promise<void>;
   /** Merges user-entered settings for one item and saves them locally. */
   updateSettings: (gearId: string, patch: GearSettings) => void;
+  /** Activity ID → gear ID, for runs that had no shoes. Saved locally, not in Strava. */
+  assignShoes: (picks: Record<string, string>) => void;
   /** Newest first. */
   notices: Notice[];
   markToasted: (id: string) => void;

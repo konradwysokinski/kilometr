@@ -61,6 +61,11 @@ export interface Dataset {
   activities: Activity[];
   settings: Record<string, GearSettings>;
   parts: BikePart[];
+  /**
+   * Shoes picked in Kilometr for runs that had none (activity ID → gear ID).
+   * Kept apart so a re-import or the regenerated sample data can apply them again.
+   */
+  assignments?: Record<string, string>;
   source: 'sample' | 'export' | 'strava';
   /** ISO date of the last import or sync. */
   updatedAt?: string;
