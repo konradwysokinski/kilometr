@@ -1,0 +1,42 @@
+.card {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-tile);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.label,
+.sub {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.sub {
+  text-wrap: pretty;
+}
+
+.value {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.md {
+  font-size: 30px;
+  line-height: 36px;
+}
+
+.warn {
+  color: var(--warn-ink);
+}
+
+.rule {
+  height: 1px;
+  background: var(--line-soft);
+}

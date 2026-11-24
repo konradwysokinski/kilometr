@@ -1,0 +1,126 @@
+/* Kilometr design tokens. Source of truth: CLAUDE.md §4. */
+
+:root {
+  color-scheme: light;
+
+  /* ground */
+  --canvas: #f2f3f5;
+  --canvas-gradient: linear-gradient(180deg, #f1f2f4 0%, #e8eaed 100%);
+  --surface: #ffffff;
+  --surface-sunken: #f6f7f9;
+  --line: #e3e5e9;
+  --line-soft: #edeef1;
+  --line-dashed: #d5d8de;
+  --track: #eff0f3;
+  --grid: #f1f2f4;
+  --hover: rgba(23, 25, 28, 0.04);
+  --selected: rgba(23, 25, 28, 0.07);
+  --neutral-chip: #f2f3f5;
+  --switch-off: #d5d8de;
+
+  /* text */
+  --ink: #17191c;
+  --ink-muted: #5b616b;
+
+  /* brand: moss */
+  --accent: #2f6b4f;
+  --accent-hover: #1f4d38;
+  --accent-soft: rgba(47, 107, 79, 0.1);
+  --on-accent: #ffffff;
+
+  /* states */
+  --warn: #a8590b;
+  --warn-ink: #8a4a09;
+  --warn-soft: rgba(168, 89, 11, 0.12);
+  --warn-banner: rgba(168, 89, 11, 0.08);
+  --danger: #b23a2a;
+
+  /* gear colours: only for gear in rotation */
+  --gear-1: #16a05a; --gear-1-ink: #0b6b3a; /* forest */
+  --gear-2: #2563eb; --gear-2-ink: #1a44a8; /* cobalt */
+  --gear-3: #f2602c; --gear-3-ink: #a73a12; /* tangerine */
+  --gear-4: #e5a500; --gear-4-ink: #845f00; /* sun */
+  --gear-5: #8b5cf6; --gear-5-ink: #5b2fc9; /* violet */
+  --gear-6: #0ea5b7; --gear-6-ink: #0a6c78; /* teal */
+  --gear-7: #e0457b; --gear-7-ink: #a5244f; /* magenta */
+  --gear-other: #8a9099; --gear-other-ink: #4f555e; /* granite */
+
+  /* type */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+
+  /* spacing (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* radii */
+  --radius-nav: 10px;
+  --radius-control: 12px;
+  --radius-tile: 14px;
+  --radius-card: 18px;
+  --radius-pill: 999px;
+  --radius-bar-seg: 6px;
+
+  /* shadows */
+  --shadow-panel: 0 0 0 1px rgba(16, 24, 40, 0.04), 0 1px 2px rgba(16, 24, 40, 0.04),
+    0 8px 28px rgba(16, 24, 40, 0.06);
+  --shadow-float: 0 0 0 1px rgba(16, 24, 40, 0.06), 0 8px 28px rgba(16, 24, 40, 0.08);
+  --shadow-modal: 0 0 0 1px rgba(16, 24, 40, 0.04), 0 2px 4px rgba(16, 24, 40, 0.06),
+    0 24px 56px rgba(16, 24, 40, 0.22);
+  --shadow-knob: 0 1px 2px rgba(16, 24, 40, 0.25);
+  --scrim: rgba(23, 25, 28, 0.36);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #141618;
+  --canvas-gradient: linear-gradient(180deg, #16181b 0%, #111315 100%);
+  --surface: #1c1f22;
+  --surface-sunken: #17191c;
+  --line: #2c3035;
+  --line-soft: #262a2e;
+  --line-dashed: #3a3f45;
+  --track: #2a2e33;
+  --grid: #24272b;
+  --hover: rgba(236, 238, 241, 0.05);
+  --selected: rgba(236, 238, 241, 0.09);
+  --neutral-chip: #2a2e33;
+  --switch-off: #3a3f45;
+
+  --ink: #eceef1;
+  --ink-muted: #a2a8b1;
+
+  --accent: #7fc29e;
+  --accent-hover: #9fd4b7;
+  --accent-soft: #23362b;
+  --on-accent: #10231a;
+
+  --warn: #e8a55a;
+  --warn-ink: #e8a55a;
+  --warn-soft: #3a2b1a;
+  --warn-banner: rgba(232, 165, 90, 0.1);
+  --danger: #f08a78;
+
+  /* in dark, initials read best in the light gear hue itself */
+  --gear-1: #4ed08a; --gear-1-ink: #4ed08a;
+  --gear-2: #6b9bff; --gear-2-ink: #6b9bff;
+  --gear-3: #ff8a5c; --gear-3-ink: #ff8a5c;
+  --gear-4: #ffc633; --gear-4-ink: #ffc633;
+  --gear-5: #b196ff; --gear-5-ink: #b196ff;
+  --gear-6: #4fd3e0; --gear-6-ink: #4fd3e0;
+  --gear-7: #ff7aa5; --gear-7-ink: #ff7aa5;
+  --gear-other: #6e747d; --gear-other-ink: #b4b9c1;
+
+  --shadow-panel: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 28px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 28px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 24px 56px rgba(0, 0, 0, 0.6);
+  --shadow-knob: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --scrim: rgba(0, 0, 0, 0.55);
+}

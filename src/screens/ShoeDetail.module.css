@@ -1,0 +1,225 @@
+.back {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -6px 0 -10px -6px;
+  padding: 4px 8px 4px 6px;
+  border-radius: var(--radius-nav);
+  font-size: 14px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.back:hover {
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.titles {
+  flex: 1 1 260px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.status {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 12px;
+  position: relative;
+  top: -3px;
+}
+
+.caption,
+.muted {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.primary,
+.secondary {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.secondary {
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 500;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.primary:disabled,
+.secondary:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.wear {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wearRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.wearKm {
+  font-size: 40px;
+  line-height: 46px;
+  letter-spacing: -0.02em;
+}
+
+.wearLimit {
+  font-size: 16px;
+  letter-spacing: 0;
+  color: var(--ink-muted);
+}
+
+.wearNote {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.terrain {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: -8px;
+}
+
+.terrainRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: 14px;
+}
+
+.terrainBar {
+  display: flex;
+  gap: 4px;
+  height: 8px;
+}
+
+.terrainBar > div {
+  border-radius: var(--radius-pill);
+}
+
+.road {
+  flex: 1;
+  background: var(--line-dashed);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.runs {
+  flex: 1 1 380px;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.runsTitle {
+  margin-bottom: 10px;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.runList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto 64px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+  font-size: 14px;
+}
+
+.runDate,
+.runElev {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.runName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.runKm {
+  text-align: right;
+  font-weight: 500;
+}
+
+.runElev {
+  text-align: right;
+}

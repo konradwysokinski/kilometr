@@ -1,0 +1,236 @@
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { sampleDataset } from '../data/sample';
+import { gearStats, type GearStats } from '../domain/gear';
+import type { Dataset, GearSettings } from '../domain/types';
+import { createFormat, detectLocale, MESSAGES, type Locale } from '../i18n';
+import { unassignedNotice, type Notice } from '../domain/notifications';
+import { unassignedRuns } from '../domain/overview';
+import { importStravaExport } from '../import/importExport';
+import { ExportError } from '../import/stravaExport';
+import { dbGet, dbSet } from '../lib/db';
+import { StoreContext, type ImportState, type Store, type Theme } from './context';
+
+const KEY_SOURCE = 'kilometr.source';
+const KEY_THEME = 'kilometr.theme';
+const KEY_LOCALE = 'kilometr.locale';
+const DB_DATASET = 'dataset';
+/** Sample data is regenerated on every visit; only what the user changed is stored. */
+const DB_SAMPLE_SETTINGS = 'sample-settings';
+
+const withSettings = (data: Dataset, saved: Record<string, GearSettings> | undefined): Dataset =>
+  saved ? { ...data, settings: { ...data.settings, ...saved } } : data;
+
+function read(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function write(key: string, value: string | null) {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {
+    /* storage unavailable: keep working in memory */
+  }
+}
+
+/** A setter that also remembers the value between visits. */
+function usePersisted<T extends string>(key: string, initial: () => T, accept: (v: string) => v is T) {
+  const [value, setValue] = useState<T>(() => {
+    const saved = read(key);
+    return saved !== null && accept(saved) ? saved : initial();
+  });
+  const set = useCallback(
+    (v: T) => {
+      setValue(v);
+      write(key, v);
+    },
+    [key],
+  );
+  return [value, set] as const;
+}
+
+const isTheme = (v: string): v is Theme => v === 'light' || v === 'dark';
+const isLocale = (v: string): v is Locale => v === 'en' || v === 'pl';
+
+export function StoreProvider({ children }: { children: ReactNode }) {
+  const [now] = useState(() => new Date());
+  const [source] = useState(() => read(KEY_SOURCE));
+  const [data, setData] = useState<Dataset | null>(() => (source === 'sample' ? sampleDataset(now) : null));
+  // Imported data lives in IndexedDB; until it is read back the app shows nothing.
+  const [ready, setReady] = useState(source !== 'export');
+  const [importState, setImportState] = useState<ImportState>({ status: 'idle' });
+  // True once saved settings are merged in; nothing is written back before that.
+  const [hydrated, setHydrated] = useState(false);
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const noticesRef = useRef(notices);
+  noticesRef.current = notices;
+
+  const saveNotices = useCallback((next: Notice[], src: Dataset['source']) => {
+    noticesRef.current = next;
+    setNotices(next);
+    dbSet(`notices:${src}`, next).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (source !== 'sample' && source !== 'export') return;
+    dbGet<Notice[]>(`notices:${source}`)
+      .then((saved) => saved && setNotices(saved))
+      .catch(() => undefined);
+  }, [source]);
+
+  /** After new data arrives: one notice for runs without shoes we haven't reported yet. */
+  const noticeNewData = useCallback(
+    async (next: Dataset) => {
+      const existing = (await dbGet<Notice[]>(`notices:${next.source}`).catch(() => undefined)) ?? [];
+      const notice = unassignedNotice(unassignedRuns(next, now), existing, new Date());
+      saveNotices(notice ? [notice, ...existing] : existing, next.source);
+    },
+    [now, saveNotices],
+  );
+  const [theme, setTheme] = usePersisted<Theme>(KEY_THEME, () => 'light', isTheme);
+  const [locale, setLocale] = usePersisted<Locale>(KEY_LOCALE, detectLocale, isLocale);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
+  useEffect(() => {
+    if (source !== 'sample') return;
+    dbGet<Record<string, GearSettings>>(DB_SAMPLE_SETTINGS)
+      .then((saved) => setData((d) => (d?.source === 'sample' ? withSettings(d, saved) : d)))
+      .catch(() => undefined)
+      .finally(() => setHydrated(true));
+  }, [source]);
+
+  useEffect(() => {
+    if (source !== 'export') return;
+    dbGet<Dataset>(DB_DATASET)
+      .then((saved) => {
+        if (saved) setData(saved);
+        else write(KEY_SOURCE, null);
+      })
+      .catch(() => write(KEY_SOURCE, null))
+      .finally(() => {
+        setReady(true);
+        setHydrated(true);
+      });
+  }, [source]);
+
+  const importFile = useCallback(
+    async (file: Blob) => {
+      setImportState({ status: 'reading' });
+      try {
+        const previous = data?.source === 'export' ? data : ((await dbGet<Dataset>(DB_DATASET).catch(() => undefined)) ?? null);
+        const next = await importStravaExport(file, previous);
+        await dbSet(DB_DATASET, next);
+        write(KEY_SOURCE, 'export');
+        setData(next);
+        setHydrated(true);
+        setImportState({ status: 'idle' });
+        await noticeNewData(next);
+      } catch (e) {
+        setImportState({ status: 'error', code: e instanceof ExportError ? e.code : 'unreadable' });
+      }
+    },
+    [data, noticeNewData],
+  );
+
+  const loadSample = useCallback(() => {
+    const sample = sampleDataset(now);
+    setHydrated(false);
+    setData(sample);
+    write(KEY_SOURCE, 'sample');
+    dbGet<Record<string, GearSettings>>(DB_SAMPLE_SETTINGS)
+      .then((saved) => setData((d) => (d?.source === 'sample' ? withSettings(d, saved) : d)))
+      .catch(() => undefined)
+      .finally(() => setHydrated(true));
+    void noticeNewData(sample);
+  }, [now, noticeNewData]);
+
+  const markToasted = useCallback(
+    (id: string) => {
+      const src = dataRef.current?.source;
+      if (src) saveNotices(noticesRef.current.map((n) => (n.id === id ? { ...n, toasted: true } : n)), src);
+    },
+    [saveNotices],
+  );
+
+  const markAllRead = useCallback(() => {
+    const src = dataRef.current?.source;
+    if (src && noticesRef.current.some((n) => !n.read)) {
+      saveNotices(noticesRef.current.map((n) => ({ ...n, read: true, toasted: true })), src);
+    }
+  }, [saveNotices]);
+
+  /** Merges settings for several items and saves them (sample: settings only; export: the whole dataset). */
+  const patchSettings = useCallback((patches: Record<string, GearSettings>) => {
+    const d = dataRef.current;
+    if (!d) return;
+    const settings = { ...d.settings };
+    for (const [id, patch] of Object.entries(patches)) settings[id] = { ...settings[id], ...patch };
+    const next = { ...d, settings };
+    dataRef.current = next;
+    setData(next);
+    const save = next.source === 'sample' ? dbSet(DB_SAMPLE_SETTINGS, settings) : dbSet(DB_DATASET, next);
+    save.catch(() => undefined); // still works in memory if storage is unavailable
+  }, []);
+
+  const updateSettings = useCallback(
+    (gearId: string, patch: GearSettings) => patchSettings({ [gearId]: patch }),
+    [patchSettings],
+  );
+
+  // Back to Start. Imported data stays in IndexedDB so a re-import keeps prices and limits.
+  const clear = useCallback(() => {
+    setImportState({ status: 'idle' });
+    setData(null);
+    write(KEY_SOURCE, null);
+  }, []);
+
+  const stats = useMemo(() => (data ? gearStats(data, now) : new Map<string, GearStats>()), [data, now]);
+
+  // Hues are sticky: once an item in rotation gets one, it is saved so it
+  // doesn't shift when another item leaves the rotation.
+  useEffect(() => {
+    if (!hydrated || !data) return;
+    const patches: Record<string, GearSettings> = {};
+    for (const [id, s] of stats) {
+      if (s.inRotation && s.colour && data.settings[id]?.colour !== s.colour) patches[id] = { colour: s.colour };
+    }
+    if (Object.keys(patches).length > 0) patchSettings(patches);
+  }, [hydrated, data, stats, patchSettings]);
+  const f = useMemo(() => createFormat(locale), [locale]);
+
+  const value = useMemo(
+    () => ({
+      data, ready, stats, now, loadSample, importFile, importState, updateSettings, clear,
+      notices, markToasted, markAllRead,
+      theme, setTheme, locale, setLocale, t: MESSAGES[locale], f,
+    }),
+    [data, ready, stats, now, loadSample, importFile, importState, updateSettings, clear, notices, markToasted, markAllRead, theme, setTheme, locale, setLocale, f],
+  );
+  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+}
+
+export function useStore(): Store {
+  const ctx = useContext(StoreContext);
+  if (!ctx) throw new Error('useStore must be used inside <StoreProvider>');
+  return ctx;
+}
+
+/** For screens that only render once data is loaded. */
+export function useDataset() {
+  const { data, ...rest } = useStore();
+  if (!data) throw new Error('useDataset called without data');
+  return { data, ...rest };
+}

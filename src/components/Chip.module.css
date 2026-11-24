@@ -1,0 +1,37 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 22px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.md {
+  font-size: 13px;
+  line-height: 26px;
+  padding: 0 12px;
+}
+
+.neutral {
+  background: var(--neutral-chip);
+  color: var(--ink-muted);
+}
+
+.warn {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.danger {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}

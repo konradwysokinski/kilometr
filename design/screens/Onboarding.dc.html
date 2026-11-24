@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kilometr — Get started</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F6B4F}a:hover{color:#1F4D38}
+</style>
+</helmet>
+<div style="min-height: 800px; box-sizing: border-box; background: linear-gradient(180deg, #F1F2F4 0%, #E8EAED 100%); font-family: Inter, system-ui, sans-serif; color: #17191C; padding: 64px 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 40px">
+
+  <div style="width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 14px">
+    <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 40px; line-height: 44px">Kilometr</div>
+    <h1 style="margin: 0; font-size: 34px; line-height: 42px; font-weight: 500; letter-spacing: -0.02em; max-width: 620px">Your shoes and bikes, <span style="font-weight: 400; color: #5B616B">in kilometres.</span></h1>
+    <p style="margin: 0; font-size: 16px; line-height: 24px; color: #5B616B; max-width: 560px">Kilometr reads your gear from Strava and shows how worn each pair is and what it costs per kilometre. Your data stays on this computer.</p>
+  </div>
+
+  <div style="width: 100%; max-width: 900px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+
+    <section aria-labelledby="imp-h" style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px rgba(16, 24, 40, 0.04), 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 28px rgba(16, 24, 40, 0.06); padding: 28px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <h2 id="imp-h" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 500">Import a Strava export</h2>
+        <span style="font-size: 12px; font-weight: 500; line-height: 24px; padding: 0 10px; border-radius: 999px; background: rgba(47, 107, 79, 0.10); color: #2F6B4F">No setup</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 21px; color: #5B616B">Request your archive in Strava's account settings, then drop the .zip here. Good for a first look or a one-off check.</p>
+      <div style="flex: 1; min-height: 170px; border: 1.5px dashed #D5D8DE; border-radius: 14px; background: #F6F7F9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; text-align: center">
+        <div style="width: 44px; height: 44px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E5E9; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 28 28" fill="none" stroke="#5B616B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V5M9 10l5-5 5 5M5 18v4h18v-4"></path></svg>
+        </div>
+        <span style="font-size: 15px">Drop export .zip here</span>
+        <label style="font-size: 14px; font-weight: 500; color: #2F6B4F; cursor: pointer">or choose a file<input type="file" accept=".zip" style="position: absolute; width: 1px; height: 1px; opacity: 0"></label>
+      </div>
+      <p style="margin: 0; font-size: 13px; line-height: 18px; color: #5B616B">Read locally. Nothing is uploaded. No live updates — import again to refresh.</p>
+    </section>
+
+    <section aria-labelledby="con-h" style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px rgba(16, 24, 40, 0.04), 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 28px rgba(16, 24, 40, 0.06); padding: 28px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <h2 id="con-h" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 500">Connect Strava</h2>
+        <span style="font-size: 12px; font-weight: 500; line-height: 24px; padding: 0 10px; border-radius: 999px; background: #F2F3F5; color: #5B616B">About 5 min</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 21px; color: #5B616B">Live sync with your own Strava API app. Strava lets an app show you only your own data, so every Kilometr install uses its own key.</p>
+      <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 22px">
+        <li style="display: flex; gap: 12px"><span style="width: 22px; height: 22px; border-radius: 999px; background: rgba(47, 107, 79, 0.10); color: #2F6B4F; font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex: none">1</span><span>Create an API app in Strava's developer settings</span></li>
+        <li style="display: flex; gap: 12px"><span style="width: 22px; height: 22px; border-radius: 999px; background: rgba(47, 107, 79, 0.10); color: #2F6B4F; font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex: none">2</span><span>Paste its Client ID and secret below</span></li>
+        <li style="display: flex; gap: 12px"><span style="width: 22px; height: 22px; border-radius: 999px; background: rgba(47, 107, 79, 0.10); color: #2F6B4F; font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex: none">3</span><span>Approve access in the Strava window</span></li>
+      </ol>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #5B616B">Client ID<input type="text" placeholder="123456" style="font: inherit; font-size: 15px; color: #17191C; height: 44px; box-sizing: border-box; padding: 0 14px; border: 1px solid #E3E5E9; border-radius: 12px; background: #FFFFFF"></label>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #5B616B">Client secret<input type="password" placeholder="••••••••" style="font: inherit; font-size: 15px; color: #17191C; height: 44px; box-sizing: border-box; padding: 0 14px; border: 1px solid #E3E5E9; border-radius: 12px; background: #FFFFFF"></label>
+      </div>
+      <a href="Main.dc.html" style="height: 44px; border-radius: 12px; background: #2F6B4F; color: #FFFFFF; font-size: 15px; font-weight: 500; text-decoration: none; display: flex; align-items: center; justify-content: center">Connect with Strava</a>
+    </section>
+  </div>
+
+  <p style="margin: 0; font-size: 13px; color: #5B616B">Open source · MIT · [YOUR GITHUB REPO]</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

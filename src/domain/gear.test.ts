@@ -1,0 +1,94 @@
+import { describe, expect, it } from 'vitest';
+import { sampleDataset } from '../data/sample';
+import { gearStats, initials, partWear, wearOf } from './gear';
+import { averageCostPerKm, nextToRetire, unassignedRuns, weeklyRunKm } from './overview';
+
+const now = new Date('2026-11-24T12:00:00');
+const data = sampleDataset(now);
+const stats = gearStats(data, now);
+const get = (id: string) => stats.get(id)!;
+
+describe('initials', () => {
+  it.each([
+    ['Hoka', 'Speedgoat 5', 'HS5'],
+    ['Nike', 'Pegasus 41', 'NP41'],
+    ['Saucony', 'Endorphin Speed 4', 'SES4'],
+    ['Salomon', 'Genesis', 'SG'],
+    ['Canyon', 'Grail CF SL', 'CG'],
+  ])('%s %s → %s', (brand, model, expected) => {
+    expect(initials({ brand, model })).toBe(expected);
+  });
+});
+
+describe('wear', () => {
+  it('flags 85% and over as nearly done, past 100% as over', () => {
+    expect(wearOf(500, 800).state).toBe('ok');
+    expect(wearOf(736, 800).state).toBe('near');
+    expect(wearOf(801, 800).state).toBe('over');
+    expect(wearOf(801, 800).leftKm).toBe(0);
+  });
+});
+
+describe('retiring', () => {
+  it('stops counting runs after the retire date, but keeps counting walks pairs', () => {
+    const cut = '2026-10-01T00:00:00.000Z';
+    const before = data.activities.filter((a) => a.gearId === 'g-np41' && a.startDate <= cut).length;
+    const retired = gearStats({ ...data, settings: { ...data.settings, 'g-np41': { retired: true, retiredAt: cut } } }, now);
+    expect(retired.get('g-np41')!.activityCount).toBe(before);
+    expect(retired.get('g-np41')!.inRotation).toBe(false);
+    expect(retired.get('g-np41')!.colour).toBeNull();
+
+    const walks = gearStats({ ...data, settings: { ...data.settings, 'g-np41': { keepForWalks: true, retiredAt: cut } } }, now);
+    expect(walks.get('g-np41')!.totalKm).toBeCloseTo(412, 5);
+    expect(walks.get('g-np41')!.inRotation).toBe(false);
+  });
+});
+
+describe('sticky hues', () => {
+  it('keeps saved hues when another item leaves the rotation', () => {
+    const saved = { 'g-hs5': 1, 'g-np41': 2, 'g-ses4': 3, 'g-sg': 4 } as const;
+    const settings = { ...data.settings };
+    for (const [id, colour] of Object.entries(saved)) settings[id] = { ...settings[id], colour };
+    settings['g-hs5'] = { ...settings['g-hs5'], retired: true, retiredAt: '2026-11-20T00:00:00.000Z' };
+    const after = gearStats({ ...data, settings }, now);
+    expect(['g-np41', 'g-ses4', 'g-sg'].map((id) => after.get(id)!.colour)).toEqual([2, 3, 4]);
+  });
+});
+
+describe('sample data', () => {
+  it('matches the totals in the designs', () => {
+    expect(get('g-hs5').totalKm).toBeCloseTo(736, 5);
+    expect(get('g-np41').totalKm).toBeCloseTo(412, 5);
+    expect(get('g-ses4').totalKm).toBeCloseTo(188, 5);
+    expect(get('g-sg').totalKm).toBeCloseTo(64, 5);
+    expect(get('g-cg').totalKm).toBeCloseTo(3214, 5);
+  });
+
+  it('puts recent, active gear in rotation with hues in order', () => {
+    expect(['g-hs5', 'g-np41', 'g-ses4', 'g-sg', 'g-cg'].map((id) => get(id).colour)).toEqual([1, 2, 3, 4, 5]);
+    expect(get('g-ab12').inRotation).toBe(false); // last used 95 days ago
+    expect(get('g-oc').inRotation).toBe(false); // keep for walks
+    expect(get('g-np40').colour).toBeNull(); // retired
+  });
+
+  it('derives the overview numbers', () => {
+    const shoes = [...stats.values()].filter((s) => s.inRotation && s.gear.kind === 'shoe');
+    expect(averageCostPerKm(shoes)).toBeCloseTo(1947 / 1336, 5);
+    expect(nextToRetire(shoes)?.gear.id).toBe('g-hs5');
+    const runs = unassignedRuns(data, now);
+    expect(runs).toHaveLength(2);
+    expect(runs.reduce((s, a) => s + a.distance, 0) / 1000).toBeCloseTo(14.6, 1);
+  });
+
+  it('counts bike parts from rides since install', () => {
+    const chain = partWear(data.parts[0]!, data.activities);
+    expect(chain.ratio).toBeGreaterThan(0.6);
+    expect(chain.ratio).toBeLessThan(0.65);
+  });
+
+  it('stacks 12 weeks of running by shoe', () => {
+    const { bars, series } = weeklyRunKm(data, stats, now);
+    expect(bars).toHaveLength(12);
+    expect(series.map((s) => s.name)).toContain('Speedgoat 5');
+  });
+});

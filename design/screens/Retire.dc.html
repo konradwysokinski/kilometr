@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kilometr — Retire pair</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F6B4F}a:hover{color:#1F4D38}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: linear-gradient(180deg, #F1F2F4 0%, #E8EAED 100%); font-family: Inter, system-ui, sans-serif; color: #17191C; font-variant-numeric: tabular-nums">
+
+  <div aria-hidden="true" style="position: absolute; inset: 0; display: flex">
+    <div style="width: 250px; padding: 24px 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 26px">
+      <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 34px">Kilometr</div>
+      <div style="display: flex; flex-direction: column; gap: 14px"><span style="height: 14px; width: 110px; border-radius: 999px; background: #DDE0E4"></span><span style="height: 14px; width: 90px; border-radius: 999px; background: #DDE0E4"></span><span style="height: 14px; width: 100px; border-radius: 999px; background: #DDE0E4"></span><span style="height: 14px; width: 80px; border-radius: 999px; background: #DDE0E4"></span></div>
+    </div>
+    <div style="flex: 1; margin: 10px; background: #FFFFFF; border-radius: 18px; padding: 40px 44px; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; align-items: center; gap: 20px"><div style="width: 76px; height: 76px; border-radius: 999px; background: linear-gradient(135deg, #16A05A38, #16A05A1A)"></div><div style="width: 300px; height: 30px; border-radius: 999px; background: #F1F2F4"></div></div>
+      <div style="height: 8px; border-radius: 999px; background: #EFF0F3"></div>
+      <div style="height: 110px; display: flex; gap: 24px"><div style="flex: 1; border-radius: 14px; background: #F6F7F9"></div><div style="flex: 1; border-radius: 14px; background: #F6F7F9"></div><div style="flex: 1; border-radius: 14px; background: #F6F7F9"></div><div style="flex: 1; border-radius: 14px; background: #F6F7F9"></div></div>
+      <div style="display: flex; gap: 14px; flex: 1"><div style="flex: 1; border: 1px solid #EDEEF1; border-radius: 18px"></div><div style="flex: 1; border: 1px solid #EDEEF1; border-radius: 18px"></div></div>
+    </div>
+  </div>
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(23, 25, 28, 0.36)"></div>
+
+  <section role="dialog" aria-modal="true" aria-labelledby="ret-h" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 500px; box-sizing: border-box; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px rgba(16, 24, 40, 0.04), 0 2px 4px rgba(16, 24, 40, 0.06), 0 24px 56px rgba(16, 24, 40, 0.22); padding: 28px; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; align-items: center; gap: 16px">
+      <div style="width: 56px; height: 56px; border-radius: 999px; background: linear-gradient(135deg, #16A05A38, #16A05A1A); color: #0B6B3A; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; justify-content: center; flex: none">HS5</div>
+      <div>
+        <h2 id="ret-h" style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 500; letter-spacing: -0.01em">Retire Hoka Speedgoat 5?</h2>
+        <p style="margin: 2px 0 0; font-size: 14px; line-height: 20px; color: #5B616B">“Mud ones” · 14 Mar – 23 Nov 2026</p>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 14px"><span style="font-size: 22px; line-height: 28px; letter-spacing: -0.02em">736<span style="font-size: 14px; color: #5B616B; letter-spacing: 0"> / 800 km</span></span><span style="color: #5B616B">92% of the limit</span></div>
+      <div style="height: 8px; border-radius: 999px; background: #EFF0F3; overflow: hidden"><div style="height: 8px; width: 92%; border-radius: 999px; background: linear-gradient(90deg, #16A05A99, #16A05A)"></div></div>
+    </div>
+
+    <div style="border-radius: 14px; background: #F6F7F9; padding: 18px 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 12px">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="6">
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; line-height: 26px; font-weight: 400; letter-spacing: -0.02em">{{ s.v }}</span><span style="font-size: 13px; color: #5B616B">{{ s.l }}</span></div>
+      </sc-for>
+    </div>
+
+    <p style="margin: 0; font-size: 14px; line-height: 21px; color: #3A3F46">New runs won't be counted on this pair and it moves to Retired. You can bring it back any time.</p>
+
+    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid #EDEEF1; border-radius: 14px; font-size: 14px; line-height: 20px; cursor: pointer">
+      <input type="checkbox" style="width: 18px; height: 18px; margin: 1px 0 0; accent-color: #2F6B4F; flex: none">
+      <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">Keep it for walks</span><span style="font-size: 13px; color: #5B616B">Still counts kilometres, but leaves the rotation and the sidebar.</span></span>
+    </label>
+
+    <div style="display: flex; justify-content: flex-end; gap: 8px">
+      <a href="Shoe.dc.html" style="height: 44px; padding: 0 18px; border: 1px solid #E3E5E9; border-radius: 12px; color: #17191C; font-size: 14px; text-decoration: none; display: flex; align-items: center">Cancel</a>
+      <a href="Main.dc.html" style="height: 44px; padding: 0 18px; border-radius: 12px; background: #2F6B4F; color: #FFFFFF; font-size: 14px; font-weight: 500; text-decoration: none; display: flex; align-items: center">Retire pair</a>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const stats = [
+      { v: '58', l: 'runs' },
+      { v: '21 480 m', l: 'climbed' },
+      { v: '42.3 km', l: 'longest run' },
+      { v: '8 months', l: 'in rotation' },
+      { v: '0.81 PLN', l: 'per km' },
+      { v: '81%', l: 'on trail' }
+    ];
+    return { stats };
+  }
+}
+</script>
+</body>
+</html>

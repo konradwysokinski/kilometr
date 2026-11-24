@@ -1,0 +1,226 @@
+import type { Messages } from './en';
+import type { Locale } from './types';
+
+/** Polish plural: 1 bieg, 2–4 biegi (but 12–14 biegów), 5+ biegów. */
+function plural(n: number, one: string, few: string, many: string): string {
+  if (n === 1) return one;
+  const last = n % 10;
+  const lastTwo = n % 100;
+  return last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14) ? few : many;
+}
+
+/** Locative month names: "w listopadzie". */
+const MONTH_LOCATIVE = [
+  'styczniu', 'lutym', 'marcu', 'kwietniu', 'maju', 'czerwcu',
+  'lipcu', 'sierpniu', 'wrześniu', 'październiku', 'listopadzie', 'grudniu',
+];
+
+export const pl: Messages = {
+  locale: 'pl' as Locale,
+  languageName: 'Polski',
+
+  nav: {
+    label: 'Główna nawigacja',
+    overview: 'Przegląd',
+    shoes: 'Buty',
+    bikes: 'Rowery',
+    activities: 'Aktywności',
+    retired: 'Wycofane',
+    settings: 'Ustawienia',
+  },
+
+  sidebar: {
+    shoesInRotation: 'Buty w rotacji',
+    bikes: 'Rowery',
+    showAll: (n) => `Pokaż wszystkie (${n})`,
+    showFewer: 'Pokaż mniej',
+    darkMode: 'Tryb ciemny',
+    language: 'Język',
+    sampleData: 'Dane demo',
+    useMine: 'Użyj moich',
+    synced: 'Zsynchronizowano przed chwilą',
+    imported: (date) => `Import ${date}`,
+    importAgain: 'Zaimportuj nowszy eksport',
+    reading: 'Czytam eksport…',
+  },
+
+  period: {
+    label: 'Okres',
+    month: 'Miesiąc',
+    year: 'Rok',
+    previous: { month: 'Poprzedni miesiąc', year: 'Poprzedni rok' },
+    next: { month: 'Następny miesiąc', year: 'Następny rok' },
+    inMonth: (monthIndex) => `w ${MONTH_LOCATIVE[monthIndex]}`,
+    inYear: (year) => `w ${year}`,
+  },
+
+  overview: {
+    run: (period) => `przebiegnięte ${period}`,
+    ridden: (period) => `przejechane ${period}`,
+    filterLabel: 'Filtruj sprzęt',
+    filterAll: 'Cały sprzęt',
+    filterShoes: 'Buty',
+    filterBikes: 'Rowery',
+    keyNumbers: 'Najważniejsze liczby',
+    running: 'Bieganie',
+    runsOnPairs: (runs, runsF, pairs, pairsF) =>
+      `${runsF} ${plural(runs, 'bieg', 'biegi', 'biegów')} na ${pairsF} ${pairs === 1 ? 'parze' : 'parach'}`,
+    riding: 'Rower',
+    ridesOn: (rides, ridesF, bike) => `${ridesF} ${plural(rides, 'jazda', 'jazdy', 'jazd')} na ${bike}`,
+    ridesOnBikes: (rides, ridesF, bikes, bikesF) =>
+      `${ridesF} ${plural(rides, 'jazda', 'jazdy', 'jazd')} na ${bikesF} ${bikes === 1 ? 'rowerze' : 'rowerach'}`,
+    noRides: (period) => `Brak jazd ${period}`,
+    costPerKm: 'Koszt za km',
+    costAverage: 'Średnio dla butów z ceną',
+    costMissing: 'Dodaj ceny butów',
+    nextToRetire: 'Następne do wymiany',
+    leftOn: (name) => `zostało w ${name}`,
+    noShoesInRotation: 'Brak butów w rotacji',
+    unassigned: (n, nF, km) => `${nF} ${plural(n, 'bieg', 'biegi', 'biegów')} bez butów (${km})`,
+    unassignedHint: 'Z ostatnich 30 dni, nie liczą się na żadnej parze',
+    assignShoes: 'Przypisz ›',
+    shoesInRotation: 'Buty w rotacji',
+    shoesInRotationHint: 'używane w ostatnich 60 dniach',
+    noShoesUsed: 'Brak biegów w butach w ostatnich 60 dniach.',
+  },
+
+  gear: {
+    road: 'Asfalt',
+    trail: 'Teren',
+    nearlyDone: 'Prawie zużyte',
+    overLimit: 'Ponad limit',
+    left: 'zostało',
+    perKm: 'za km',
+    addPrice: 'Dodaj cenę',
+    ofLimit: (used, limit) => `${used} z ${limit}`,
+    inTotal: (km) => `${km} łącznie`,
+  },
+
+  parts: {
+    chain: 'Łańcuch',
+    brakePads: 'Klocki hamulcowe',
+    tyres: 'Opony',
+    cassette: 'Kaseta',
+    note: 'Części liczy Kilometr: kilometry z jazd od ostatniego serwisu.',
+    none: 'Brak śledzonych części. Wkrótce dodasz tu łańcuch, opony i klocki.',
+    logService: 'Zapisz serwis',
+  },
+
+  chart: {
+    byWeek: 'Kilometry w tygodniach',
+    other: 'Inne',
+    weekLabel: (week) => `T${week}`,
+    summary: (weeks, total) =>
+      `Skumulowany wykres słupkowy kilometrów biegowych w ostatnich ${weeks} tygodniach, kolory według butów. Łącznie ${total}.`,
+  },
+
+  detail: {
+    back: 'Przegląd',
+    since: (date) => `w użyciu od ${date}`,
+    edit: 'Edytuj',
+    retire: 'Wycofaj parę',
+    soon: 'Pojawi się w kolejnym kroku',
+    wear: 'Zużycie',
+    kmLeft: (km) => `Zostało ${km}.`,
+    overBy: (km) => `${km} ponad limit.`,
+    weeksAtPace: (weeks, weeksF) =>
+      weeks < 1
+        ? 'W Twoim tempie na tej parze to mniej niż tydzień.'
+        : `W Twoim tempie na tej parze to ok. ${weeksF} ${plural(weeks, 'tydzień', 'tygodnie', 'tygodni')}.`,
+    activities: 'Aktywności',
+    longest: (km) => `Najdłuższa ${km}`,
+    elevation: 'Przewyższenie',
+    perRun: (m) => `średnio ${m} na bieg`,
+    costPerKm: 'Koszt za km',
+    boughtFor: (price) => `Kupione za ${price}`,
+    noPrice: 'Dodaj cenę, żeby go zobaczyć',
+    terrain: 'Nawierzchnia',
+    trailPct: (pct) => `${pct}% teren`,
+    roadPct: (pct) => `${pct}% asfalt`,
+    offRoad: (part, total) => `${part} z ${total} w terenie`,
+    onRoad: (part, total) => `${part} z ${total} po asfalcie`,
+    split: (trail, road) => `${trail} teren · ${road} asfalt`,
+    perMonth: 'Kilometry w miesiącach',
+    perMonthSummary: (from, to) => `Wykres słupkowy kilometrów na tej parze w miesiącach, od ${from} do ${to}`,
+    recent: 'Ostatnie biegi',
+    noRuns: 'Na tej parze nie ma jeszcze biegów.',
+    missing: 'Tego sprzętu nie ma na Twojej liście.',
+  },
+
+  notices: {
+    title: 'Powiadomienia',
+    empty: 'Nic nowego. Kilometr da tu znać, gdy coś będzie wymagało uwagi.',
+    close: 'Zamknij',
+    unread: (n) => `${n} nieprzeczytane`,
+  },
+
+  retire: {
+    title: (name) => `Wycofać ${name}?`,
+    ofLimit: (pct) => `${pct}% limitu`,
+    runs: (n) => plural(n, 'bieg', 'biegi', 'biegów'),
+    climbed: 'w górę',
+    longest: 'najdłuższy bieg',
+    duration: (n, unit) =>
+      unit === 'week' ? plural(n, 'tydzień', 'tygodnie', 'tygodni') : plural(n, 'miesiąc', 'miesiące', 'miesięcy'),
+    inRotation: 'w rotacji',
+    perKm: 'za km',
+    onTrail: 'w terenie',
+    onRoad: 'po asfalcie',
+    body: 'Nowe biegi nie będą liczone na tej parze, a ona trafi do Wycofanych. Możesz ją przywrócić w każdej chwili.',
+    bodyWalks: 'Para zniknie z rotacji i z sidebara, ale dalej będzie liczyć kilometry. Możesz ją przywrócić w każdej chwili.',
+    walksTitle: 'Zostaw do chodzenia',
+    walksBody: 'Dalej liczy kilometry, ale znika z rotacji i z sidebara.',
+    cancel: 'Anuluj',
+    confirm: 'Wycofaj parę',
+    confirmWalks: 'Przenieś do chodzenia',
+    retired: 'Wycofane',
+    walks: 'Do chodzenia',
+    restore: 'Przywróć',
+  },
+
+  start: {
+    title: 'Twoje buty i rowery,',
+    titleMuted: 'w kilometrach.',
+    lead: 'Kilometr czyta Twój sprzęt ze Stravy i pokazuje, jak zużyta jest każda para i ile kosztuje każdy kilometr. Dane zostają na tym komputerze.',
+    importTitle: 'Zaimportuj eksport ze Stravy',
+    importTag: 'Bez konfiguracji',
+    importBody:
+      'Poproś o archiwum w ustawieniach konta Strava, a potem upuść tu plik .zip. Dobre na pierwsze spojrzenie albo jednorazowe sprawdzenie.',
+    drop: 'Upuść tu plik .zip',
+    choose: 'albo wybierz plik',
+    importNote: 'Czytane lokalnie. Nic nie jest wysyłane. Bez synchronizacji, zaimportuj ponownie, żeby odświeżyć.',
+    reading: 'Czytam eksport…',
+    errors: {
+      'not-zip': 'To nie jest archiwum .zip. Upuść eksport, który Strava wysłała Ci mailem.',
+      'no-activities': 'W tym archiwum nie ma activities.csv. Czy to na pewno eksport ze Stravy?',
+      unreadable: 'Nie udało się odczytać żadnej aktywności z tego eksportu.',
+    },
+    connectTitle: 'Połącz ze Stravą',
+    connectTag: 'Ok. 5 min',
+    connectBody:
+      'Synchronizacja na żywo przez Twoją własną aplikację API Stravy. Strava pozwala aplikacji pokazywać tylko dane jej właściciela, więc każda instalacja Kilometra używa własnego klucza.',
+    steps: [
+      'Utwórz aplikację API w ustawieniach deweloperskich Stravy',
+      'Wklej poniżej jej Client ID i secret',
+      'Zatwierdź dostęp w oknie Stravy',
+    ],
+    clientId: 'Client ID',
+    clientSecret: 'Client secret',
+    connect: 'Połącz ze Stravą',
+    connectSoon: 'Łączenie ze Stravą pojawi się w jednym z kolejnych kroków.',
+    sample: 'Zobacz na przykładowych danych',
+    openSource: 'Open source · MIT',
+  },
+
+  placeholder: {
+    gearDetail: 'Szczegóły sprzętu',
+    shoes: 'Buty',
+    bikes: 'Rowery',
+    activities: 'Biegi bez butów',
+    retired: 'Wycofane',
+    settings: 'Ustawienia',
+    notFound: 'Nie znaleziono',
+    body: 'Ten ekran powstanie w jednym z kolejnych kroków.',
+    back: 'Wróć do przeglądu',
+  },
+};

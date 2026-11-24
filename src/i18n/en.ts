@@ -1,0 +1,215 @@
+import type { Locale } from './types';
+
+const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+
+export const en = {
+  locale: 'en' as Locale,
+  languageName: 'English',
+
+  nav: {
+    label: 'Main',
+    overview: 'Overview',
+    shoes: 'Shoes',
+    bikes: 'Bikes',
+    activities: 'Activities',
+    retired: 'Retired',
+    settings: 'Settings',
+  },
+
+  sidebar: {
+    shoesInRotation: 'Shoes in rotation',
+    bikes: 'Bikes',
+    showAll: (n: string) => `Show all ${n}`,
+    showFewer: 'Show fewer',
+    darkMode: 'Dark mode',
+    language: 'Language',
+    sampleData: 'Sample data',
+    useMine: 'Use mine',
+    synced: 'Synced just now',
+    imported: (date: string) => `Imported ${date}`,
+    importAgain: 'Import a newer export',
+    reading: 'Reading export…',
+  },
+
+  period: {
+    label: 'Period',
+    month: 'Month',
+    year: 'Year',
+    previous: { month: 'Previous month', year: 'Previous year' },
+    next: { month: 'Next month', year: 'Next year' },
+    inMonth: (_monthIndex: number, monthName: string) => `in ${monthName}`,
+    inYear: (year: number) => `in ${year}`,
+  },
+
+  overview: {
+    run: (period: string) => `run ${period}`,
+    ridden: (period: string) => `ridden ${period}`,
+    filterLabel: 'Filter gear',
+    filterAll: 'All gear',
+    filterShoes: 'Shoes',
+    filterBikes: 'Bikes',
+    keyNumbers: 'Key numbers',
+    running: 'Running',
+    runsOnPairs: (runs: number, runsF: string, pairs: number, pairsF: string) =>
+      `${runsF} ${plural(runs, 'run', 'runs')} on ${pairsF} ${plural(pairs, 'pair', 'pairs')}`,
+    riding: 'Riding',
+    ridesOn: (rides: number, ridesF: string, bike: string) => `${ridesF} ${plural(rides, 'ride', 'rides')} on ${bike}`,
+    ridesOnBikes: (rides: number, ridesF: string, bikes: number, bikesF: string) =>
+      `${ridesF} ${plural(rides, 'ride', 'rides')} on ${bikesF} ${plural(bikes, 'bike', 'bikes')}`,
+    noRides: (period: string) => `No rides ${period}`,
+    costPerKm: 'Cost per km',
+    costAverage: 'Average across priced shoes',
+    costMissing: 'Add prices to your shoes',
+    nextToRetire: 'Next to retire',
+    leftOn: (name: string) => `left on ${name}`,
+    noShoesInRotation: 'No shoes in rotation',
+    unassigned: (n: number, nF: string, km: string) => `${nF} ${plural(n, 'run', 'runs')} without shoes (${km})`,
+    unassignedHint: 'From the last 30 days, not counted on any pair',
+    assignShoes: 'Assign ›',
+    shoesInRotation: 'Shoes in rotation',
+    shoesInRotationHint: 'used in the last 60 days',
+    noShoesUsed: 'No runs with shoes in the last 60 days.',
+  },
+
+  gear: {
+    road: 'Road',
+    trail: 'Trail',
+    nearlyDone: 'Nearly done',
+    overLimit: 'Over limit',
+    left: 'left',
+    perKm: 'per km',
+    addPrice: 'Add price',
+    ofLimit: (used: string, limit: string) => `${used} of ${limit}`,
+    inTotal: (km: string) => `${km} in total`,
+  },
+
+  parts: {
+    chain: 'Chain',
+    brakePads: 'Brake pads',
+    tyres: 'Tyres',
+    cassette: 'Cassette',
+    note: 'Parts are tracked in Kilometr: counted from rides since the last service.',
+    none: 'No parts tracked yet. Chain, tyres and brake pads can be added here soon.',
+    logService: 'Log service',
+  },
+
+  chart: {
+    byWeek: 'Kilometres by week',
+    other: 'Other',
+    weekLabel: (week: number) => `W${week}`,
+    summary: (weeks: number, total: string) =>
+      `Stacked bar chart of running kilometres per week over the last ${weeks} weeks, coloured by shoe. ${total} in total.`,
+  },
+
+  detail: {
+    back: 'Overview',
+    since: (date: string) => `in use since ${date}`,
+    edit: 'Edit',
+    retire: 'Retire pair',
+    soon: 'Coming in the next step',
+    wear: 'Wear',
+    kmLeft: (km: string) => `${km} left.`,
+    overBy: (km: string) => `${km} over the limit.`,
+    weeksAtPace: (weeks: number, weeksF: string) =>
+      weeks < 1
+        ? 'At your pace on this pair that is under a week.'
+        : `At your pace on this pair that's about ${weeksF} ${plural(weeks, 'week', 'weeks')}.`,
+    activities: 'Activities',
+    longest: (km: string) => `Longest ${km}`,
+    elevation: 'Elevation gain',
+    perRun: (m: string) => `${m} per run on average`,
+    costPerKm: 'Cost per km',
+    boughtFor: (price: string) => `Bought for ${price}`,
+    noPrice: 'Add a price to see it',
+    terrain: 'Terrain',
+    trailPct: (pct: number) => `${pct}% trail`,
+    roadPct: (pct: number) => `${pct}% road`,
+    offRoad: (part: string, total: string) => `${part} of ${total} off-road`,
+    onRoad: (part: string, total: string) => `${part} of ${total} on road`,
+    split: (trail: string, road: string) => `${trail} trail · ${road} road`,
+    perMonth: 'Kilometres per month',
+    perMonthSummary: (from: string, to: string) => `Bar chart of kilometres per month on this pair, ${from} to ${to}`,
+    recent: 'Recent runs',
+    noRuns: 'No runs on this pair yet.',
+    missing: 'This item is not in your gear.',
+  },
+
+  notices: {
+    title: 'Notifications',
+    empty: 'Nothing new. Kilometr lets you know here when something needs a look.',
+    close: 'Close',
+    unread: (n: number) => `${n} unread`,
+  },
+
+  retire: {
+    title: (name: string) => `Retire ${name}?`,
+    ofLimit: (pct: number) => `${pct}% of the limit`,
+    runs: (n: number) => plural(n, 'run', 'runs'),
+    climbed: 'climbed',
+    longest: 'longest run',
+    duration: (n: number, unit: 'week' | 'month') =>
+      unit === 'week' ? plural(n, 'week', 'weeks') : plural(n, 'month', 'months'),
+    inRotation: 'in rotation',
+    perKm: 'per km',
+    onTrail: 'on trail',
+    onRoad: 'on road',
+    body: "New runs won't be counted on this pair and it moves to Retired. You can bring it back any time.",
+    bodyWalks: 'It leaves the rotation and the sidebar but keeps counting kilometres. You can bring it back any time.',
+    walksTitle: 'Keep it for walks',
+    walksBody: 'Still counts kilometres, but leaves the rotation and the sidebar.',
+    cancel: 'Cancel',
+    confirm: 'Retire pair',
+    confirmWalks: 'Move to walks',
+    retired: 'Retired',
+    walks: 'Kept for walks',
+    restore: 'Bring back',
+  },
+
+  start: {
+    title: 'Your shoes and bikes,',
+    titleMuted: 'in kilometres.',
+    lead: 'Kilometr reads your gear from Strava and shows how worn each pair is and what it costs per kilometre. Your data stays on this computer.',
+    importTitle: 'Import a Strava export',
+    importTag: 'No setup',
+    importBody:
+      "Request your archive in Strava's account settings, then drop the .zip here. Good for a first look or a one-off check.",
+    drop: 'Drop export .zip here',
+    choose: 'or choose a file',
+    importNote: 'Read locally. Nothing is uploaded. No live updates, import again to refresh.',
+    reading: 'Reading your export…',
+    errors: {
+      'not-zip': 'That file is not a .zip archive. Drop the export Strava emailed you.',
+      'no-activities': 'There is no activities.csv in this archive. Is it a Strava export?',
+      unreadable: 'Could not read any activities from this export.',
+    },
+    connectTitle: 'Connect Strava',
+    connectTag: 'About 5 min',
+    connectBody:
+      'Live sync with your own Strava API app. Strava lets an app show you only your own data, so every Kilometr install uses its own key.',
+    steps: [
+      "Create an API app in Strava's developer settings",
+      'Paste its Client ID and secret below',
+      'Approve access in the Strava window',
+    ],
+    clientId: 'Client ID',
+    clientSecret: 'Client secret',
+    connect: 'Connect with Strava',
+    connectSoon: 'Connecting to Strava is coming in a later build step.',
+    sample: 'Explore with sample data',
+    openSource: 'Open source · MIT',
+  },
+
+  placeholder: {
+    gearDetail: 'Gear detail',
+    shoes: 'Shoes',
+    bikes: 'Bikes',
+    activities: 'Runs without shoes',
+    retired: 'Retired',
+    settings: 'Settings',
+    notFound: 'Not found',
+    body: 'This screen comes in a later step.',
+    back: 'Back to Overview',
+  },
+};
+
+export type Messages = typeof en;

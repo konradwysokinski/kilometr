@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kilometr — Runs without shoes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+.km-switch{appearance:none;-webkit-appearance:none;flex:none;width:34px;height:20px;margin:0;border-radius:999px;background:#D5D8DE;position:relative;cursor:pointer;transition:background .2s}.km-switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:999px;background:#FFFFFF;box-shadow:0 1px 2px rgba(16,24,40,.25);transition:transform .2s}.km-switch:checked{background:#2F6B4F}.km-switch:checked::after{transform:translateX(14px)}.km-switch:focus-visible{outline:2px solid #2F6B4F;outline-offset:2px}
+a{color:#2F6B4F}a:hover{color:#1F4D38}
+</style>
+</helmet>
+<div style="min-height: 960px; background: linear-gradient(180deg, #F1F2F4 0%, #E8EAED 100%); font-family: Inter, system-ui, sans-serif; color: #17191C; font-variant-numeric: tabular-nums; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<nav aria-label="Main" style="flex: 1 1 220px; max-width: 250px; box-sizing: border-box; padding: 24px 14px 18px; display: flex; flex-direction: column; gap: 26px">
+  <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 34px; padding: 0 12px">Kilometr</div>
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; color: #17191C; font-size: 15px; text-decoration: none">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5B616B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1.5"></rect><rect x="9" y="2" width="5" height="5" rx="1.5"></rect><rect x="2" y="9" width="5" height="5" rx="1.5"></rect><rect x="9" y="9" width="5" height="5" rx="1.5"></rect></svg>Overview</a>
+    <a href="Shoe.dc.html" style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; color: #17191C; font-size: 15px; text-decoration: none">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5B616B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 12.5V11c0-1.5 1.2-2.2 2.6-2.6L6 4.5l2 .4.4 2.3c2.2.5 4.6 1.2 5.6 2.7v2.6z"></path></svg>Shoes</a>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; color: #17191C; font-size: 15px; text-decoration: none">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5B616B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4" cy="11" r="2.75"></circle><circle cx="12" cy="11" r="2.75"></circle><path d="M4 11l2.5-5.5h3.5L12 11M6.5 5.5L8.5 11"></path></svg>Bikes</a>
+    <a href="Unassigned.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; background: rgba(23, 25, 28, 0.07); color: #17191C; font-size: 15px; font-weight: 500; text-decoration: none">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#17191C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 8h3l1.5-4 3 8 1.5-4h4"></path></svg><span style="flex: 1">Activities</span><span style="width: 7px; height: 7px; border-radius: 999px; background: #A8590B" aria-label="7 need shoes"></span></a>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; color: #17191C; font-size: 15px; text-decoration: none">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5B616B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="3" rx="1"></rect><path d="M3 6v7h10V6M6.5 9h3"></path></svg>Retired</a>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <div style="padding: 0 12px 8px; font-size: 13px; color: #5B616B">Shoes in rotation</div>
+    <a href="Shoe.dc.html" style="display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 14px; color: #17191C; text-decoration: none">
+      <span style="width: 9px; height: 9px; border-radius: 3px; flex: none; background: #2563EB"></span>
+      <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Pegasus 41</span>
+      <span style="color: #5B616B; font-size: 13px; font-weight: 400">412</span>
+    </a>
+    <a href="Shoe.dc.html" style="display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 14px; color: #17191C; text-decoration: none">
+      <span style="width: 9px; height: 9px; border-radius: 3px; flex: none; background: #16A05A"></span>
+      <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Speedgoat 5</span>
+      <span style="color: #5B616B; font-size: 13px; font-weight: 400">736</span>
+    </a>
+    <a href="Shoe.dc.html" style="display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 14px; color: #17191C; text-decoration: none">
+      <span style="width: 9px; height: 9px; border-radius: 3px; flex: none; background: #F2602C"></span>
+      <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Endorphin Speed 4</span>
+      <span style="color: #5B616B; font-size: 13px; font-weight: 400">188</span>
+    </a>
+    <a href="Shoe.dc.html" style="display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 14px; color: #17191C; text-decoration: none">
+      <span style="width: 9px; height: 9px; border-radius: 3px; flex: none; background: #E5A500"></span>
+      <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Genesis</span>
+      <span style="color: #5B616B; font-size: 13px; font-weight: 400">64</span>
+    </a>
+    <button type="button" style="font: inherit; height: 34px; padding: 0 12px 0 33px; border: 0; border-radius: 10px; background: transparent; font-size: 14px; color: #5B616B; text-align: left; cursor: pointer">Show all 18</button>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <div style="padding: 0 12px 8px; font-size: 13px; color: #5B616B">Bikes</div>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 14px; color: #17191C; text-decoration: none">
+      <span style="width: 9px; height: 9px; border-radius: 3px; flex: none; background: #8B5CF6"></span>
+      <span style="flex: 1">Canyon Grail</span>
+      <span style="color: #5B616B; font-size: 13px">3 214</span>
+    </a>
+  </div>
+  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 2px">
+    <label style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; color: #17191C; font-size: 15px; cursor: pointer">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5B616B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1z"></path></svg><span style="flex: 1">Dark mode</span><input type="checkbox" role="switch" class="km-switch" aria-label="Dark mode"></label>
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 12px; height: 32px; font-size: 13px; color: #5B616B"><span style="width: 7px; height: 7px; border-radius: 999px; background: #2F6B4F; box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.18)"></span>Synced 12 min ago</div>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-radius: 10px; color: #17191C; font-size: 15px; text-decoration: none">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5B616B" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="2.5"></circle><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"></path></svg>Settings</a>
+  </div>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; margin: 10px; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px rgba(16, 24, 40, 0.04), 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 28px rgba(16, 24, 40, 0.06); padding: 40px 44px; display: flex; flex-direction: column; gap: 26px">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-size: 30px; line-height: 36px; font-weight: 500; letter-spacing: -0.02em">7 runs <span style="font-weight: 400; color: #5B616B">without shoes</span></h1>
+      <p style="margin: 0; font-size: 14px; line-height: 20px; color: #5B616B; max-width: 560px">67.2 km that no pair is counting yet. Pick a pair for each run, or take the suggestions.</p>
+    </div>
+    <button type="button" onClick="{{ acceptAll }}" style="font: inherit; font-size: 14px; height: 40px; padding: 0 16px; border: 1px solid #E3E5E9; border-radius: 12px; background: #FFFFFF; color: #17191C; cursor: pointer">Assign all suggested</button>
+  </header>
+
+  <div style="display: flex; flex-direction: column">
+    <sc-for list="{{ runs }}" as="r" hint-placeholder-count="7">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 16px 0; border-top: 1px solid #EDEEF1">
+        <div style="flex: 1 1 260px; min-width: 0; display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 2px 12px">
+          <span style="font-size: 13px; line-height: 22px; color: #5B616B; grid-row: span 2">{{ r.date }}</span>
+          <span style="font-size: 15px; line-height: 22px; font-weight: 500">{{ r.name }}</span>
+          <span style="font-size: 13px; color: #5B616B">{{ r.meta }}</span>
+        </div>
+        <div role="radiogroup" aria-label="Shoes for {{ r.name }}" style="flex: 2 1 440px; display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{ r.chips }}" as="c" hint-placeholder-count="4">
+            <button type="button" role="radio" aria-checked="{{ c.on }}" onClick="{{ c.pick }}" style="font: inherit; font-size: 14px; height: 36px; padding: 0 14px 0 12px; display: flex; align-items: center; gap: 8px; border-radius: 999px; cursor: pointer; border: {{ c.border }}; background: {{ c.bg }}; font-weight: {{ c.weight }}; color: #17191C">
+              <span style="width: 9px; height: 9px; border-radius: 3px; background: {{ c.color }}"></span>{{ c.label }}<span style="font-size: 12px; color: #5B616B; font-weight: 400">{{ c.hint }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position: sticky; bottom: 10px; margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 16px 16px 22px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(16, 24, 40, 0.06), 0 8px 28px rgba(16, 24, 40, 0.08)">
+    <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px">
+        <span style="font-size: 16px; font-weight: 500">{{ done }} of 7 assigned</span>
+        <span style="font-size: 13px; color: #5B616B">Kilometr sets the gear on each activity in Strava. Needs write access, asked once.</span>
+      </div>
+      <div style="height: 8px; border-radius: 999px; background: #EFF0F3; overflow: hidden; max-width: 420px"><div style="height: 8px; border-radius: 999px; width: {{ pct }}; background: linear-gradient(90deg, #2F6B4F99, #2F6B4F)"></div></div>
+    </div>
+    <a href="Main.dc.html" style="height: 44px; padding: 0 20px; border-radius: 12px; background: #2F6B4F; color: #FFFFFF; font-size: 14px; font-weight: 500; text-decoration: none; display: flex; align-items: center">Save to Strava</a>
+  </div>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":960}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { a: { r1: 'peg', r2: 'sg' } };
+  }
+  renderVals() {
+    const shoes = [
+      { id: 'sg', label: 'Speedgoat 5', color: '#16A05A' },
+      { id: 'peg', label: 'Pegasus 41', color: '#2563EB' },
+      { id: 'end', label: 'Endorphin Speed 4', color: '#F2602C' },
+      { id: 'gen', label: 'Genesis', color: '#E5A500' }
+    ];
+    const list = [
+      { id: 'r1', date: '23 Nov', name: 'Lunch run', meta: '8.2 km · +30 m · road', sug: 'peg' },
+      { id: 'r2', date: '22 Nov', name: 'Trail with friends', meta: '16.5 km · +380 m · trail', sug: 'sg' },
+      { id: 'r3', date: '20 Nov', name: 'Tempo 3 × 3 km', meta: '11.0 km · +40 m · workout', sug: 'end' },
+      { id: 'r4', date: '17 Nov', name: 'Evening run', meta: '7.4 km · +25 m · road', sug: 'peg' },
+      { id: 'r5', date: '13 Nov', name: 'Forest loop', meta: '12.3 km · +210 m · trail', sug: 'sg' },
+      { id: 'r6', date: '6 Nov', name: 'Easy run', meta: '6.8 km · +20 m · road', sug: 'peg' },
+      { id: 'r7', date: '29 Oct', name: 'Parkrun', meta: '5.0 km · +10 m · race', sug: 'end' }
+    ];
+    const a = this.state.a;
+    const runs = list.map((r) => ({
+      date: r.date, name: r.name, meta: r.meta,
+      chips: shoes.map((s) => {
+        const on = a[r.id] === s.id;
+        const sug = !a[r.id] && r.sug === s.id;
+        return {
+          label: s.label, color: s.color, on: on ? 'true' : 'false',
+          hint: sug ? 'suggested' : '',
+          border: on ? '1.5px solid ' + s.color : (sug ? '1px dashed ' + s.color : '1px solid #E3E5E9'),
+          bg: on ? s.color + '1F' : '#FFFFFF',
+          weight: on ? '500' : '400',
+          pick: () => this.setState({ a: Object.assign({}, this.state.a, { [r.id]: s.id }) })
+        };
+      })
+    }));
+    const done = Object.keys(a).length;
+    const acceptAll = () => {
+      const next = Object.assign({}, this.state.a);
+      list.forEach((r) => { if (!next[r.id]) next[r.id] = r.sug; });
+      this.setState({ a: next });
+    };
+    return { runs, done, pct: Math.round(done / 7 * 100) + '%', acceptAll };
+  }
+}
+</script>
+</body>
+</html>
