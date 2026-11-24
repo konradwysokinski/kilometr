@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '../app/store';
 import type { GearStats } from '../domain/gear';
 import { gearColour } from '../lib/colour';
 import { Avatar } from './Avatar';
 import { Chip } from './Chip';
+import { PriceDialog } from './PriceDialog';
 import { WearBar } from './WearBar';
 import s from './GearCard.module.css';
 
 /** `footnote`: one quiet line at the bottom, e.g. when the item was last used. */
 export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: string }) {
   const { t, f } = useStore();
+  const [pricing, setPricing] = useState(false);
   const terrain = g.terrain.label === 'Trail' ? t.gear.trail : g.terrain.label === 'Road' ? t.gear.road : null;
   const caption = [g.settings.nickname && f.quote(g.settings.nickname), terrain].filter(Boolean).join(' · ');
 
@@ -23,11 +26,15 @@ export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: st
         : { text: `${Math.round(g.wear.ratio * 100)}%`, tone: 'neutral' as const };
 
   return (
-    <Link to={`/gear/${g.gear.id}`} className={`${s.card} ${footnote ? s.withFootnote : ''}`}>
+    // The name link stretches over the whole card (see .cardLink), so the card
+    // can also hold its own button ("Add price") without nesting it in a link.
+    <article className={`${s.card} ${footnote ? s.withFootnote : ''}`}>
       <div className={s.head}>
         <Avatar initials={g.initials} colour={g.colour} />
         <div className={s.titles}>
-          <span className={s.name}>{g.name}</span>
+          <Link to={`/gear/${g.gear.id}`} className={`${s.name} ${s.cardLink}`}>
+            {g.name}
+          </Link>
           {caption && <span className={s.caption}>{caption}</span>}
         </div>
       </div>
@@ -71,11 +78,14 @@ export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: st
             <strong>{f.money(g.costPerKm)}</strong> {t.gear.perKm}
           </span>
         ) : (
-          <span className={s.addPrice}>{t.gear.addPrice}</span>
+          <button type="button" className={s.addPrice} onClick={() => setPricing(true)}>
+            {t.price.add}
+          </button>
         )}
       </div>
 
       {footnote && <p className={s.footnote}>{footnote}</p>}
-    </Link>
+      <PriceDialog gear={g} open={pricing} onClose={() => setPricing(false)} />
+    </article>
   );
 }

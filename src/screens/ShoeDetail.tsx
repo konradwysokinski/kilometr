@@ -6,6 +6,7 @@ import { Chip } from '../components/Chip';
 import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { MonthlyChart } from '../components/MonthlyChart';
+import { PriceDialog } from '../components/PriceDialog';
 import { RetireDialog } from '../components/RetireDialog';
 import { WearBar } from '../components/WearBar';
 import { activitiesOf, monthlyKm } from '../domain/detail';
@@ -19,6 +20,7 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
   const { data, now, t, f, updateSettings } = useDataset();
   const navigate = useNavigate();
   const [retiring, setRetiring] = useState(false);
+  const [pricing, setPricing] = useState(false);
   const activities = useMemo(() => activitiesOf(data, shoe.gear.id), [data, shoe.gear.id]);
   const months = useMemo(() => monthlyKm(activities, now), [activities, now]);
   const colour = gearColour(shoe.colour);
@@ -75,8 +77,8 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
           {caption && <p className={s.caption}>{caption}</p>}
         </div>
         <div className={s.actions}>
-          <button type="button" className={s.secondary} disabled title={t.detail.soon}>
-            {t.detail.edit}
+          <button type="button" className={s.secondary} onClick={() => setPricing(true)}>
+            {shoe.settings.price ? t.price.edit : t.price.add}
           </button>
           {status ? (
             <button type="button" className={s.primary} onClick={bringBack}>
@@ -128,7 +130,15 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
           size="md"
           label={t.detail.costPerKm}
           value={shoe.costPerKm !== null ? f.money(shoe.costPerKm) : '—'}
-          sub={settings.price ? t.detail.boughtFor(f.price(settings.price)) : t.detail.noPrice}
+          sub={
+            settings.price ? (
+              t.detail.boughtFor(f.price(settings.price))
+            ) : (
+              <button type="button" className={s.inlineAction} onClick={() => setPricing(true)}>
+                {t.price.add}
+              </button>
+            )
+          }
         />
         <KpiCard
           size="md"
@@ -166,6 +176,7 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
       )}
 
       <RetireDialog shoe={shoe} open={retiring} onClose={() => setRetiring(false)} onConfirm={retire} />
+      <PriceDialog gear={shoe} open={pricing} onClose={() => setPricing(false)} />
 
       <div className={s.row}>
         {months.length > 0 && <MonthlyChart bars={months} colour={colour} />}

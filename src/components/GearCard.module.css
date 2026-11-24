@@ -5,6 +5,7 @@
  * all of them together. The parent grid must set grid-auto-rows: auto.
  */
 .card {
+  position: relative;
   display: grid;
   grid-row: span 4;
   grid-template-rows: subgrid;
@@ -40,6 +41,32 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.cardLink {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.cardLink:hover {
+  color: var(--ink);
+}
+
+/* The whole card is the link's hit area. */
+.cardLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+}
+
+.cardLink:focus-visible {
+  outline: none;
+}
+
+.cardLink:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .name {
@@ -104,8 +131,24 @@
 }
 
 .addPrice {
+  /* Above the stretched link, so it gets its own clicks. */
+  position: relative;
+  z-index: 1;
+  padding: 9px 0;
+  margin: -9px 0;
+  border: 0;
+  background: none;
   color: var(--accent);
+  font-size: 13px;
+  line-height: 18px;
   font-weight: 500;
+  cursor: pointer;
+}
+
+.addPrice:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .footnote {

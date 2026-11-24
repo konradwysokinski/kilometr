@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useDataset } from '../app/store';
 import { Avatar } from '../components/Avatar';
@@ -6,6 +6,7 @@ import { Chip } from '../components/Chip';
 import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { MonthlyChart } from '../components/MonthlyChart';
+import { PriceDialog } from '../components/PriceDialog';
 import { PartCounters } from '../components/PartCounters';
 import { activitiesOf, monthlyKm } from '../domain/detail';
 import { km, type GearStats } from '../domain/gear';
@@ -19,6 +20,7 @@ const RECENT = 6;
 /** One bike: lifetime numbers, kilometres per month and recent rides. Same layout as the shoe page. */
 export function BikeDetail({ bike }: { bike: GearStats }) {
   const { data, now, t, f } = useDataset();
+  const [pricing, setPricing] = useState(false);
   const rides = useMemo(() => activitiesOf(data, bike.gear.id), [data, bike.gear.id]);
   const months = useMemo(() => monthlyKm(rides, now), [rides, now]);
   const parts = data.parts.filter((p) => p.bikeId === bike.gear.id);
@@ -51,8 +53,8 @@ export function BikeDetail({ bike }: { bike: GearStats }) {
           {caption && <p className={s.caption}>{caption}</p>}
         </div>
         <div className={s.actions}>
-          <button type="button" className={s.secondary} disabled title={t.detail.soon}>
-            {t.detail.edit}
+          <button type="button" className={s.secondary} onClick={() => setPricing(true)}>
+            {bike.settings.price ? t.price.edit : t.price.add}
           </button>
         </div>
       </header>
@@ -74,7 +76,15 @@ export function BikeDetail({ bike }: { bike: GearStats }) {
           size="md"
           label={t.detail.costPerKm}
           value={bike.costPerKm !== null ? f.money(bike.costPerKm) : '—'}
-          sub={bike.settings.price ? t.detail.boughtFor(f.price(bike.settings.price)) : t.detail.noPrice}
+          sub={
+            bike.settings.price ? (
+              t.detail.boughtFor(f.price(bike.settings.price))
+            ) : (
+              <button type="button" className={s.inlineAction} onClick={() => setPricing(true)}>
+                {t.price.add}
+              </button>
+            )
+          }
         />
         <KpiCard
           size="md"
@@ -83,6 +93,8 @@ export function BikeDetail({ bike }: { bike: GearStats }) {
           sub={longest ? t.bikes.longestOn(longest.name, f.date(new Date(longest.startDate))) : '—'}
         />
       </section>
+
+      <PriceDialog gear={bike} open={pricing} onClose={() => setPricing(false)} />
 
       {/* Off for now (see lib/features.ts); with it on, "Log service" still needs wiring. */}
       {FEATURES.bikeParts && <PartCounters bike={bike} parts={parts} activities={data.activities} />}

@@ -64,7 +64,7 @@ MVP (designed, see `design/screens/`):
 Next (not designed yet):
 6. Retired / Hall of Fame
 7. Bike detail (built, `/gear/:id` for a bike, `src/screens/BikeDetail.tsx`): back to Bikes, header (avatar, name, ride mix · since), KPIs (Rides, Elevation gain, Cost per km, Longest ride), kilometres per month (hidden when all twelve months are empty), recent rides. Bike names on Overview and /bikes link here. Service counters and service log wait behind `FEATURES.bikeParts`.
-8. Edit gear: price, limit, photo, nickname, colour
+8. Edit gear (built as price only, Konrad 2026-11-24: name and nickname come from Strava, colour is automatic): `PriceDialog`, opened from "Add price" on gear cards (stretched name link, so the button isn't inside a link), "Add / Edit price" on the detail pages and the Cost per km tile. Limit stays the default unless Strava provides one.
 9. Share card (export an image)
 10. Settings (built, /settings): Appearance (Light / Dark / System; System follows `prefers-color-scheme` live), Language (EN | PL), Data (current source, import again, "Remove all data" with a confirmation modal; theme and language survive it), About (GitHub, MIT). Later: units, currency, default limits, sync.
 11. Dark theme (built; chosen in Settings)

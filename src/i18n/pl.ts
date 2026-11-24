@@ -170,9 +170,21 @@ export const pl: Messages = {
     left: 'zostało',
     over: 'za dużo',
     perKm: 'za km',
-    addPrice: 'Dodaj cenę',
     ofLimit: (used, limit) => `${used} z ${limit}`,
     inTotal: (km) => `${km} łącznie`,
+  },
+
+  price: {
+    title: (name) => `Cena: ${name}`,
+    label: 'Cena',
+    currency: 'zł',
+    hint: 'Kwota zakupu. Kilometr dzieli ją przez kilometry i liczy koszt za km. Zostaje w tej przeglądarce.',
+    invalid: 'Wpisz kwotę, np. 599 albo 549,99.',
+    add: 'Dodaj cenę',
+    edit: 'Edytuj cenę',
+    remove: 'Usuń cenę',
+    cancel: 'Anuluj',
+    save: 'Zapisz',
   },
 
   parts: {
@@ -201,9 +213,7 @@ export const pl: Messages = {
   detail: {
     back: 'Przegląd',
     since: (date) => `w użyciu od ${date}`,
-    edit: 'Edytuj',
     retire: 'Wycofaj parę',
-    soon: 'Pojawi się w kolejnym kroku',
     wear: 'Zużycie',
     kmLeft: (km) => `Zostało ${km}.`,
     overBy: (km) => `${km} ponad limit.`,

@@ -1,0 +1,183 @@
+.dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-modal);
+  overflow: auto;
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+.dialog[open] {
+  animation: enter 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dialog[open]::backdrop {
+  animation: fade 0.22s ease;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open] {
+    animation-name: fade;
+  }
+}
+
+.body {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.title {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.inputWrap {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  transition: border-color 0.15s ease;
+}
+
+.inputWrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.invalid,
+.invalid:focus-within {
+  border-color: var(--danger);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 14px;
+  border: 0;
+  background: transparent;
+  /* 16px so phones don't zoom in on focus */
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.input::placeholder {
+  color: color-mix(in srgb, var(--ink-muted) 70%, transparent);
+}
+
+.unit {
+  padding: 0 14px 0 8px;
+  color: var(--ink-muted);
+}
+
+.hint,
+.error {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.hint {
+  color: var(--ink-muted);
+}
+
+.error {
+  color: var(--danger);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.primary,
+.secondary {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-control);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.secondary {
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.secondary:hover {
+  background: var(--hover);
+}
+
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 500;
+}
+
+.primary:hover {
+  background: var(--accent-hover);
+}
+
+/* Quiet, on the left, away from Save. */
+.remove {
+  height: 44px;
+  margin-right: auto;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--danger);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.remove:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .body {
+    padding: 22px 20px;
+  }
+}

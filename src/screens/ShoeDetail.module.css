@@ -223,3 +223,21 @@
 .runElev {
   text-align: right;
 }
+
+/* A text action inside a KPI subline, e.g. "Add price". */
+.inlineAction {
+  padding: 9px 0;
+  margin: -9px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.inlineAction:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

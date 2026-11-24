@@ -157,9 +157,21 @@ export const en = {
     left: 'left',
     over: 'over',
     perKm: 'per km',
-    addPrice: 'Add price',
     ofLimit: (used: string, limit: string) => `${used} of ${limit}`,
     inTotal: (km: string) => `${km} in total`,
+  },
+
+  price: {
+    title: (name: string) => `Price of ${name}`,
+    label: 'Price',
+    currency: 'PLN',
+    hint: 'What it cost. Kilometr divides it by the kilometres to get the cost per km. Stays in this browser.',
+    invalid: 'Enter an amount, like 599 or 549.99.',
+    add: 'Add price',
+    edit: 'Edit price',
+    remove: 'Remove price',
+    cancel: 'Cancel',
+    save: 'Save',
   },
 
   parts: {
@@ -188,9 +200,7 @@ export const en = {
   detail: {
     back: 'Overview',
     since: (date: string) => `in use since ${date}`,
-    edit: 'Edit',
     retire: 'Retire pair',
-    soon: 'Coming in the next step',
     wear: 'Wear',
     kmLeft: (km: string) => `${km} left.`,
     overBy: (km: string) => `${km} over the limit.`,

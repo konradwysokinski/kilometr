@@ -23,7 +23,7 @@ Early work in progress.
 - [x] Shoes, Bikes, Activities and Retired screens; line chart toggle
 - [x] Settings: theme (light, dark, system), language, remove all data
 - [x] Bike detail
-- [ ] Edit gear: price, limit, nickname, colour
+- [x] Price per item (cost per km), saved locally
 
 ## Run it
 
