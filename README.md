@@ -20,8 +20,9 @@ Early work in progress.
 - [x] Shoe detail: wear, pace estimate, KPIs, terrain, kilometres per month, recent runs
 - [x] Retire pair (or keep it for walks) and bring it back; saved locally
 - [x] Notifications: a toast after import for runs without shoes, then a slide-in panel
-- [ ] Shoes, Bikes, Activities and Retired screens; line chart toggle; Edit gear
-- [ ] Bike detail and service log, Edit gear, Retired, Settings
+- [x] Shoes, Bikes, Activities and Retired screens; line chart toggle
+- [x] Settings: theme (light, dark, system), language, remove all data
+- [ ] Bike detail, Edit gear
 
 ## Run it
 

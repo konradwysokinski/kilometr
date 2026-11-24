@@ -16,7 +16,6 @@
   --hover: rgba(23, 25, 28, 0.04);
   --selected: rgba(23, 25, 28, 0.07);
   --neutral-chip: #f2f3f5;
-  --switch-off: #d5d8de;
 
   /* text */
   --ink: #17191c;
@@ -92,7 +91,6 @@
   --hover: rgba(236, 238, 241, 0.05);
   --selected: rgba(236, 238, 241, 0.09);
   --neutral-chip: #2a2e33;
-  --switch-off: #3a3f45;
 
   --ink: #eceef1;
   --ink-muted: #a2a8b1;

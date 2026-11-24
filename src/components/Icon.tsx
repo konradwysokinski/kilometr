@@ -60,6 +60,7 @@ const PATHS = {
   ),
   close: <path d="M4 4l8 8M12 4l-8 8" />,
   refresh: <path d="M13 3.5v3h-3M3 12.5v-3h3M12.6 6.5A5 5 0 0 0 3.8 5M3.4 9.5a5 5 0 0 0 8.8 1.5" />,
+  external: <path d="M6.5 3.5h6v6M12.5 3.5 4 12" />,
   chevronLeft: <path d="M10 3.5 5.5 8l4.5 4.5" />,
   chevronRight: <path d="M6 3.5 10.5 8 6 12.5" />,
   chevronUpDown: <path d="M5 6l3-3 3 3M5 10l3 3 3-3" />,

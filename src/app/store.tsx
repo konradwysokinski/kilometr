@@ -1,4 +1,13 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 import { sampleDataset } from '../data/sample';
 import { withAssignments } from '../domain/assign';
 import { gearStats, type GearStats } from '../domain/gear';
@@ -8,8 +17,8 @@ import { unassignedNotice, type Notice } from '../domain/notifications';
 import { unassignedRuns } from '../domain/overview';
 import { importStravaExport } from '../import/importExport';
 import { ExportError } from '../import/stravaExport';
-import { dbGet, dbSet } from '../lib/db';
-import { StoreContext, type ImportState, type Store, type Theme } from './context';
+import { dbDelete, dbGet, dbSet } from '../lib/db';
+import { StoreContext, type ImportState, type Store, type Theme, type ThemePref } from './context';
 
 const KEY_SOURCE = 'kilometr.source';
 const KEY_THEME = 'kilometr.theme';
@@ -64,7 +73,16 @@ export function usePersisted<T extends string>(key: string, initial: () => T, ac
   return [value, set] as const;
 }
 
-const isTheme = (v: string): v is Theme => v === 'light' || v === 'dark';
+const isThemePref = (v: string): v is ThemePref => v === 'light' || v === 'dark' || v === 'system';
+
+const DARK_QUERY = '(prefers-color-scheme: dark)';
+const subscribeDark = (onChange: () => void) => {
+  const mq = window.matchMedia(DARK_QUERY);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+};
+/** Follows the system setting live, so 'system' switches when the OS does. */
+const useSystemDark = () => useSyncExternalStore(subscribeDark, () => window.matchMedia(DARK_QUERY).matches);
 const isLocale = (v: string): v is Locale => v === 'en' || v === 'pl';
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -104,7 +122,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [now, saveNotices],
   );
-  const [theme, setTheme] = usePersisted<Theme>(KEY_THEME, () => 'light', isTheme);
+  const [themePref, setThemePref] = usePersisted<ThemePref>(KEY_THEME, () => 'light', isThemePref);
+  const systemDark = useSystemDark();
+  const theme: Theme = themePref === 'system' ? (systemDark ? 'dark' : 'light') : themePref;
   const [locale, setLocale] = usePersisted<Locale>(KEY_LOCALE, detectLocale, isLocale);
 
   useEffect(() => {
@@ -220,6 +240,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     write(KEY_SOURCE, null);
   }, []);
 
+  const removeAllData = useCallback(async () => {
+    const notices = (['sample', 'export', 'strava'] as const).map((src) => `notices:${src}`);
+    const keys = [DB_DATASET, DB_SAMPLE_SETTINGS, DB_SAMPLE_ASSIGNMENTS, ...notices];
+    await Promise.all(keys.map((k) => dbDelete(k).catch(() => undefined)));
+    noticesRef.current = [];
+    setNotices([]);
+    setImportState({ status: 'idle' });
+    setData(null);
+    write(KEY_SOURCE, null);
+  }, []);
+
   const stats = useMemo(() => (data ? gearStats(data, now) : new Map<string, GearStats>()), [data, now]);
 
   // Hues are sticky: once an item in rotation gets one, it is saved so it
@@ -236,11 +267,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear,
+      data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear, removeAllData,
       notices, markToasted, markAllRead,
-      theme, setTheme, locale, setLocale, t: MESSAGES[locale], f,
+      theme, themePref, setThemePref, locale, setLocale, t: MESSAGES[locale], f,
     }),
-    [data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear, notices, markToasted, markAllRead, theme, setTheme, locale, setLocale, f],
+    [data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllRead, theme, themePref, setThemePref, locale, setLocale, f],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

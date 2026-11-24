@@ -26,7 +26,7 @@ Design references:
 - **Retiring a pair:** a modal with a life summary of the pair and a "Keep it for walks" option (it keeps counting km but leaves the rotation and the sidebar).
 - **Bike parts / service** (chain, brake pads, tyres) are **not available from the Strava API**. They are entered in Kilometr: part, install date, limit in km. Km are counted from rides on that bike since that date. "Log service" resets the counter.
 - **Units:** km, metres, PLN. Settings will later allow units and currency.
-- **Languages:** English and Polish. First visit follows the browser's first supported language; the choice is remembered. Switch: EN | PL in the sidebar footer under "Dark mode", and in the Start screen footer. It moves to Settings when that screen exists.
+- **Languages:** English and Polish. First visit follows the browser's first supported language; the choice is remembered. Switch: EN | PL in Settings (Language) and in the Start screen footer.
 
 ## 2. Data from Strava
 
@@ -66,8 +66,8 @@ Next (not designed yet):
 7. Bike detail with service counters (chain, tyres, pads) and service log
 8. Edit gear: price, limit, photo, nickname, colour
 9. Share card (export an image)
-10. Settings: units, currency, default limits, sync, theme
-11. Dark theme (tokens below are ready; the sidebar already has a "Dark mode" switch)
+10. Settings (built, /settings): Appearance (Light / Dark / System; System follows `prefers-color-scheme` live), Language (EN | PL), Data (current source, import again, "Remove all data" with a confirmation modal; theme and language survive it), About (GitHub, MIT). Later: units, currency, default limits, sync.
+11. Dark theme (built; chosen in Settings)
 12. Notifications (done, simple): after an import or sync, new runs without shoes produce one notice. It shows once as a toast (Sonner, headless `toast.custom`, top right just below the bell, 10 s) and then lives in a notifications panel that slides in from the right (about 420px, full width on phones, no scrim; it fades in with a 12px shift inside the app frame), opened from a bell button in the top-right corner of the content panel on every screen (warn dot when unread; the bell becomes the panel's X; Esc or a click outside closes it; opening marks notices read; toasts pause while it is open). Later notices: gear at 85% of its limit, bike parts due.
 13. Mobile navigation: on phones the sidebar currently stacks above the content and fills the whole first screen. Replace with a compact top bar + hamburger (sidebar as a drawer). Konrad asked for this "for later".
 
@@ -219,7 +219,7 @@ Layout: sidebar ~250px (padding 24/14/18, gap 26 between groups). Content panel 
 
 - **Sidebar nav row:** 38px, padding 0 12, radius 10, icon 17px + label 15px. Active: `rgba(23,25,28,.07)` background, weight 500, icon `--ink`. Activities row shows a 7px `--warn` dot when runs lack shoes.
 - **Sidebar gear row:** 34px, colour square 9×9 radius 3, name (ellipsis), km right in 13px `--ink-muted`. Section label 13px `--ink-muted`. "Show all 18" as a text button.
-- **Sidebar footer:** "Dark mode" row with a switch (34×20 track, 16px knob, on = `--accent`), sync status (7px moss dot with a 3px soft ring, "Synced 12 min ago"), Settings.
+- **Sidebar footer:** sync status (7px moss dot with a 3px soft ring, "Synced 12 min ago"), Settings. Theme and language live in Settings.
 - **Button:** height 40 (44 for main CTA), padding 0 16, radius 12, 14px. Primary: `--accent` bg, white, 500. Secondary: white bg, 1px `--line`.
 - **Filter pill:** height 36, radius pill, 1px `--line`; selected 1.5px `--ink` border, 500; count in `--ink-muted`.
 - **Select / period dropdown:** height 40, radius 12, 1px `--line`, label + double chevron icon (up/down, 12×14, stroke 1.4).

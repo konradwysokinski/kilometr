@@ -7,6 +7,8 @@ import type { Format, Locale, Messages } from '../i18n';
 // Kept in its own module so hot reloads of the store don't recreate the context.
 
 export type Theme = 'light' | 'dark';
+/** What the user picked; 'system' follows prefers-color-scheme. */
+export type ThemePref = Theme | 'system';
 
 export type ImportState =
   | { status: 'idle' }
@@ -30,9 +32,14 @@ export interface Store {
   markToasted: (id: string) => void;
   markAllRead: () => void;
   importState: ImportState;
+  /** Back to Start; imported data stays stored so a re-import keeps settings. */
   clear: () => void;
+  /** Deletes everything Kilometr stored in this browser (but not theme or language) and goes back to Start. */
+  removeAllData: () => Promise<void>;
+  /** The theme in use, with 'system' resolved. */
   theme: Theme;
-  setTheme: (t: Theme) => void;
+  themePref: ThemePref;
+  setThemePref: (t: ThemePref) => void;
   locale: Locale;
   setLocale: (l: Locale) => void;
   t: Messages;

@@ -36,9 +36,8 @@
   border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
-/* Settings-like rows sit a step quieter than the main nav. */
-.footer .navRow,
-.footer .settingRow {
+/* The footer sits a step quieter than the main nav. */
+.footer .navRow {
   font-size: 12px;
 }
 
@@ -63,19 +62,6 @@
 .gearRow {
   height: var(--gear-row);
   font-size: 14px;
-}
-
-.settingRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: var(--row);
-  padding: 0 12px;
-  font-size: 15px;
-}
-
-.clickable {
-  cursor: pointer;
 }
 
 .navRow:hover,
@@ -219,40 +205,6 @@
 .textButton:disabled {
   opacity: 0.5;
   cursor: default;
-}
-
-.switch {
-  appearance: none;
-  flex: none;
-  width: 34px;
-  height: 20px;
-  margin: 0;
-  border-radius: var(--radius-pill);
-  background: var(--switch-off);
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.switch::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: var(--radius-pill);
-  background: #fff;
-  box-shadow: var(--shadow-knob);
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.switch:checked {
-  background: var(--accent);
-}
-
-.switch:checked::after {
-  transform: translateX(14px);
 }
 
 @media (max-height: 780px) {
