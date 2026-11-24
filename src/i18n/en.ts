@@ -42,6 +42,7 @@ export const en = {
   },
 
   overview: {
+    total: (period: string) => period,
     run: (period: string) => `run ${period}`,
     ridden: (period: string) => `ridden ${period}`,
     filterLabel: 'Filter gear',

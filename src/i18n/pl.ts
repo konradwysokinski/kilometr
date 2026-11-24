@@ -55,8 +55,9 @@ export const pl: Messages = {
   },
 
   overview: {
-    run: (period) => `przebiegnięte ${period}`,
-    ridden: (period) => `przejechane ${period}`,
+    total: (period) => period,
+    run: (period) => `przebiegniętych ${period}`,
+    ridden: (period) => `przejechanych ${period}`,
     filterLabel: 'Filtruj sprzęt',
     filterAll: 'Cały sprzęt',
     filterShoes: 'Buty',

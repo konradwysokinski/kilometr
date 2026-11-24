@@ -35,6 +35,9 @@ export function Overview() {
   const weekly = useMemo(() => weeklyRunKm(data, stats, new Date(chartEnd)), [data, stats, chartEnd]);
 
   const bikeNames = summary.bikeIds.flatMap((id) => stats.get(id)?.shortName ?? []);
+  // All gear adds both up; the split stays in the Running and Riding cards.
+  const titleKm = { all: summary.runKm + summary.rideKm, shoe: summary.runKm, bike: summary.rideKm };
+  const titleText = { all: t.overview.total, shoe: t.overview.run, bike: t.overview.ridden };
   const showShoes = filter !== 'bike';
   const showBikes = filter !== 'shoe';
 
@@ -55,10 +58,7 @@ export function Overview() {
     <>
       <header className={s.header}>
         <h1 className={s.title}>
-          {f.km(filter === 'bike' ? summary.rideKm : summary.runKm)}{' '}
-          <span className={s.titleMuted}>
-            {filter === 'bike' ? t.overview.ridden(inPeriod) : t.overview.run(inPeriod)}
-          </span>
+          {f.km(titleKm[filter])} <span className={s.titleMuted}>{titleText[filter](inPeriod)}</span>
         </h1>
         <div className={s.controls}>
           <div className={s.switcher}>
