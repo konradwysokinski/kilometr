@@ -16,7 +16,38 @@
   overflow-y: auto;
 }
 
+.wordmark:hover {
+  color: var(--ink);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Only in the drawer (narrow windows). */
+.close {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-muted);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
 .wordmark {
+  color: var(--ink);
+  text-decoration: none;
   font-family: var(--font-serif);
   font-size: 30px;
   line-height: 34px;
@@ -220,12 +251,46 @@
   }
 }
 
+/*
+ * Narrow windows: the sidebar becomes a drawer from the right, where the top
+ * bar's menu button is (Layout). Hidden and out of the tab order when closed.
+ */
 @media (max-width: 820px) {
   .sidebar {
-    flex-basis: 100%;
-    width: auto;
-    position: static;
-    height: auto;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    width: min(300px, 86vw);
+    height: 100dvh;
+    padding-top: 12px;
+    background: var(--canvas);
+    box-shadow: var(--shadow-modal);
+    overscroll-behavior: contain;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform 0.18s ease-in,
+      visibility 0s linear 0.18s;
+  }
+
+  .sidebar[data-open] {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .close {
+    display: flex;
+    margin-right: -2px;
+  }
+}
+
+@media (max-width: 820px) and (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar[data-open] {
+    transition: visibility 0s;
   }
 }
 

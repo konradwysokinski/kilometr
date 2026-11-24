@@ -8,6 +8,9 @@ export const en = {
 
   nav: {
     label: 'Main',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    back: 'Back',
     overview: 'Overview',
     shoes: 'Shoes',
     bikes: 'Bikes',

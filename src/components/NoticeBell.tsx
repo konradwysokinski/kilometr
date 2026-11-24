@@ -8,8 +8,8 @@ import s from './NoticeBell.module.css';
 
 const PANEL_ID = 'notice-panel';
 
-/** Where the X sits when the bell isn't near the top of the screen: the panel's own padding (40 + 10, or 28 + 10 on phones). */
-const fallbackTop = () => (window.matchMedia('(max-width: 640px)').matches ? 38 : 50);
+/** Narrow windows: the bell sits in the sticky top bar (see NoticeBell.module.css and Layout). */
+const isNarrow = () => window.matchMedia('(max-width: 820px)').matches;
 
 interface Props {
   open: boolean;
@@ -17,7 +17,8 @@ interface Props {
 }
 
 /**
- * Bell in the top-right corner of the content panel on every screen. It opens
+ * Bell in the top-right corner of the content panel on every screen (in the
+ * top bar, next to the menu button, on narrow windows). It opens
  * notifications in a panel that slides in from the right, with no scrim, so the
  * screen behind stays usable. While the panel is open the bell becomes its X.
  */
@@ -102,10 +103,13 @@ export function NoticeBell({ open, onOpenChange }: Props) {
         onClick={() => {
           if (!open && bellRef.current) {
             const r = bellRef.current.getBoundingClientRect();
-            // Out of view, or low on a phone where the sidebar sits above the content:
-            // the X takes the panel's usual corner instead.
-            const offCorner = r.top < 0 || r.top > 120;
-            setAnchor({ top: offCorner ? fallbackTop() : Math.max(r.top, 20), left: r.left });
+            if (isNarrow()) {
+              // Fixed in the top bar: always on screen, so the X takes exactly its place.
+              setAnchor({ top: r.top, left: r.left });
+            } else {
+              // Scrolled out of view: the X takes the panel's usual corner instead.
+              setAnchor({ top: r.top < 0 ? 50 : Math.max(r.top, 20), left: r.left });
+            }
           }
           onOpenChange(!open);
         }}

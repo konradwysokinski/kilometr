@@ -69,7 +69,7 @@ Next (not designed yet):
 10. Settings (built, /settings): Appearance (Light / Dark / System; System follows `prefers-color-scheme` live), Language (EN | PL), Data (current source, import again, "Remove all data" with a confirmation modal; theme and language survive it), About (GitHub, MIT). Later: units, currency, default limits, sync.
 11. Dark theme (built; chosen in Settings)
 12. Notifications (done, simple): after an import or sync, new runs without shoes produce one notice. It shows once as a toast (Sonner, headless `toast.custom`, top right just below the bell, 10 s) and then lives in a notifications panel that slides in from the right (about 420px, full width on phones, no scrim; it fades in with a 12px shift inside the app frame), opened from a bell button in the top-right corner of the content panel on every screen (warn dot when unread; the bell becomes the panel's X; Esc or a click outside closes it; opening marks notices read; toasts pause while it is open). Later notices: gear at 85% of its limit, bike parts due.
-13. Mobile navigation: on phones the sidebar currently stacks above the content and fills the whole first screen. Replace with a compact top bar + hamburger (sidebar as a drawer). Konrad asked for this "for later".
+13. Mobile navigation (built): up to 820px wide a sticky top bar replaces the sidebar. Left: back arrow on detail screens (history back, home if none; the in-content back link hides) and the wordmark, a link to Overview. Right: the bell (fixed there by its own CSS; its panel becomes a full-height sheet) and the menu button, which opens the sidebar as a drawer from the right (min(300px, 86vw), soft scrim, own X). Esc, the scrim, the X or picking a screen close it; focus returns to the menu button; the page behind is inert and doesn't scroll. The sidebar wordmark links to Overview too.
 
 ### Build queue (agreed with Konrad, in this order)
 
@@ -77,7 +77,7 @@ Next (not designed yet):
 2. Bikes screen
 3. Activities screen and Retired screen
 4. "Kilometres by week" chart: a small toggle between stacked bars and a line chart
-5. Later: mobile hamburger (see 13 above)
+5. Mobile hamburger (done, see 13 above)
 
 ---
 

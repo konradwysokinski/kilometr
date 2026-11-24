@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import { useDataset } from '../app/store';
 import { byLastUsed, type GearStats } from '../domain/gear';
 import { unassignedRuns } from '../domain/overview';
@@ -20,14 +20,28 @@ const NAV: { to: string; key: 'overview' | 'shoes' | 'bikes' | 'activities' | 'r
 
 const navClass = ({ isActive }: { isActive: boolean }) => `${s.navRow} ${isActive ? s.active : ''}`;
 
-export function Sidebar() {
+interface Props {
+  id: string;
+  /** Phones and narrow windows only: the sidebar is a drawer there. */
+  open: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ id, open, onClose }: Props) {
   const { data, stats, now, t } = useDataset();
   const runsWithoutShoes = unassignedRuns(data, now).length;
   const all = [...stats.values()];
 
   return (
-    <nav aria-label={t.nav.label} className={s.sidebar}>
-      <div className={s.wordmark}>Kilometr</div>
+    <nav id={id} aria-label={t.nav.label} className={s.sidebar} data-open={open || undefined}>
+      <div className={s.top}>
+        <Link to="/" className={s.wordmark}>
+          Kilometr
+        </Link>
+        <button type="button" className={s.close} aria-label={t.nav.closeMenu} onClick={onClose}>
+          <Icon name="close" size={16} />
+        </button>
+      </div>
 
       <div className={s.group}>
         {NAV.map((item) => (

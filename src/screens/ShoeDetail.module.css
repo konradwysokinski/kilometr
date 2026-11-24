@@ -241,3 +241,10 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* Narrow windows have a back arrow in the top bar instead (Layout). */
+@media (max-width: 820px) {
+  .back {
+    display: none;
+  }
+}

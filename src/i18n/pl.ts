@@ -21,6 +21,9 @@ export const pl: Messages = {
 
   nav: {
     label: 'Główna nawigacja',
+    openMenu: 'Otwórz menu',
+    closeMenu: 'Zamknij menu',
+    back: 'Wstecz',
     overview: 'Przegląd',
     shoes: 'Buty',
     bikes: 'Rowery',

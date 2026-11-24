@@ -19,7 +19,7 @@ export function App() {
       <Screens />
       {/* Mounted once, always, so toasts survive moving between Start and the app. */}
       {/* Top right, just below the notification bell in the content panel. */}
-      <Toaster theme={theme} position="top-right" offset={{ top: 92, right: 54 }} mobileOffset={16} />
+      <Toaster theme={theme} position="top-right" offset={{ top: 92, right: 54 }} mobileOffset={{ top: 72, right: 16, left: 16 }} />
     </>
   );
 }
