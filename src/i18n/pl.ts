@@ -130,6 +130,8 @@ export const pl: Messages = {
     title: 'Aktywności',
     unassigned: 'Biegi bez butów',
     unassignedHint: 'z ostatnich 30 dni, nie liczą się na żadnej parze',
+    unassignedNote: (n, nF) => `${nF} ${plural(n, 'bieg', 'biegi', 'biegów')} bez butów`,
+    assignShoes: 'Przypisz buty',
     assignAll: 'Przypisz wszystkie sugerowane',
     shoesFor: (name, date) => `Buty dla: ${name}, ${date}`,
     suggested: 'sugerowane',

@@ -3,11 +3,19 @@ import { useStore } from '../app/store';
 import type { GearStats } from '../domain/gear';
 import s from './ListSection.module.css';
 
-/** A titled group on the Shoes and Bikes screens. */
-export function ListSection({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+interface Props {
+  title: string;
+  hint?: string;
+  /** Makes the section a target: links can scroll to it and move focus there. */
+  id?: string;
+  children: ReactNode;
+}
+
+/** A titled group on the Shoes, Bikes and Activities screens. */
+export function ListSection({ title, hint, id: sectionId, children }: Props) {
   const id = useId();
   return (
-    <section aria-labelledby={id} className={s.section}>
+    <section id={sectionId} tabIndex={sectionId ? -1 : undefined} aria-labelledby={id} className={s.section}>
       <h2 id={id} className={s.title}>
         {title} {hint && <span className={s.hint}>{hint}</span>}
       </h2>

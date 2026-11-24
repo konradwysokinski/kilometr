@@ -117,6 +117,8 @@ export const en = {
     title: 'Activities',
     unassigned: 'Runs without shoes',
     unassignedHint: 'from the last 30 days, not counted on any pair',
+    unassignedNote: (n: number, nF: string) => `${nF} ${plural(n, 'run', 'runs')} without shoes`,
+    assignShoes: 'Assign shoes',
     assignAll: 'Assign all suggested',
     shoesFor: (name: string, date: string) => `Shoes for ${name}, ${date}`,
     suggested: 'suggested',

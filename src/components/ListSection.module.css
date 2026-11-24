@@ -16,3 +16,12 @@
   color: var(--ink-muted);
   margin-left: 4px;
 }
+
+/* A scroll target (see the id prop): a little room above, and no ring round the whole section. */
+.section[id] {
+  scroll-margin-top: 24px;
+}
+
+.section[id]:focus {
+  outline: none;
+}

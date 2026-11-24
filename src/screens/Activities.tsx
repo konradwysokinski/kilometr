@@ -11,15 +11,39 @@ import { gearColour, tint } from '../lib/colour';
 import s from './Activities.module.css';
 
 const MONTHS_STEP = 3;
+const UNASSIGNED_ID = 'runs-without-shoes';
 type Filter = 'all' | 'runs' | 'rides';
 
 export function Activities() {
-  const { t } = useDataset();
+  const { data, now, t, f } = useDataset();
+  const unassigned = useMemo(() => unassignedRuns(data, now).length, [data, now]);
+
+  const goToUnassigned = () => {
+    const section = document.getElementById(UNASSIGNED_ID);
+    if (!section) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    section.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    section.focus({ preventScroll: true });
+  };
+
   return (
     <>
-      <h1 className={s.title}>{t.activities.title}</h1>
-      <Unassigned />
+      <header className={s.header}>
+        <h1 className={s.title}>{t.activities.title}</h1>
+        {/* Quiet on purpose: rare and low-stakes, so a note rather than a banner. */}
+        {unassigned > 0 && (
+          <p className={s.note}>
+            <span className={s.noteDot} aria-hidden="true" />
+            {t.activities.unassignedNote(unassigned, f.int(unassigned))}
+            <span aria-hidden="true">·</span>
+            <button type="button" className={s.noteAction} onClick={goToUnassigned}>
+              {t.activities.assignShoes}
+            </button>
+          </p>
+        )}
+      </header>
       <AllActivities />
+      <Unassigned />
     </>
   );
 }
@@ -51,7 +75,7 @@ function Unassigned() {
   };
 
   return (
-    <ListSection title={t.activities.unassigned} hint={t.activities.unassignedHint}>
+    <ListSection id={UNASSIGNED_ID} title={t.activities.unassigned} hint={t.activities.unassignedHint}>
       {choices.length === 0 ? (
         <p className={s.muted}>{t.activities.noChoices}</p>
       ) : (

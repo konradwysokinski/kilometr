@@ -1,3 +1,9 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .title {
   font-size: 30px;
   line-height: 36px;
@@ -9,6 +15,43 @@
   font-size: 13px;
   line-height: 18px;
   color: var(--ink-muted);
+}
+
+/* Quiet note under the title (CLAUDE.md 4.5: not a banner) */
+
+.note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-muted);
+}
+
+.noteDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--warn);
+}
+
+.noteAction {
+  /* 36px tall to tap, without pushing the line apart. */
+  padding: 9px 0;
+  margin: -9px 0;
+  border: 0;
+  background: none;
+  color: var(--warn-ink);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.noteAction:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Buttons */
