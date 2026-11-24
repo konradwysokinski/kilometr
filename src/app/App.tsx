@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { Toaster } from 'sonner';
+import { Bikes } from '../screens/Bikes';
 import { GearDetail } from '../screens/GearDetail';
 import { Notifications } from '../screens/Notifications';
 import { Overview } from '../screens/Overview';
@@ -32,7 +33,7 @@ function Screens() {
           <Route index element={<Overview />} />
           <Route path="gear/:id" element={<GearDetail />} />
           <Route path="shoes" element={<Shoes />} />
-          <Route path="bikes" element={<Placeholder screen="bikes" />} />
+          <Route path="bikes" element={<Bikes />} />
           <Route path="activities" element={<Placeholder screen="activities" />} />
           <Route path="retired" element={<Placeholder screen="retired" />} />
           <Route path="settings" element={<Placeholder screen="settings" />} />

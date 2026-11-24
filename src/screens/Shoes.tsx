@@ -1,21 +1,24 @@
-import { useId } from 'react';
 import { Link } from 'react-router';
 import { useDataset } from '../app/store';
 import { GearCard } from '../components/GearCard';
+import { ListSection, useLastUsed } from '../components/ListSection';
 import type { GearStats } from '../domain/gear';
 import { groupGear } from '../domain/lists';
-import s from './Shoes.module.css';
+import s from './GearList.module.css';
 
 export function Shoes() {
-  const { stats, now, t, f } = useDataset();
+  const { stats, t, f } = useDataset();
+  const lastUsed = useLastUsed();
   const { rotation, resting, walks, retiredCount } = groupGear(stats.values(), 'shoe');
   const total = rotation.length + resting.length + walks.length;
 
-  const lastUsed = (g: GearStats) => {
-    if (!g.lastUsed) return t.shoes.neverUsed;
-    const sameYear = g.lastUsed.getFullYear() === now.getFullYear();
-    return t.shoes.lastUsed(sameYear ? f.dayMonth(g.lastUsed) : f.date(g.lastUsed));
-  };
+  const grid = (list: GearStats[], withLastUsed = false) => (
+    <div className={s.grid}>
+      {list.map((g) => (
+        <GearCard key={g.gear.id} gear={g} footnote={withLastUsed ? lastUsed(g) : undefined} />
+      ))}
+    </div>
+  );
 
   return (
     <>
@@ -27,9 +30,21 @@ export function Shoes() {
 
       {total === 0 && <p className={s.empty}>{t.shoes.empty}</p>}
 
-      <Group title={t.shoes.inRotation} hint={t.shoes.inRotationHint} gear={rotation} />
-      <Group title={t.shoes.resting} hint={t.shoes.restingHint} gear={resting} footnote={lastUsed} />
-      <Group title={t.shoes.walks} hint={t.shoes.walksHint} gear={walks} footnote={lastUsed} />
+      {rotation.length > 0 && (
+        <ListSection title={t.shoes.inRotation} hint={t.shoes.inRotationHint}>
+          {grid(rotation)}
+        </ListSection>
+      )}
+      {resting.length > 0 && (
+        <ListSection title={t.shoes.resting} hint={t.shoes.restingHint}>
+          {grid(resting, true)}
+        </ListSection>
+      )}
+      {walks.length > 0 && (
+        <ListSection title={t.shoes.walks} hint={t.shoes.walksHint}>
+          {grid(walks, true)}
+        </ListSection>
+      )}
 
       {retiredCount > 0 && (
         <p className={s.retired}>
@@ -39,32 +54,5 @@ export function Shoes() {
         </p>
       )}
     </>
-  );
-}
-
-function Group({
-  title,
-  hint,
-  gear,
-  footnote,
-}: {
-  title: string;
-  hint: string;
-  gear: GearStats[];
-  footnote?: (g: GearStats) => string;
-}) {
-  const id = useId();
-  if (gear.length === 0) return null;
-  return (
-    <section aria-labelledby={id} className={s.section}>
-      <h2 id={id} className={s.sectionTitle}>
-        {title} <span className={s.sectionHint}>{hint}</span>
-      </h2>
-      <div className={s.grid}>
-        {gear.map((g) => (
-          <GearCard key={g.gear.id} gear={g} footnote={footnote?.(g)} />
-        ))}
-      </div>
-    </section>
   );
 }

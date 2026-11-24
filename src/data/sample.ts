@@ -24,6 +24,8 @@ interface Plan {
   avgKm: number;
   /** Share of activities that are trail runs (shoes only). */
   trail?: number;
+  /** Share of rides that are gravel rides (bikes only, default 0.6). */
+  gravel?: number;
 }
 
 const shoe = (id: string, brand: string, model: string, retired = false): Gear => ({
@@ -80,6 +82,12 @@ const PLANS: Plan[] = [
     settings: { price: 11999, colour: 5 },
     totalKm: 3214, from: 820, to: 4, avgKm: 52,
   },
+  // Last, so the random draws for the gear above stay the same.
+  {
+    gear: { id: 'g-sa', kind: 'bike', brand: 'Specialized', model: 'Allez', retired: false },
+    settings: { price: 4299 },
+    totalKm: 5400, from: 1500, to: 125, avgKm: 61, gravel: 0,
+  },
 ];
 
 const timeOfDay = (hour: number) => (hour < 11 ? 'Morning' : hour < 15 ? 'Lunch' : hour < 18 ? 'Afternoon' : 'Evening');
@@ -104,7 +112,7 @@ function activitiesFor(plan: Plan, now: Date, rand: () => number): Activity[] {
     left -= units;
     const distance = units * 10;
     const sportType: SportType =
-      plan.gear.kind === 'bike' ? (rand() < 0.6 ? 'GravelRide' : 'Ride') : rand() < (plan.trail ?? 0) ? 'TrailRun' : 'Run';
+      plan.gear.kind === 'bike' ? (rand() < (plan.gravel ?? 0.6) ? 'GravelRide' : 'Ride') : rand() < (plan.trail ?? 0) ? 'TrailRun' : 'Run';
     const climb = sportType === 'TrailRun' ? 38 : sportType === 'GravelRide' ? 11 : sportType === 'Ride' ? 8 : 7;
     const date = addDays(now, -r.daysAgo);
     date.setHours(r.hour, Math.floor(rand() * 60), 0, 0);

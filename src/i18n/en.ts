@@ -87,6 +87,18 @@ export const en = {
     empty: 'No shoes yet. Add them in Strava, then import again.',
   },
 
+  bikes: {
+    onBikes: (n: number, nF: string) => `on ${nF} ${plural(n, 'bike', 'bikes')}`,
+    inRotationHint: 'ridden in the last 60 days',
+    restingHint: 'not ridden in the last 60 days',
+    mix: { road: 'Road', gravel: 'Gravel', mtb: 'MTB' },
+    rides: 'Rides',
+    perRide: (m: string) => `${m} per ride on average`,
+    parts: 'Parts',
+    retired: (n: number, nF: string) => `${nF} retired ${plural(n, 'bike', 'bikes')}`,
+    empty: 'No bikes yet. Add them in Strava, then import again.',
+  },
+
   gear: {
     road: 'Road',
     trail: 'Trail',

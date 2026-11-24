@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats } from './gear';
-import { groupGear } from './lists';
+import { activitiesOf } from './detail';
+import { groupGear, rideMix } from './lists';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -19,6 +20,14 @@ describe('groupGear', () => {
   it('keeps bikes apart from shoes', () => {
     const bikes = groupGear(gearStats(data, now).values(), 'bike');
     expect(ids(bikes.rotation)).toEqual(['g-cg']);
-    expect(bikes.resting).toHaveLength(0);
+    expect(ids(bikes.resting)).toEqual(['g-sa']);
+  });
+});
+
+describe('rideMix', () => {
+  it('names a bike by what it is mostly ridden as', () => {
+    expect(rideMix(activitiesOf(data, 'g-cg'))).toBe('gravel');
+    expect(rideMix(activitiesOf(data, 'g-sa'))).toBe('road');
+    expect(rideMix([])).toBeNull();
   });
 });

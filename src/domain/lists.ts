@@ -1,5 +1,5 @@
 import { byLastUsed, type GearStats } from './gear';
-import type { GearKind } from './types';
+import type { Activity, GearKind } from './types';
 
 export interface GearGroups {
   /** Used in the last 60 days. */
@@ -26,4 +26,18 @@ export function groupGear(stats: Iterable<GearStats>, kind: GearKind): GearGroup
   groups.resting.sort(byLastUsed);
   groups.walks.sort(byLastUsed);
   return groups;
+}
+
+export type RideMix = 'road' | 'gravel' | 'mtb';
+
+/** What a bike is mostly ridden as, by kilometres. Null without rides. */
+export function rideMix(activities: Activity[]): RideMix | null {
+  const kmBy: Record<RideMix, number> = { road: 0, gravel: 0, mtb: 0 };
+  for (const a of activities) {
+    if (a.sportType === 'Ride') kmBy.road += a.distance;
+    else if (a.sportType === 'GravelRide') kmBy.gravel += a.distance;
+    else if (a.sportType === 'MountainBikeRide') kmBy.mtb += a.distance;
+  }
+  const [top, metres] = (Object.entries(kmBy) as [RideMix, number][]).sort((a, b) => b[1] - a[1])[0]!;
+  return metres > 0 ? top : null;
 }

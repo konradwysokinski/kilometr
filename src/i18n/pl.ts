@@ -100,6 +100,18 @@ export const pl: Messages = {
     empty: 'Brak butów. Dodaj je w Strava i zaimportuj ponownie.',
   },
 
+  bikes: {
+    onBikes: (n, nF) => `na ${nF} ${n === 1 ? 'rowerze' : 'rowerach'}`,
+    inRotationHint: 'jeżdżone w ostatnich 60 dniach',
+    restingHint: 'nieużywane od ponad 60 dni',
+    mix: { road: 'Szosa', gravel: 'Gravel', mtb: 'MTB' },
+    rides: 'Jazdy',
+    perRide: (m) => `średnio ${m} na jazdę`,
+    parts: 'Części',
+    retired: (n, nF) => `${nF} ${plural(n, 'wycofany rower', 'wycofane rowery', 'wycofanych rowerów')}`,
+    empty: 'Brak rowerów. Dodaj je w Strava i zaimportuj ponownie.',
+  },
+
   gear: {
     road: 'Asfalt',
     trail: 'Teren',
