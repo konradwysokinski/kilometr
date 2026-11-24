@@ -223,6 +223,7 @@ export const en = {
     roadPct: (pct: number) => `${pct}% road`,
     offRoad: (part: string, total: string) => `${part} of ${total} off-road`,
     onRoad: (part: string, total: string) => `${part} of ${total} on road`,
+    noTerrain: 'No surface data for these runs',
     split: (trail: string, road: string) => `${trail} trail · ${road} road`,
     perMonth: 'Kilometres per month',
     perMonthSummary: (from: string, to: string, kind: 'shoe' | 'bike') =>

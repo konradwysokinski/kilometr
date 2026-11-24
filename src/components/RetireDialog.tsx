@@ -47,9 +47,11 @@ export function RetireDialog({ shoe, open, onClose, onConfirm }: Props) {
     { value: f.kmPrecise(shoe.longestKm), label: t.retire.longest },
     { value: `${f.int(duration.n)} ${t.retire.duration(duration.n, duration.unit)}`, label: t.retire.inRotation },
     { value: shoe.costPerKm !== null ? f.money(shoe.costPerKm) : '—', label: t.retire.perKm },
-    trailShare >= 0.5
-      ? { value: `${Math.round(trailShare * 100)}%`, label: t.retire.onTrail }
-      : { value: `${Math.round((1 - trailShare) * 100)}%`, label: t.retire.onRoad },
+    terrainTotal === 0
+      ? { value: '—', label: t.retire.onRoad }
+      : trailShare >= 0.5
+        ? { value: `${Math.round(trailShare * 100)}%`, label: t.retire.onTrail }
+        : { value: `${Math.round((1 - trailShare) * 100)}%`, label: t.retire.onRoad },
   ];
 
   const caption = [

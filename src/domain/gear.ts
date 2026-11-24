@@ -73,6 +73,16 @@ export function wearOf(totalKm: number, limitKm: number): Wear {
   };
 }
 
+/**
+ * "Trail" or "Road" for a pair, but only when enough of its km carry surface
+ * data (old exported runs don't): 100 km, or a fifth of all its km.
+ */
+function terrainLabel(roadKm: number, trailKm: number, totalKm: number): 'Road' | 'Trail' | null {
+  const known = roadKm + trailKm;
+  if (known === 0 || (known < 100 && known < totalKm * 0.2)) return null;
+  return trailKm > roadKm ? 'Trail' : 'Road';
+}
+
 function statsFor(gear: Gear, activities: Activity[], settings: GearSettings, now: Date) {
   let totalKm = 0;
   let longestKm = 0;
@@ -90,8 +100,14 @@ function statsFor(gear: Gear, activities: Activity[], settings: GearSettings, no
     totalKm += d;
     longestKm = Math.max(longestKm, d);
     elevationGain += a.elevationGain;
+    // Terrain: a trail run counts as trail; otherwise the unpaved metres from
+    // the export split the run; runs the export has no surface data for are left out.
     if (a.sportType === 'TrailRun') trailKm += d;
-    else if (a.sportType === 'Run') roadKm += d;
+    else if (a.sportType === 'Run' && a.dirtDistance !== null) {
+      const dirt = a.dirtDistance === undefined ? 0 : Math.min(km(a.dirtDistance), d);
+      trailKm += dirt;
+      roadKm += d - dirt;
+    }
     if (date >= paceFrom && date <= now) recentKm += d;
     if (!firstUsed || date < firstUsed) firstUsed = date;
     if (!lastUsed || date > lastUsed) lastUsed = date;
@@ -125,7 +141,7 @@ function statsFor(gear: Gear, activities: Activity[], settings: GearSettings, no
     terrain: {
       roadKm,
       trailKm,
-      label: gear.kind === 'bike' ? null : trailKm > roadKm ? 'Trail' : roadKm > 0 ? 'Road' : null,
+      label: gear.kind === 'bike' ? null : terrainLabel(roadKm, trailKm, totalKm),
     },
     weeksLeft: wear && weeklyPace > 0 ? wear.leftKm / weeklyPace : null,
   } satisfies GearStats;

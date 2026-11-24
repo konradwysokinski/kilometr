@@ -29,6 +29,43 @@ describe('wear', () => {
   });
 });
 
+describe('terrain', () => {
+  const runs = (dirt: (distance: number) => number | null) =>
+    gearStats(
+      {
+        ...data,
+        activities: data.activities.map((a) =>
+          a.gearId === 'g-np41' && a.sportType === 'Run' ? { ...a, dirtDistance: dirt(a.distance) } : a,
+        ),
+      },
+      now,
+    ).get('g-np41')!.terrain;
+
+  it('splits runs by their unpaved metres', () => {
+    const t = runs((d) => d / 4);
+    expect(t.trailKm / (t.trailKm + t.roadKm)).toBeCloseTo(0.25, 5);
+    expect(t.label).toBe('Road');
+  });
+
+  it('names the terrain only with enough km of surface data', () => {
+    const data2 = {
+      ...data,
+      activities: data.activities.map((a, i) =>
+        a.gearId === 'g-np41' && a.sportType === 'Run' ? { ...a, dirtDistance: i % 10 === 0 ? a.distance : null } : a,
+      ),
+    };
+    const t = gearStats(data2, now).get('g-np41')!.terrain;
+    expect(t.trailKm + t.roadKm).toBeLessThan(100);
+    expect(t.label).toBeNull();
+  });
+
+  it('leaves out runs with no surface data', () => {
+    const t = runs(() => null);
+    expect(t.trailKm + t.roadKm).toBe(0);
+    expect(t.label).toBeNull();
+  });
+});
+
 describe('retiring', () => {
   it('stops counting runs after the retire date, but keeps counting walks pairs', () => {
     const cut = '2026-10-01T00:00:00.000Z';

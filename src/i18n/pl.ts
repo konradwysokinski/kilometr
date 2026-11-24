@@ -236,6 +236,7 @@ export const pl: Messages = {
     roadPct: (pct) => `${pct}% asfalt`,
     offRoad: (part, total) => `${part} z ${total} w terenie`,
     onRoad: (part, total) => `${part} z ${total} po asfalcie`,
+    noTerrain: 'Brak danych o nawierzchni tych biegów',
     split: (trail, road) => `${trail} teren · ${road} asfalt`,
     perMonth: 'Kilometry w miesiącach',
     perMonthSummary: (from, to, kind) =>

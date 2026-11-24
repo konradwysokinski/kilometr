@@ -24,6 +24,13 @@ export interface Activity {
   /** Metres. */
   elevationGain: number;
   gearId: string | null;
+  /**
+   * Metres on unpaved ground, from the export's "Dirt Distance" (Strava fills it
+   * from about 2021). null: the export has the column but not for this run, so
+   * its terrain is unknown. undefined: no such data (sample, API); the sport
+   * type decides (TrailRun = trail, Run = road).
+   */
+  dirtDistance?: number | null;
 }
 
 /** Things only the user knows, stored locally. */

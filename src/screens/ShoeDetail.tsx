@@ -144,12 +144,19 @@ export function ShoeDetail({ shoe }: { shoe: GearStats }) {
           size="md"
           label={t.detail.terrain}
           value={
-            mostlyTrail ? t.detail.trailPct(Math.round(trailShare * 100)) : t.detail.roadPct(Math.round((1 - trailShare) * 100))
+            terrainTotal === 0
+              ? '—'
+              : mostlyTrail
+                ? t.detail.trailPct(Math.round(trailShare * 100))
+                : t.detail.roadPct(Math.round((1 - trailShare) * 100))
           }
           sub={
-            mostlyTrail
-              ? t.detail.offRoad(f.int(terrain.trailKm), f.km(terrainTotal))
-              : t.detail.onRoad(f.int(terrain.roadKm), f.km(terrainTotal))
+            // Older exported runs carry no surface data.
+            terrainTotal === 0
+              ? t.detail.noTerrain
+              : mostlyTrail
+                ? t.detail.offRoad(f.int(terrain.trailKm), f.km(terrainTotal))
+                : t.detail.onRoad(f.int(terrain.roadKm), f.km(terrainTotal))
           }
         />
       </section>

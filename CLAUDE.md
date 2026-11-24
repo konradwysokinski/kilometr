@@ -40,11 +40,12 @@ Export .zip:
 - `activities.csv`: columns incl. "Activity Gear", "Distance", "Elevation Gain", "Activity Type", "Activity Date", "Activity Name".
 - `shoes.csv` / `bikes.csv`: Shoe|Bike Name, Brand, Model. Name is the Strava display name (a nickname if set) and is what "Activity Gear" contains.
 - "Distance" appears twice in activities.csv: km first, metres later. Dates look like "Nov 23, 2026, 7:12:45 AM" (UTC).
-- The export has no gear IDs and no retired flag: gear is keyed by kind + name (`src/import/stravaExport.ts`). Not yet checked against a real export; Konrad can provide his.
+- Checked against Konrad's real export (2026-11-24, 5 469 activities, 104 columns). Gear is keyed by kind + name (`src/import/stravaExport.ts`); "Shoe Name" is often empty, then brand + model is the name. activities.csv also has a "Gear" column with numeric Strava gear IDs (2658514.0 → g2658514), unused so far but handy for matching with the API. No retired flag.
+- Terrain: the export never says "Trail Run" (all runs are "Run") and "Shoe Default Sport Types" is empty, but "Dirt Distance" (metres unpaved) is filled for runs from about 2021. Kilometr splits each run by it (`Activity.dirtDistance`); runs without it are left out of the terrain split. With the API, sport_type TrailRun decides.
 
 Derived per gear item:
 - total km, number of activities, longest activity, **elevation gain sum** (sum of `total_elevation_gain` over activities with that `gear_id`), average gain per activity.
-- **terrain split**: `TrailRun` = trail, `Run` = road (km and %).
+- **terrain split**: from the export, unpaved metres ("Dirt Distance") vs the rest; from the API, `TrailRun` = trail, `Run` = road (km and %).
 - km per week / month, last used date → rotation.
 - cost per km = price / km (price entered by the user).
 - wear % = km / limit; km left; rough "weeks left" from recent pace on that pair.

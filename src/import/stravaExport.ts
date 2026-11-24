@@ -155,6 +155,8 @@ export function parseStravaExport(files: ExportFiles): ParsedExport {
     }
 
     const elevation = num(r['Elevation Gain']);
+    // Exports have no "Trail Run" type for most runs, but say how much of each was unpaved.
+    const dirt = 'Dirt Distance' in r ? num(r['Dirt Distance']) : undefined;
     activities.push({
       id: r['Activity ID']?.trim() || `row-${i}`,
       name: r['Activity Name']?.trim() ?? '',
@@ -163,6 +165,7 @@ export function parseStravaExport(files: ExportFiles): ParsedExport {
       distance,
       elevationGain: Number.isFinite(elevation) ? elevation : 0,
       gearId: gear ? gearId(gear.kind, gear.displayName) : null,
+      ...(dirt !== undefined && { dirtDistance: Number.isFinite(dirt) ? Math.max(0, dirt) : null }),
     });
   });
 

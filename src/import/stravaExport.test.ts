@@ -67,6 +67,26 @@ describe('parseStravaExport', () => {
   });
 });
 
+describe('surface (Dirt Distance)', () => {
+  const withDirt = [
+    'Activity ID,Activity Date,Activity Name,Activity Type,Distance,Activity Gear,Distance,Elevation Gain,Dirt Distance',
+    '201,"Nov 23, 2026, 7:12:45 AM",Forest loop,Run,"10.00",Mud ones,10000.0,300.0,3000.5',
+    '202,"Mar 2, 2020, 7:12:45 AM",Old run,Run,"8.00",Mud ones,8000.0,40.0,',
+  ].join('\n');
+  const out = parseStravaExport({ activities: withDirt, shoes: SHOES });
+  const byId = new Map(out.activities.map((a) => [a.id, a]));
+
+  it('keeps the unpaved metres, and marks runs without the value as unknown', () => {
+    expect(byId.get('201')!.dirtDistance).toBe(3000.5);
+    expect(byId.get('202')!.dirtDistance).toBeNull();
+  });
+
+  it('leaves it out when the export has no such column', () => {
+    const plain = parseStravaExport({ activities: ACTIVITIES, shoes: SHOES, bikes: BIKES });
+    expect(plain.activities.every((a) => !('dirtDistance' in a))).toBe(true);
+  });
+});
+
 describe('readExportZip', () => {
   async function zip(files: Record<string, string>) {
     const writer = new ZipWriter(new BlobWriter('application/zip'));
