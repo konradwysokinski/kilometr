@@ -6,11 +6,11 @@ import s from './NoticeCard.module.css';
 interface Props {
   notice: Notice;
   onAction: () => void;
-  /** Shown in a toast; the list has no close button. */
+  /** Shown in a toast; the panel has no close button. */
   onClose?: () => void;
 }
 
-/** One notice, shared by the toast and the notifications list. */
+/** One notice, shared by the toast and the notifications panel. */
 export function NoticeCard({ notice, onAction, onClose }: Props) {
   const { t, f } = useStore();
   const n = notice.activityIds.length;

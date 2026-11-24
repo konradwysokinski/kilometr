@@ -19,7 +19,7 @@ Early work in progress.
 - [ ] Connect Strava with your own API app (OAuth)
 - [x] Shoe detail: wear, pace estimate, KPIs, terrain, kilometres per month, recent runs
 - [x] Retire pair (or keep it for walks) and bring it back; saved locally
-- [x] Notifications: a toast after import for runs without shoes, then a list
+- [x] Notifications: a toast after import for runs without shoes, then a slide-in panel
 - [ ] Shoes, Bikes, Activities and Retired screens; line chart toggle; Edit gear
 - [ ] Bike detail and service log, Edit gear, Retired, Settings
 

@@ -20,8 +20,8 @@
   position: relative;
 }
 
-/* Keeps the first row of every screen clear of the notification bell. */
-.panel > :nth-child(2) {
+/* Keeps the first row of every screen clear of the notification bell (the bell and its panel come first). */
+.panel > :nth-child(3) {
   padding-right: 52px;
 }
 

@@ -8,14 +8,16 @@ const DURATION = 10_000;
 
 /**
  * Shows each new notice once as a toast. When it closes (by hand or on its
- * own) it is marked as toasted and lives on in the notifications list.
+ * own) it is marked as toasted and lives on in the notifications panel.
+ * Paused while that panel is open: it already shows every notice.
  * Mounted inside the router so the action can navigate.
  */
-export function NoticeToasts() {
+export function NoticeToasts({ paused }: { paused: boolean }) {
   const { notices, markToasted } = useStore();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (paused) return;
     for (const n of notices) {
       if (n.toasted) continue;
       // A stable id means StrictMode's double effect updates instead of duplicating.
@@ -37,7 +39,7 @@ export function NoticeToasts() {
         { id: n.id, duration: DURATION, onAutoClose: () => markToasted(n.id), onDismiss: () => markToasted(n.id) },
       );
     }
-  }, [notices, markToasted, navigate]);
+  }, [notices, markToasted, navigate, paused]);
 
   return null;
 }

@@ -3,7 +3,6 @@ import { Toaster } from 'sonner';
 import { Activities } from '../screens/Activities';
 import { Bikes } from '../screens/Bikes';
 import { GearDetail } from '../screens/GearDetail';
-import { Notifications } from '../screens/Notifications';
 import { Overview } from '../screens/Overview';
 import { Placeholder } from '../screens/Placeholder';
 import { Retired } from '../screens/Retired';
@@ -40,7 +39,6 @@ function Screens() {
           <Route path="activities" element={<Activities />} />
           <Route path="retired" element={<Retired />} />
           <Route path="settings" element={<Placeholder screen="settings" />} />
-          <Route path="notifications" element={<Notifications />} />
           <Route path="*" element={<Placeholder screen="notFound" />} />
         </Route>
       </Routes>

@@ -230,6 +230,7 @@ export const pl: Messages = {
     title: 'Powiadomienia',
     empty: 'Nic nowego. Kilometr da tu znać, gdy coś będzie wymagało uwagi.',
     close: 'Zamknij',
+    closePanel: 'Zamknij powiadomienia',
     unread: (n) => `${n} nieprzeczytane`,
   },
 

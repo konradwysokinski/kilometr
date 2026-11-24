@@ -217,6 +217,7 @@ export const en = {
     title: 'Notifications',
     empty: 'Nothing new. Kilometr lets you know here when something needs a look.',
     close: 'Close',
+    closePanel: 'Close notifications',
     unread: (n: number) => `${n} unread`,
   },
 

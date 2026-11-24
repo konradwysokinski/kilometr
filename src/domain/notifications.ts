@@ -2,7 +2,7 @@ import type { Activity } from './types';
 
 /**
  * Something worth telling the user once, after an import or sync. It shows
- * as a toast first; once dismissed it stays in the notifications list.
+ * as a toast first; once dismissed it stays in the notifications panel.
  */
 export interface Notice {
   id: string;
