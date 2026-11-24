@@ -14,11 +14,13 @@ Design references:
 
 ## 1. Product decisions
 
-- **Local-first.** Data stays on the user's computer. No backend, no accounts.
+- **Local-first.** Data stays in the user's browser. No accounts. The only server code is the Strava token exchange (`server/stravaToken.ts`, served as `api/strava/token.ts` on Vercel and as Vite middleware in dev), because the Client Secret must not reach the browser; it stores nothing.
+- **Hosting:** Vercel, project `kilometr` (https://kilometr-roan.vercel.app); every push to `main` deploys. `vercel.json` sends every non-/api path to `index.html`. Env: `STRAVA_CLIENT_ID` (public, 300555) and `STRAVA_CLIENT_SECRET` (Konrad sets it; locally in `.env.local`, see `.env.example`).
 - **Two ways in:**
   1. **Import a Strava export (.zip)**: no setup, read locally, no live updates (import again to refresh).
   2. **Connect Strava via the user's own API app**: Strava only lets an app show data to its owner, so every install uses its own Client ID and secret (OAuth in a browser window). Gives live sync, and write access is needed to set gear on activities.
-- **Platform:** decided: a local web app on localhost (Vite + React + TypeScript). It may be wrapped with Tauri later if a Mac app is wanted.
+- **Platform:** a web app (Vite + React + TypeScript), hosted on Vercel and runnable on localhost. It may be wrapped with Tauri later if a Mac app is wanted.
+- **Strava app:** one shared Kilometr API app (Client ID 300555, owned by Konrad; Single Player Mode until more athletes are requested). App icon: `design/app-icon-512.png`.
 - **Rotation** = gear used in the last 60 days.
 - **Sidebar:** separate Shoes and Bikes sections, items in rotation, most recently used first, **max 5 per section**, the rest behind "Show all (n)". Retired items never appear there.
 - **Gear colours:** 7 hues for gear in rotation plus granite for everything else (see 4.2).
