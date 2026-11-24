@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { useStore } from '../app/store';
 import type { GearStats } from '../domain/gear';
 import type { Activity, BikePart } from '../domain/types';
@@ -21,7 +22,9 @@ export function BikeCard({ bike, parts, activities }: Props) {
         <Avatar initials={bike.initials} colour={bike.colour} />
         <div>
           <h2 id={headingId} className={s.name}>
-            {bike.name}
+            <Link to={`/gear/${bike.gear.id}`} className={s.nameLink}>
+              {bike.name}
+            </Link>
           </h2>
           <div className={s.caption}>{t.gear.inTotal(f.km(bike.totalKm))}</div>
         </div>

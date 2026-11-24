@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 import { useDataset } from '../app/store';
-import { Placeholder } from './Placeholder';
+import { BikeDetail } from './BikeDetail';
 import { ShoeDetail } from './ShoeDetail';
 
 export function GearDetail() {
@@ -9,8 +9,7 @@ export function GearDetail() {
   const gear = stats.get(id);
 
   if (!gear) return <p style={{ color: 'var(--ink-muted)' }}>{t.detail.missing}</p>;
-  // Bike detail (parts and service log) is a separate screen, not built yet.
-  if (gear.gear.kind === 'bike') return <Placeholder screen="bikes" />;
-  // Keyed so switching pairs from the sidebar starts fresh.
+  // Keyed so switching items from the sidebar starts fresh.
+  if (gear.gear.kind === 'bike') return <BikeDetail key={id} bike={gear} />;
   return <ShoeDetail key={id} shoe={gear} />;
 }

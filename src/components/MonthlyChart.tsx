@@ -7,15 +7,18 @@ const HEIGHT = 150;
 interface Props {
   bars: MonthBar[];
   colour: string;
+  /** Only changes the chart's description for screen readers. */
+  kind?: 'shoe' | 'bike';
 }
 
 /** Single-series bars with the value above each bar, as in the Shoe detail design. */
-export function MonthlyChart({ bars, colour }: Props) {
+export function MonthlyChart({ bars, colour, kind = 'shoe' }: Props) {
   const { t, f } = useStore();
   const max = Math.max(1, ...bars.map((b) => b.km));
   const first = bars[0];
   const last = bars.at(-1);
-  const summary = first && last ? t.detail.perMonthSummary(f.monthYear(first.start), f.monthYear(last.start)) : '';
+  const summary =
+    first && last ? t.detail.perMonthSummary(f.monthYear(first.start), f.monthYear(last.start), kind) : '';
 
   return (
     <section aria-labelledby="month-h" className={s.card}>

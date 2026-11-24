@@ -63,7 +63,7 @@ MVP (designed, see `design/screens/`):
 
 Next (not designed yet):
 6. Retired / Hall of Fame
-7. Bike detail with service counters (chain, tyres, pads) and service log
+7. Bike detail (built, `/gear/:id` for a bike, `src/screens/BikeDetail.tsx`): back to Bikes, header (avatar, name, ride mix · since), KPIs (Rides, Elevation gain, Cost per km, Longest ride), kilometres per month (hidden when all twelve months are empty), recent rides. Bike names on Overview and /bikes link here. Service counters and service log wait behind `FEATURES.bikeParts`.
 8. Edit gear: price, limit, photo, nickname, colour
 9. Share card (export an image)
 10. Settings (built, /settings): Appearance (Light / Dark / System; System follows `prefers-color-scheme` live), Language (EN | PL), Data (current source, import again, "Remove all data" with a confirmation modal; theme and language survive it), About (GitHub, MIT). Later: units, currency, default limits, sync.

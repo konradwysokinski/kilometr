@@ -88,7 +88,9 @@ function BikePanel({ bike, showLastUsed = false }: { bike: GearStats; showLastUs
         <Avatar initials={bike.initials} colour={bike.colour} />
         <div className={s.titles}>
           <h3 id={headingId} className={s.name}>
-            {bike.name}
+            <Link to={`/gear/${bike.gear.id}`} className={s.nameLink}>
+              {bike.name}
+            </Link>
           </h3>
           {caption && <p className={s.caption}>{caption}</p>}
         </div>

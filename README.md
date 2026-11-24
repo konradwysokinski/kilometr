@@ -22,7 +22,8 @@ Early work in progress.
 - [x] Notifications: a toast after import for runs without shoes, then a slide-in panel
 - [x] Shoes, Bikes, Activities and Retired screens; line chart toggle
 - [x] Settings: theme (light, dark, system), language, remove all data
-- [ ] Bike detail, Edit gear
+- [x] Bike detail
+- [ ] Edit gear: price, limit, nickname, colour
 
 ## Run it
 
