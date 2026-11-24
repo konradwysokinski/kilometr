@@ -48,8 +48,8 @@
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  /* the developer section can open; the other card keeps its own height */
-  align-items: start;
+  /* both cards as tall as the taller one */
+  align-items: stretch;
   gap: 16px;
 }
 
@@ -60,7 +60,7 @@
   padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .cardHead {
@@ -94,13 +94,14 @@
 
 .body {
   font-size: 14px;
-  line-height: 21px;
+  line-height: 20px;
   color: var(--ink-muted);
 }
 
 .drop {
   flex: 1;
-  min-height: 170px;
+  /* same as .connect, so both cards land on the 4px grid */
+  min-height: 176px;
   border: 1.5px dashed var(--line-dashed);
   border-radius: var(--radius-tile);
   background: var(--surface-sunken);
@@ -176,89 +177,19 @@
   color: var(--ink-muted);
 }
 
-.steps {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 14px;
-  line-height: 22px;
-}
-
-.steps li {
-  display: flex;
-  gap: 12px;
-}
-
-.stepNo {
-  width: 22px;
-  height: 22px;
-  flex: none;
-  border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 500;
+.connect {
+  flex: 1;
+  min-height: 176px;
+  border-radius: var(--radius-tile);
+  background: var(--surface-sunken);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--ink-muted);
-}
-
-.field input {
-  font-size: 15px;
-  color: var(--ink);
-  height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  transition: border-color 0.15s ease;
-}
-
-.field input:hover {
-  border-color: color-mix(in srgb, var(--ink) 25%, var(--line));
-}
-
-.field input:focus-visible {
-  outline-offset: 0;
-  border-color: var(--accent);
-}
-
-.cardPrimary {
-  gap: 20px;
-}
-
-.connect {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 16px;
 }
 
 /* Mock-up stand-in for Strava's official button (orange, 48px). Replace with their asset. */
 .strava {
-  align-self: flex-start;
   height: 48px;
   padding: 0 22px;
   border: 0;
@@ -272,63 +203,6 @@
 
 .strava:hover {
   background: #e34a00;
-}
-
-.ownApp {
-  border-top: 1px solid var(--line-soft);
-  padding-top: 16px;
-}
-
-.ownApp summary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink-muted);
-  cursor: pointer;
-  list-style: none;
-}
-
-.ownApp summary::-webkit-details-marker {
-  display: none;
-}
-
-.ownApp summary:hover {
-  color: var(--ink);
-}
-
-.ownApp summary svg {
-  transition: transform 0.15s ease;
-}
-
-.ownApp[open] summary svg {
-  transform: rotate(90deg);
-}
-
-.ownAppBody {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding-top: 12px;
-}
-
-.secondary {
-  height: 40px;
-  padding: 0 16px;
-  align-self: flex-start;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.secondary:hover {
-  background: var(--hover);
 }
 
 .footer {
