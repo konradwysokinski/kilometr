@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { useStore } from '../app/store';
@@ -7,6 +7,9 @@ import { NoticeCard } from './NoticeCard';
 import s from './NoticeBell.module.css';
 
 const PANEL_ID = 'notice-panel';
+
+/** Where the X sits when the bell isn't near the top of the screen: the panel's own padding (40 + 10, or 28 + 10 on phones). */
+const fallbackTop = () => (window.matchMedia('(max-width: 640px)').matches ? 38 : 50);
 
 interface Props {
   open: boolean;
@@ -24,6 +27,9 @@ export function NoticeBell({ open, onOpenChange }: Props) {
   const { pathname } = useLocation();
   const bellRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
+  // Where the bell is on screen when the panel opens. The X stays exactly there,
+  // so nothing jumps, and the panel lines its title up with it.
+  const [anchor, setAnchor] = useState({ top: 50, left: 0 });
   const unread = notices.filter((n) => !n.read).length;
   const label = open
     ? t.notices.closePanel
@@ -65,11 +71,19 @@ export function NoticeBell({ open, onOpenChange }: Props) {
       // something focusable outside then takes it as usual.
       close(!!panelRef.current?.contains(document.activeElement));
     };
+    // The anchor is measured once, so a new layout would leave the X floating.
+    // Only a width change counts: phones resize the height as the address bar hides.
+    const width = window.innerWidth;
+    const onResize = () => {
+      if (window.innerWidth !== width) onOpenChange(false);
+    };
     document.addEventListener('keydown', onKey);
     document.addEventListener('pointerdown', onPointer);
+    window.addEventListener('resize', onResize);
     return () => {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer);
+      window.removeEventListener('resize', onResize);
     };
   }, [open, onOpenChange]);
 
@@ -84,7 +98,17 @@ export function NoticeBell({ open, onOpenChange }: Props) {
         aria-controls={PANEL_ID}
         className={s.bell}
         data-open={open || undefined}
-        onClick={() => onOpenChange(!open)}
+        style={open ? { top: anchor.top, left: anchor.left } : undefined}
+        onClick={() => {
+          if (!open && bellRef.current) {
+            const r = bellRef.current.getBoundingClientRect();
+            // Out of view, or low on a phone where the sidebar sits above the content:
+            // the X takes the panel's usual corner instead.
+            const offCorner = r.top < 0 || r.top > 120;
+            setAnchor({ top: offCorner ? fallbackTop() : Math.max(r.top, 20), left: r.left });
+          }
+          onOpenChange(!open);
+        }}
       >
         <Icon name={open ? 'close' : 'bell'} size={open ? 16 : 18} />
         {!open && unread > 0 && <span className={s.dot} aria-hidden="true" />}
@@ -96,6 +120,7 @@ export function NoticeBell({ open, onOpenChange }: Props) {
         aria-labelledby={`${PANEL_ID}-title`}
         tabIndex={-1}
         className={s.panel}
+        style={{ '--x-top': `${anchor.top}px` } as CSSProperties}
         data-open={open || undefined}
         inert={!open}
       >

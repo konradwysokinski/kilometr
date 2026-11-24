@@ -24,11 +24,10 @@
   color: var(--ink);
 }
 
-/* Open, the bell stays put as the panel's X, even when the page is scrolled. */
+/* Open, the bell becomes the panel's X and stays where it was on screen (top / left set from where it was). */
 .bell[data-open] {
   position: fixed;
-  top: 50px;
-  right: 54px;
+  right: auto;
 }
 
 .dot {
@@ -55,7 +54,8 @@
   bottom: 10px;
   z-index: 20;
   width: min(420px, calc(100vw - 20px));
-  padding: 40px 44px 28px;
+  /* The title lines up with the X (--x-top is where the X sits; the panel starts 10px down). */
+  padding: calc(var(--x-top, 50px) - 10px) 44px 28px;
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--surface);
@@ -131,14 +131,9 @@
     right: 20px;
   }
 
-  .bell[data-open] {
-    top: 38px;
-    right: 30px;
-  }
-
   .panel {
     left: 10px;
     width: auto;
-    padding: 28px 20px 20px;
+    padding: calc(var(--x-top, 38px) - 10px) 20px 20px;
   }
 }
