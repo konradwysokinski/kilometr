@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate, type Location } from 'react-router';
 import { Toaster } from 'sonner';
 import { Activities } from '../screens/Activities';
@@ -9,6 +10,8 @@ import { Retired } from '../screens/Retired';
 import { Shoes } from '../screens/Shoes';
 import { SettingsDialog } from '../components/SettingsDialog';
 import { Start } from '../screens/Start';
+import { StravaCallback } from '../screens/StravaCallback';
+import { CALLBACK_PATH } from '../strava/auth';
 import { Layout } from './Layout';
 import { useStore } from './store';
 
@@ -31,6 +34,14 @@ export function App() {
 
 function Screens() {
   const { data, ready } = useStore();
+  const [atCallback, setAtCallback] = useState(() => window.location.pathname === CALLBACK_PATH);
+  const leaveCallback = useCallback(() => {
+    window.history.replaceState(null, '', '/');
+    setAtCallback(false);
+  }, []);
+
+  // Strava's redirect back, before anything else: it may bring the first data.
+  if (atCallback) return <StravaCallback onDone={leaveCallback} />;
   if (!ready) return null;
   if (!data) return <Start />;
 

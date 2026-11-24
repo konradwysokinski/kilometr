@@ -92,7 +92,8 @@ export const slug = (s: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-const gearId = (kind: GearKind, displayName: string) => `${kind}:${slug(displayName)}`;
+/** Exports have no gear IDs, so gear is keyed by kind + Strava display name. */
+export const gearId = (kind: GearKind, displayName: string) => `${kind}:${slug(displayName)}`;
 
 interface GearRow {
   kind: GearKind;

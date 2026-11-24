@@ -288,9 +288,24 @@ export const en = {
       'Approve access in Strava and Kilometr reads your shoes, bikes and runs, and keeps them up to date. Your data stays in this browser.',
     connectButton: 'Connect with Strava',
     connectNote: 'Opens Strava to approve read access. You can disconnect at any time.',
-    connectSoon: 'Connecting to Strava is coming in a later build step.',
     sample: 'Explore with sample data',
     openSource: 'Open source · MIT',
+  },
+
+  strava: {
+    connecting: 'Connecting to Strava…',
+    gear: 'Reading your shoes and bikes…',
+    activities: (n: string) => `Reading activities… ${n}`,
+    errorTitle: "Couldn't connect to Strava",
+    errors: {
+      denied: "You didn't allow access. Kilometr needs to read your gear and activities to count kilometres.",
+      scope:
+        'Kilometr needs access to your profile (for gear) and your activities. Connect again and leave both boxes ticked.',
+      failed: 'Something went wrong on the way back from Strava. Try connecting again.',
+      'rate-limited': 'Strava is getting too many requests right now. Try again in 15 minutes.',
+      'not-configured': "This copy of Kilometr isn't set up for Strava yet (no Client Secret on the server).",
+    },
+    back: 'Back to start',
   },
 
   settings: {

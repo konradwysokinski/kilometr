@@ -18,12 +18,17 @@ import { unassignedRuns } from '../domain/overview';
 import { importStravaExport } from '../import/importExport';
 import { ExportError } from '../import/stravaExport';
 import { dbDelete, dbGet, dbSet } from '../lib/db';
-import { StoreContext, type ImportState, type Store, type Theme, type ThemePref } from './context';
+import { buildStravaDataset } from '../strava/mapping';
+import { finishSignIn, startSignIn, StravaError, type StravaTokens } from '../strava/auth';
+import { pullFromStrava } from '../strava/sync';
+import { StoreContext, type ImportState, type StravaState, type Store, type Theme, type ThemePref } from './context';
 
 const KEY_SOURCE = 'kilometr.source';
 const KEY_THEME = 'kilometr.theme';
 const KEY_LOCALE = 'kilometr.locale';
+/** The imported or synced dataset (export or Strava). */
 const DB_DATASET = 'dataset';
+const DB_STRAVA_TOKENS = 'strava-tokens';
 /** Sample data is regenerated on every visit; only what the user changed is stored. */
 const DB_SAMPLE_SETTINGS = 'sample-settings';
 const DB_SAMPLE_ASSIGNMENTS = 'sample-assignments';
@@ -88,10 +93,12 @@ const isLocale = (v: string): v is Locale => v === 'en' || v === 'pl';
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [now] = useState(() => new Date());
   const [source] = useState(() => read(KEY_SOURCE));
+  const stored = source === 'export' || source === 'strava';
   const [data, setData] = useState<Dataset | null>(() => (source === 'sample' ? sampleDataset(now) : null));
-  // Imported data lives in IndexedDB; until it is read back the app shows nothing.
-  const [ready, setReady] = useState(source !== 'export');
+  // Imported or synced data lives in IndexedDB; until it is read back the app shows nothing.
+  const [ready, setReady] = useState(!stored);
   const [importState, setImportState] = useState<ImportState>({ status: 'idle' });
+  const [stravaState, setStravaState] = useState<StravaState>({ status: 'idle' });
   // True once saved settings are merged in; nothing is written back before that.
   const [hydrated, setHydrated] = useState(false);
   const dataRef = useRef(data);
@@ -107,11 +114,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (source !== 'sample' && source !== 'export') return;
+    if (source !== 'sample' && !stored) return;
     dbGet<Notice[]>(`notices:${source}`)
       .then((saved) => saved && setNotices(saved))
       .catch(() => undefined);
-  }, [source]);
+  }, [source, stored]);
 
   /** After new data arrives: one notice for runs without shoes we haven't reported yet. */
   const noticeNewData = useCallback(
@@ -144,10 +151,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [source]);
 
   useEffect(() => {
-    if (source !== 'export') return;
+    if (!stored) return;
     dbGet<Dataset>(DB_DATASET)
       .then((saved) => {
-        if (saved) setData(saved);
+        // Functional: a Strava sign-in finishing meanwhile has newer data.
+        if (saved) setData((d) => d ?? saved);
         else write(KEY_SOURCE, null);
       })
       .catch(() => write(KEY_SOURCE, null))
@@ -155,7 +163,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setReady(true);
         setHydrated(true);
       });
-  }, [source]);
+  }, [stored]);
 
   const importFile = useCallback(
     async (file: Blob) => {
@@ -174,6 +182,40 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     },
     [data, noticeNewData],
+  );
+
+  const connectStrava = useCallback(() => startSignIn(), []);
+
+  const completeStravaSignIn = useCallback(
+    async (search: string) => {
+      setStravaState({ status: 'syncing', progress: null });
+      try {
+        const tokens: StravaTokens = await finishSignIn(search);
+        await dbSet(DB_STRAVA_TOKENS, tokens);
+        // Prices and other settings carry over from what was here before (an export or an earlier sync).
+        const current = dataRef.current;
+        const previous =
+          current && current.source !== 'sample'
+            ? current
+            : ((await dbGet<Dataset>(DB_DATASET).catch(() => undefined)) ?? null);
+        const pull = await pullFromStrava(tokens.accessToken, (progress) =>
+          setStravaState({ status: 'syncing', progress }),
+        );
+        const next = buildStravaDataset(pull, previous);
+        await dbSet(DB_DATASET, next);
+        write(KEY_SOURCE, 'strava');
+        setData(next);
+        setHydrated(true);
+        setReady(true);
+        setStravaState({ status: 'idle' });
+        await noticeNewData(next);
+        return true;
+      } catch (e) {
+        setStravaState({ status: 'error', code: e instanceof StravaError ? e.code : 'failed' });
+        return false;
+      }
+    },
+    [noticeNewData],
   );
 
   const loadSample = useCallback(() => {
@@ -242,7 +284,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const removeAllData = useCallback(async () => {
     const notices = (['sample', 'export', 'strava'] as const).map((src) => `notices:${src}`);
-    const keys = [DB_DATASET, DB_SAMPLE_SETTINGS, DB_SAMPLE_ASSIGNMENTS, ...notices];
+    const keys = [DB_DATASET, DB_STRAVA_TOKENS, DB_SAMPLE_SETTINGS, DB_SAMPLE_ASSIGNMENTS, ...notices];
     await Promise.all(keys.map((k) => dbDelete(k).catch(() => undefined)));
     noticesRef.current = [];
     setNotices([]);
@@ -267,11 +309,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear, removeAllData,
+      data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, stravaState,
+      updateSettings, assignShoes, clear, removeAllData,
       notices, markToasted, markAllRead,
       theme, themePref, setThemePref, locale, setLocale, t: MESSAGES[locale], f,
     }),
-    [data, ready, stats, now, loadSample, importFile, importState, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllRead, theme, themePref, setThemePref, locale, setLocale, f],
+    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, stravaState, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllRead, theme, themePref, setThemePref, locale, setLocale, f],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

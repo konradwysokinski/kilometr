@@ -3,6 +3,8 @@ import type { GearStats } from '../domain/gear';
 import type { Notice } from '../domain/notifications';
 import type { Dataset, GearSettings } from '../domain/types';
 import type { Format, Locale, Messages } from '../i18n';
+import type { StravaErrorCode } from '../strava/auth';
+import type { SyncProgress } from '../strava/sync';
 
 // Kept in its own module so hot reloads of the store don't recreate the context.
 
@@ -14,6 +16,11 @@ export type ImportState =
   | { status: 'idle' }
   | { status: 'reading' }
   | { status: 'error'; code: 'not-zip' | 'no-activities' | 'unreadable' };
+
+export type StravaState =
+  | { status: 'idle' }
+  | { status: 'syncing'; progress: SyncProgress | null }
+  | { status: 'error'; code: StravaErrorCode };
 
 export interface Store {
   data: Dataset | null;
@@ -32,6 +39,11 @@ export interface Store {
   markToasted: (id: string) => void;
   markAllRead: () => void;
   importState: ImportState;
+  /** Sends the browser to Strava to approve access. */
+  connectStrava: () => void;
+  /** On the way back from Strava: tokens, then a full read. True when data arrived. */
+  completeStravaSignIn: (search: string) => Promise<boolean>;
+  stravaState: StravaState;
   /** Back to Start; imported data stays stored so a re-import keeps settings. */
   clear: () => void;
   /** Deletes everything Kilometr stored in this browser (but not theme or language) and goes back to Start. */

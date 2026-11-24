@@ -5,9 +5,8 @@ import { LanguageSwitch } from '../components/LanguageSwitch';
 import s from './Start.module.css';
 
 export function Start() {
-  const { loadSample, importFile, importState, t } = useStore();
+  const { loadSample, importFile, importState, connectStrava, t } = useStore();
   const [dragging, setDragging] = useState(false);
-  const [connectNote, setConnectNote] = useState<string | null>(null);
   const reading = importState.status === 'reading';
 
   const acceptFile = (file: File | undefined) => {
@@ -48,16 +47,12 @@ export function Start() {
           <p className={s.body}>{t.start.connectBody}</p>
           {/* Same shape as the drop zone next door, so the two cards line up. */}
           <div className={s.connect}>
-            {/* MOCK-UP: stand-in for Strava's official "Connect with Strava" button.
-                Swap in their asset (developers.strava.com/guidelines) and link it to
-                https://www.strava.com/oauth/authorize once the shared Kilometr app exists. */}
-            <button type="button" className={s.strava} onClick={() => setConnectNote(t.start.connectSoon)}>
+            {/* Stand-in for Strava's official "Connect with Strava" button; their asset comes in step 4. */}
+            <button type="button" className={s.strava} onClick={connectStrava}>
               {t.start.connectButton}
             </button>
           </div>
-          <p className={s.note} role="status">
-            {connectNote ?? t.start.connectNote}
-          </p>
+          <p className={s.note}>{t.start.connectNote}</p>
 
         </section>
 

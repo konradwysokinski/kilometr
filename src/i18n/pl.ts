@@ -301,9 +301,24 @@ export const pl: Messages = {
       'Zatwierdź dostęp w Stravie, a Kilometr odczyta Twoje buty, rowery i biegi i będzie je aktualizować. Dane zostają w tej przeglądarce.',
     connectButton: 'Connect with Strava',
     connectNote: 'Otwiera Stravę, żeby zatwierdzić dostęp do odczytu. Możesz go odłączyć w każdej chwili.',
-    connectSoon: 'Łączenie ze Stravą pojawi się w jednym z kolejnych kroków.',
     sample: 'Zobacz na przykładowych danych',
     openSource: 'Open source · MIT',
+  },
+
+  strava: {
+    connecting: 'Łączę ze Stravą…',
+    gear: 'Wczytuję buty i rowery…',
+    activities: (n) => `Wczytuję aktywności… ${n}`,
+    errorTitle: 'Nie udało się połączyć ze Stravą',
+    errors: {
+      denied: 'Dostęp nie został przyznany. Kilometr musi odczytać sprzęt i aktywności, żeby liczyć kilometry.',
+      scope:
+        'Kilometr potrzebuje dostępu do profilu (sprzęt) i aktywności. Połącz jeszcze raz i zostaw oba pola zaznaczone.',
+      failed: 'Coś poszło nie tak w drodze powrotnej ze Stravy. Spróbuj połączyć jeszcze raz.',
+      'rate-limited': 'Strava dostaje teraz za dużo zapytań. Spróbuj za 15 minut.',
+      'not-configured': 'Ta kopia Kilometra nie jest jeszcze skonfigurowana dla Stravy (brak sekretu na serwerze).',
+    },
+    back: 'Wróć do startu',
   },
 
   settings: {
