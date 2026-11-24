@@ -138,7 +138,7 @@ function General() {
 }
 
 function Data() {
-  const { data, importFile, importState, removeAllData, t, f } = useDataset();
+  const { data, importFile, importState, clear, removeAllData, t, f } = useDataset();
   const navigate = useNavigate();
   const input = useRef<HTMLInputElement>(null);
   const [confirming, setConfirming] = useState(false);
@@ -184,6 +184,19 @@ function Data() {
               />
             </>
           )}
+        </Row>
+        <Row title={t.settings.changeSource} hint={t.settings.changeSourceHint}>
+          <button
+            type="button"
+            className={s.button}
+            onClick={() => {
+              // Start comes next; whatever is loaded after it opens on Overview.
+              navigate('/', { replace: true });
+              clear();
+            }}
+          >
+            {t.settings.changeSourceButton}
+          </button>
         </Row>
         <Row title={t.settings.remove} hint={t.settings.removeHint}>
           <button type="button" className={`${s.button} ${s.danger}`} onClick={() => setConfirming(true)}>

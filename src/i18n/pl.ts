@@ -335,6 +335,10 @@ export const pl: Messages = {
     sourceStravaHint: 'Synchronizuje się samo.',
     importAgain: 'Importuj ponownie',
     importYours: 'Zaimportuj swój eksport',
+    changeSource: 'Zmień źródło danych',
+    changeSourceHint:
+      'Powrót do ekranu startowego, żeby połączyć Stravę albo zaimportować inny eksport. Ceny zostają zapisane.',
+    changeSourceButton: 'Zmień źródło',
     remove: 'Usuń wszystkie dane',
     removeHint: 'Usuwa wszystko, co Kilometr trzyma w tej przeglądarce. Strava zostaje bez zmian.',
     removeTitle: 'Usunąć wszystkie dane?',
