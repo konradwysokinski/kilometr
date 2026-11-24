@@ -48,6 +48,8 @@
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  /* the developer section can open; the other card keeps its own height */
+  align-items: start;
   gap: 16px;
 }
 
@@ -244,20 +246,89 @@
   border-color: var(--accent);
 }
 
-.primary {
-  height: 44px;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease;
+.cardPrimary {
+  gap: 20px;
 }
 
-.primary:hover {
-  background: var(--accent-hover);
+.connect {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Mock-up stand-in for Strava's official button (orange, 48px). Replace with their asset. */
+.strava {
+  align-self: flex-start;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 6px;
+  background: #fc5200;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.strava:hover {
+  background: #e34a00;
+}
+
+.ownApp {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 16px;
+}
+
+.ownApp summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.ownApp summary::-webkit-details-marker {
+  display: none;
+}
+
+.ownApp summary:hover {
+  color: var(--ink);
+}
+
+.ownApp summary svg {
+  transition: transform 0.15s ease;
+}
+
+.ownApp[open] summary svg {
+  transform: rotate(90deg);
+}
+
+.ownAppBody {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 12px;
+}
+
+.secondary {
+  height: 40px;
+  padding: 0 16px;
+  align-self: flex-start;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  background: var(--hover);
 }
 
 .footer {

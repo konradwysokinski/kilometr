@@ -259,9 +259,9 @@ export const pl: Messages = {
   start: {
     title: 'Twoje buty i rowery,',
     titleMuted: 'w kilometrach.',
-    lead: 'Kilometr czyta Twój sprzęt ze Stravy i pokazuje, jak zużyta jest każda para i ile kosztuje każdy kilometr. Dane zostają na tym komputerze.',
+    lead: 'Kilometr czyta Twój sprzęt ze Stravy i pokazuje, jak zużyta jest każda para i ile kosztuje każdy kilometr. Dane zostają w tej przeglądarce.',
     importTitle: 'Zaimportuj eksport ze Stravy',
-    importTag: 'Bez konfiguracji',
+    importTag: 'Bez logowania',
     importBody:
       'Poproś o archiwum w ustawieniach konta Strava, a potem upuść tu plik .zip. Dobre na pierwsze spojrzenie albo jednorazowe sprawdzenie.',
     drop: 'Upuść tu plik .zip',
@@ -274,9 +274,13 @@ export const pl: Messages = {
       unreadable: 'Nie udało się odczytać żadnej aktywności z tego eksportu.',
     },
     connectTitle: 'Połącz ze Stravą',
-    connectTag: 'Ok. 5 min',
+    connectTag: 'Ok. minuty',
     connectBody:
-      'Synchronizacja na żywo przez Twoją własną aplikację API Stravy. Strava pozwala aplikacji pokazywać tylko dane jej właściciela, więc każda instalacja Kilometra używa własnego klucza.',
+      'Zatwierdź dostęp w Stravie, a Kilometr odczyta Twoje buty, rowery i biegi i będzie je aktualizować. Dane zostają w tej przeglądarce.',
+    connectButton: 'Connect with Strava',
+    connectNote: 'Otwiera Stravę, żeby zatwierdzić dostęp do odczytu. Możesz go odłączyć w każdej chwili.',
+    ownApp: 'Użyj własnej aplikacji API Stravy',
+    ownAppBody: 'Dla deweloperów: połączenie przez aplikację API utworzoną w Stravie, z własnym Client ID i secretem.',
     steps: [
       'Utwórz aplikację API w ustawieniach deweloperskich Stravy',
       'Wklej poniżej jej Client ID i secret',
@@ -284,7 +288,7 @@ export const pl: Messages = {
     ],
     clientId: 'Client ID',
     clientSecret: 'Client secret',
-    connect: 'Połącz ze Stravą',
+    connect: 'Połącz',
     connectSoon: 'Łączenie ze Stravą pojawi się w jednym z kolejnych kroków.',
     sample: 'Zobacz na przykładowych danych',
     openSource: 'Open source · MIT',

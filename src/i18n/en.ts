@@ -246,9 +246,9 @@ export const en = {
   start: {
     title: 'Your shoes and bikes,',
     titleMuted: 'in kilometres.',
-    lead: 'Kilometr reads your gear from Strava and shows how worn each pair is and what it costs per kilometre. Your data stays on this computer.',
+    lead: 'Kilometr reads your gear from Strava and shows how worn each pair is and what it costs per kilometre. Your data stays in this browser.',
     importTitle: 'Import a Strava export',
-    importTag: 'No setup',
+    importTag: 'No sign-in',
     importBody:
       "Request your archive in Strava's account settings, then drop the .zip here. Good for a first look or a one-off check.",
     drop: 'Drop export .zip here',
@@ -261,9 +261,13 @@ export const en = {
       unreadable: 'Could not read any activities from this export.',
     },
     connectTitle: 'Connect Strava',
-    connectTag: 'About 5 min',
+    connectTag: 'About a minute',
     connectBody:
-      'Live sync with your own Strava API app. Strava lets an app show you only your own data, so every Kilometr install uses its own key.',
+      'Approve access in Strava and Kilometr reads your shoes, bikes and runs, and keeps them up to date. Your data stays in this browser.',
+    connectButton: 'Connect with Strava',
+    connectNote: 'Opens Strava to approve read access. You can disconnect at any time.',
+    ownApp: 'Use your own Strava API app',
+    ownAppBody: 'For developers: connect through an API app you create in Strava, with your own Client ID and secret.',
     steps: [
       "Create an API app in Strava's developer settings",
       'Paste its Client ID and secret below',
@@ -271,7 +275,7 @@ export const en = {
     ],
     clientId: 'Client ID',
     clientSecret: 'Client secret',
-    connect: 'Connect with Strava',
+    connect: 'Connect',
     connectSoon: 'Connecting to Strava is coming in a later build step.',
     sample: 'Explore with sample data',
     openSource: 'Open source · MIT',
