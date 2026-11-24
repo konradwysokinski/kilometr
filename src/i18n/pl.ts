@@ -84,6 +84,22 @@ export const pl: Messages = {
     noShoesUsed: 'Brak biegów w butach w ostatnich 60 dniach.',
   },
 
+  shoes: {
+    pairs: (n, nF) => `${nF} ${plural(n, 'para', 'pary', 'par')}`,
+    ofShoes: 'butów',
+    inRotation: 'W rotacji',
+    inRotationHint: 'używane w ostatnich 60 dniach',
+    resting: 'Poza rotacją',
+    restingHint: 'nieużywane od ponad 60 dni',
+    walks: 'Do chodzenia',
+    walksHint: 'liczą kilometry, poza rotacją',
+    lastUsed: (date) => `Ostatnio ${date}`,
+    neverUsed: 'Jeszcze nieużywane',
+    retired: (n, nF) => `${nF} ${plural(n, 'wycofana para', 'wycofane pary', 'wycofanych par')}`,
+    seeRetired: 'Zobacz wycofane ›',
+    empty: 'Brak butów. Dodaj je w Strava i zaimportuj ponownie.',
+  },
+
   gear: {
     road: 'Asfalt',
     trail: 'Teren',

@@ -71,6 +71,22 @@ export const en = {
     noShoesUsed: 'No runs with shoes in the last 60 days.',
   },
 
+  shoes: {
+    pairs: (n: number, nF: string) => `${nF} ${plural(n, 'pair', 'pairs')}`,
+    ofShoes: 'of shoes',
+    inRotation: 'In rotation',
+    inRotationHint: 'used in the last 60 days',
+    resting: 'Out of rotation',
+    restingHint: 'not used in the last 60 days',
+    walks: 'Kept for walks',
+    walksHint: 'still counting, outside the rotation',
+    lastUsed: (date: string) => `Last used ${date}`,
+    neverUsed: 'Not used yet',
+    retired: (n: number, nF: string) => `${nF} retired ${plural(n, 'pair', 'pairs')}`,
+    seeRetired: 'See retired ›',
+    empty: 'No shoes yet. Add them in Strava, then import again.',
+  },
+
   gear: {
     road: 'Road',
     trail: 'Trail',

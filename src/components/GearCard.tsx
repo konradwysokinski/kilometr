@@ -7,7 +7,8 @@ import { Chip } from './Chip';
 import { WearBar } from './WearBar';
 import s from './GearCard.module.css';
 
-export function GearCard({ gear: g }: { gear: GearStats }) {
+/** `footnote`: one quiet line at the bottom, e.g. when the item was last used. */
+export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: string }) {
   const { t, f } = useStore();
   const terrain = g.terrain.label === 'Trail' ? t.gear.trail : g.terrain.label === 'Road' ? t.gear.road : null;
   const caption = [g.settings.nickname && f.quote(g.settings.nickname), terrain].filter(Boolean).join(' · ');
@@ -62,6 +63,8 @@ export function GearCard({ gear: g }: { gear: GearStats }) {
           <span className={s.addPrice}>{t.gear.addPrice}</span>
         )}
       </div>
+
+      {footnote && <p className={s.footnote}>{footnote}</p>}
     </Link>
   );
 }

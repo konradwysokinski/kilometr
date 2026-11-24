@@ -4,6 +4,7 @@ import { GearDetail } from '../screens/GearDetail';
 import { Notifications } from '../screens/Notifications';
 import { Overview } from '../screens/Overview';
 import { Placeholder } from '../screens/Placeholder';
+import { Shoes } from '../screens/Shoes';
 import { Start } from '../screens/Start';
 import { Layout } from './Layout';
 import { useStore } from './store';
@@ -30,7 +31,7 @@ function Screens() {
         <Route element={<Layout />}>
           <Route index element={<Overview />} />
           <Route path="gear/:id" element={<GearDetail />} />
-          <Route path="shoes" element={<Placeholder screen="shoes" />} />
+          <Route path="shoes" element={<Shoes />} />
           <Route path="bikes" element={<Placeholder screen="bikes" />} />
           <Route path="activities" element={<Placeholder screen="activities" />} />
           <Route path="retired" element={<Placeholder screen="retired" />} />
