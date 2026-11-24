@@ -1,4 +1,6 @@
 .header {
+  /* Sized by the panel, not its content, so the month label can react to the room it has. */
+  container-type: inline-size;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -63,10 +65,30 @@
 
 .switcherLabel {
   min-width: 150px;
+  white-space: nowrap;
   text-align: center;
   font-size: 14px;
   font-weight: 500;
   padding: 0 6px;
+}
+
+/* "Listopad 2026" when there is room, "Lis 2026" when the title and controls would otherwise wrap. */
+.monthShort {
+  display: none;
+}
+
+@container (max-width: 780px) {
+  .switcherLabel {
+    min-width: 84px;
+  }
+
+  .monthLong {
+    display: none;
+  }
+
+  .monthShort {
+    display: inline;
+  }
 }
 
 .select {

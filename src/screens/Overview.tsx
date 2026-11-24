@@ -66,7 +66,17 @@ export function Overview() {
               <Icon name="chevronLeft" size={16} strokeWidth={1.4} />
             </button>
             <span className={s.switcherLabel} aria-live="polite">
-              {period.kind === 'month' ? f.monthYear(period.anchor) : period.anchor.getFullYear()}
+              {period.kind === 'month' ? (
+                <>
+                  {/* One of the two shows, by the header's width (see .monthLong / .monthShort). */}
+                  <span className={s.monthLong}>{f.monthYear(period.anchor)}</span>
+                  <span className={s.monthShort}>
+                    {f.monthShort(period.anchor)} {period.anchor.getFullYear()}
+                  </span>
+                </>
+              ) : (
+                period.anchor.getFullYear()
+              )}
             </span>
             <button
               type="button"
