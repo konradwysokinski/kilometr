@@ -43,7 +43,13 @@ export interface Store {
   connectStrava: () => void;
   /** On the way back from Strava: tokens, then a full read. True when data arrived. */
   completeStravaSignIn: (search: string) => Promise<boolean>;
+  /** Reads what's new in Strava (also runs on its own when the data is over an hour old). */
+  syncStrava: () => Promise<void>;
+  /** Asks Strava to forget the approval, drops the tokens and goes back to Start; the data stays. */
+  disconnectStrava: () => Promise<void>;
   stravaState: StravaState;
+  /** First name of the connected athlete, when known. */
+  stravaAthlete: string | null;
   /** Back to Start; imported data stays stored so a re-import keeps settings. */
   clear: () => void;
   /** Deletes everything Kilometr stored in this browser (but not theme or language) and goes back to Start. */

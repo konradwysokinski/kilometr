@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import { useDataset } from '../app/store';
 import { byLastUsed, type GearStats } from '../domain/gear';
@@ -73,8 +73,14 @@ export function Sidebar({ id, open, onClose }: Props) {
 
 /** Where the data comes from, and the way to refresh it. */
 function SourceStatus() {
-  const { data, clear, importFile, importState, t, f } = useDataset();
+  const { data, clear, importFile, importState, stravaState, syncStrava, t, f } = useDataset();
   const input = useRef<HTMLInputElement>(null);
+  // "Synced 12 minutes ago" moves on by itself.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
 
   if (data.source === 'sample') {
     return (
@@ -89,19 +95,42 @@ function SourceStatus() {
   }
 
   const reading = importState.status === 'reading';
+  const syncing = stravaState.status === 'syncing';
+  const failed = importState.status === 'error' || (data.source === 'strava' && stravaState.status === 'error');
+  const updated = data.updatedAt ? new Date(data.updatedAt) : null;
   const label = reading
     ? t.sidebar.reading
-    : data.source === 'export' && data.updatedAt
-      ? t.sidebar.imported(f.dayMonth(new Date(data.updatedAt)))
-      : t.sidebar.synced;
+    : syncing
+      ? t.sidebar.syncing
+      : data.source === 'strava'
+        ? stravaState.status === 'error'
+          ? t.sidebar.syncFailed
+          : updated
+            ? t.sidebar.syncedAgo(f.ago(updated, now))
+            : t.sidebar.synced
+        : updated
+          ? t.sidebar.imported(f.dayMonth(updated))
+          : t.sidebar.synced;
 
   return (
     <>
       <div className={s.sync}>
-        <span className={`${s.syncDot} ${importState.status === 'error' ? s.syncDotWarn : ''}`} aria-hidden="true" />
+        <span className={`${s.syncDot} ${failed ? s.syncDotWarn : ''}`} aria-hidden="true" />
         <span className={s.grow} role="status">
           {label}
         </span>
+        {data.source === 'strava' && (
+          <button
+            type="button"
+            className={s.iconButton}
+            disabled={syncing}
+            aria-label={t.sidebar.syncNow}
+            title={t.sidebar.syncNow}
+            onClick={() => void syncStrava()}
+          >
+            <Icon name="refresh" size={15} />
+          </button>
+        )}
         {data.source === 'export' && (
           <>
             <button

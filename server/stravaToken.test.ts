@@ -38,6 +38,15 @@ describe('handleTokenRequest', () => {
     expect(await res.json()).toEqual({ accessToken: 'a2', refreshToken: 'r2', expiresAt: 1_800_000_100 });
   });
 
+  it('revokes access on disconnect', async () => {
+    const fetchImpl = stravaReply({ access_token: 'a1' });
+    const res = await handleTokenRequest(post({ revoke: 'a1' }), env, fetchImpl);
+    expect(await res.json()).toEqual({ revoked: true });
+    const [url, init] = (fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(url).toBe('https://www.strava.com/oauth/deauthorize');
+    expect(String(init.body)).toBe('access_token=a1');
+  });
+
   it('says so when the secret is not set up', async () => {
     const res = await handleTokenRequest(post({ code: 'abc' }), { clientId: '300555' });
     expect(res.status).toBe(503);

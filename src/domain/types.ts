@@ -11,6 +11,8 @@ export interface Gear {
   model: string;
   /** Strava marks gear as retired; Kilometr also lets the user retire it. */
   retired: boolean;
+  /** Strava API only: true once the gear's details (brand, model, retired) were read. */
+  detailed?: boolean;
 }
 
 export interface Activity {

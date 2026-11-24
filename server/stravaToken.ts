@@ -24,6 +24,7 @@ export interface StravaTokens {
 }
 
 const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+const STRAVA_DEAUTHORIZE_URL = 'https://www.strava.com/oauth/deauthorize';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -37,11 +38,27 @@ export async function handleTokenRequest(request: Request, env: TokenEnv, fetchI
   if (request.method !== 'POST') return json({ error: 'method-not-allowed' }, 405);
   if (!env.clientId || !env.clientSecret) return json({ error: 'not-configured' }, 503);
 
-  let body: { code?: unknown; refreshToken?: unknown };
+  let body: { code?: unknown; refreshToken?: unknown; revoke?: unknown };
   try {
     body = await request.json();
   } catch {
     return json({ error: 'bad-request' }, 400);
+  }
+
+  // Disconnect: Strava forgets the athlete's approval. Done here because the
+  // deauthorize endpoint isn't open to calls from the browser.
+  if (isToken(body.revoke)) {
+    try {
+      const res = await fetchImpl(STRAVA_DEAUTHORIZE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ access_token: body.revoke }).toString(),
+      });
+      // 401: already revoked or expired; either way the connection is gone.
+      return json({ revoked: res.ok || res.status === 401 }, res.ok || res.status === 401 ? 200 : 502);
+    } catch {
+      return json({ error: 'strava-unreachable' }, 502);
+    }
   }
 
   const grant = isToken(body.code)

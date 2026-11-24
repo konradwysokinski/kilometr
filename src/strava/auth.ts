@@ -15,7 +15,7 @@ export const CALLBACK_PATH = '/strava/callback';
 const SCOPE = 'read,profile:read_all,activity:read_all';
 const STATE_KEY = 'kilometr.stravaState';
 
-export type StravaErrorCode = 'denied' | 'scope' | 'failed' | 'rate-limited' | 'not-configured';
+export type StravaErrorCode = 'denied' | 'scope' | 'failed' | 'rate-limited' | 'not-configured' | 'expired';
 
 export class StravaError extends Error {
   constructor(public readonly code: StravaErrorCode) {
@@ -42,7 +42,10 @@ export function startSignIn() {
   window.location.assign(url.toString());
 }
 
-async function tokenRequest(body: { code: string } | { refreshToken: string }): Promise<StravaTokens> {
+async function tokenRequest(
+  body: { code: string } | { refreshToken: string },
+  rejected: StravaErrorCode = 'failed',
+): Promise<StravaTokens> {
   let res: Response;
   try {
     res = await fetch('/api/strava/token', {
@@ -55,7 +58,9 @@ async function tokenRequest(body: { code: string } | { refreshToken: string }): 
   }
   if (res.ok) return (await res.json()) as StravaTokens;
   const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-  throw new StravaError(error === 'rate-limited' || error === 'not-configured' ? error : 'failed');
+  throw new StravaError(
+    error === 'rate-limited' || error === 'not-configured' ? error : error === 'rejected' ? rejected : 'failed',
+  );
 }
 
 /** Handles Strava's redirect back (`location.search`). Each code works once. */
@@ -82,6 +87,20 @@ export async function finishSignIn(search: string): Promise<StravaTokens> {
 /** Strava access tokens last six hours; refresh a minute before they run out. */
 export async function freshTokens(tokens: StravaTokens, now = Date.now()): Promise<StravaTokens> {
   if (tokens.expiresAt * 1000 - 60_000 > now) return tokens;
-  const next = await tokenRequest({ refreshToken: tokens.refreshToken });
+  // Rejected refresh: access was revoked in Strava, so the athlete has to connect again.
+  const next = await tokenRequest({ refreshToken: tokens.refreshToken }, 'expired');
   return { ...next, athlete: next.athlete ?? tokens.athlete };
+}
+
+/** Disconnect: asks Strava to forget the approval. Best effort; local data is cleared either way. */
+export async function revokeAccess(tokens: StravaTokens): Promise<void> {
+  try {
+    await fetch('/api/strava/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ revoke: tokens.accessToken }),
+    });
+  } catch {
+    /* offline: Strava keeps the approval until the athlete removes it in their Strava settings */
+  }
 }

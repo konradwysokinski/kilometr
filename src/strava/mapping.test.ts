@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Dataset } from '../domain/types';
 import { buildStravaDataset, mapActivity, mapGear, type StravaPull } from './mapping';
+import { MAX_DETAILS, pickDetails } from './sync';
 
 const run = (id: number, gear: string | null, sport = 'Run') => ({
   id,
@@ -45,7 +46,14 @@ describe('mapActivity', () => {
 describe('mapGear', () => {
   it('takes brand and model from the details, and a different display name as the nickname', () => {
     const { gear, nickname } = mapGear('shoe', pull.athlete.shoes![0]!, pull.details.g1);
-    expect(gear).toEqual({ id: 'g1', kind: 'shoe', brand: 'Hoka', model: 'Speedgoat 5', retired: false });
+    expect(gear).toEqual({
+      id: 'g1',
+      kind: 'shoe',
+      brand: 'Hoka',
+      model: 'Speedgoat 5',
+      retired: false,
+      detailed: true,
+    });
     expect(nickname).toBe('Mud ones');
   });
 
@@ -88,5 +96,36 @@ describe('buildStravaDataset', () => {
     const first = buildStravaDataset(pull, null, now);
     const priced = { ...first, settings: { ...first.settings, g2: { price: 549 } } };
     expect(buildStravaDataset(pull, priced, now).settings.g2).toEqual({ price: 549 });
+  });
+});
+
+describe('later syncs', () => {
+  const now = new Date('2026-11-24T12:00:00Z');
+  const first = buildStravaDataset(pull, null, now);
+
+  it('merges new activities into the old ones', () => {
+    const next = buildStravaDataset(
+      { athlete: pull.athlete, details: {}, activities: [run(105, 'g1'), { ...run(102, 'g1') }], incremental: true },
+      first,
+      now,
+    );
+    expect(next.activities.map((a) => a.id).sort()).toEqual(['101', '102', '103', '105']);
+    expect(next.activities.find((a) => a.id === '102')!.gearId).toBe('g1'); // the newer copy wins
+  });
+
+  it('keeps gear details from before when none were read this time', () => {
+    const next = buildStravaDataset({ ...pull, details: {}, incremental: true, activities: [] }, first, now);
+    expect(next.gear.find((g) => g.id === 'g1')).toMatchObject({ brand: 'Hoka', model: 'Speedgoat 5', detailed: true });
+    expect(next.gear.find((g) => g.id === 'b1')).toMatchObject({ model: 'Canyon Grail CF SL' });
+  });
+});
+
+describe('pickDetails', () => {
+  it('reads recently used gear first, skips gear already read, and stops at the cap', () => {
+    const many = { id: 1, shoes: Array.from({ length: 20 }, (_, i) => ({ id: `g${i}`, name: `Shoe ${i}` })) };
+    const ids = pickDetails(many, [run(1, 'g15'), run(2, 'g3')], new Set(['g0']));
+    expect(ids.length).toBe(MAX_DETAILS);
+    expect(ids.slice(0, 2)).toEqual(['g3', 'g15']); // run 2 is newer than run 1
+    expect(ids).not.toContain('g0');
   });
 });

@@ -78,6 +78,7 @@ export function mapGear(kind: GearKind, summary: StravaSummaryGear, detail?: Str
     model: brand || model ? model : summary.name,
     // The athlete's gear list may leave the flag out; the details have it.
     retired: !!(detail?.retired ?? summary.retired),
+    ...(detail && { detailed: true }),
   };
   const plain = [brand, model].filter(Boolean).join(' ');
   // A display name other than brand + model is the user's nickname for it in Strava.
@@ -85,11 +86,16 @@ export function mapGear(kind: GearKind, summary: StravaSummaryGear, detail?: Str
   return { gear, nickname };
 }
 
+/** Read from Strava's gear details already (data from before the flag existed has a brand). */
+export const hasDetails = (g: Gear) => !!g.detailed || !!g.brand;
+
 export interface StravaPull {
   athlete: StravaAthlete;
-  /** Gear details by ID; missing when Strava wouldn't give them. */
+  /** Gear details read this time, by ID (a few per sync; see sync.ts). */
   details: Record<string, StravaDetailedGear | null>;
   activities: StravaActivity[];
+  /** True when only activities after the last sync were read; they're merged into the old ones. */
+  incremental?: boolean;
 }
 
 /**
@@ -107,7 +113,14 @@ export function buildStravaDataset(pull: StravaPull, previous: Dataset | null, n
     ['bike', pull.athlete.bikes ?? []],
   ] as const) {
     for (const summary of list) {
-      const { gear: g, nickname } = mapGear(kind, summary, pull.details[summary.id]);
+      const known = previous?.source === 'strava' ? previous.gear.find((x) => x.id === summary.id) : undefined;
+      const detail = pull.details[summary.id];
+      // Details are read a few per sync; until then, the last known version (or the display name) stands.
+      if (!detail && known && hasDetails(known)) {
+        gear.push(known);
+        continue;
+      }
+      const { gear: g, nickname } = mapGear(kind, summary, detail);
       gear.push(g);
       if (nickname) nicknames[g.id] = nickname;
       fromExport.set(exportGearId(kind, summary.name), g.id);
@@ -116,10 +129,12 @@ export function buildStravaDataset(pull: StravaPull, previous: Dataset | null, n
     }
   }
 
-  const activities = pull.activities
-    .map(mapActivity)
-    .filter((a): a is Activity => a !== null)
-    .sort((a, b) => b.startDate.localeCompare(a.startDate));
+  const pulled = pull.activities.map(mapActivity).filter((a): a is Activity => a !== null);
+  const byId = new Map<string, Activity>(
+    pull.incremental && previous?.source === 'strava' ? previous.activities.map((a) => [a.id, a]) : [],
+  );
+  for (const a of pulled) byId.set(a.id, a);
+  const activities = [...byId.values()].sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   let settings: Record<string, GearSettings> = {};
   let assignments: Record<string, string> | undefined;

@@ -18,8 +18,8 @@ import { unassignedRuns } from '../domain/overview';
 import { importStravaExport } from '../import/importExport';
 import { ExportError } from '../import/stravaExport';
 import { dbDelete, dbGet, dbSet } from '../lib/db';
-import { buildStravaDataset } from '../strava/mapping';
-import { finishSignIn, startSignIn, StravaError, type StravaTokens } from '../strava/auth';
+import { buildStravaDataset, hasDetails } from '../strava/mapping';
+import { finishSignIn, freshTokens, revokeAccess, startSignIn, StravaError, type StravaTokens } from '../strava/auth';
 import { pullFromStrava } from '../strava/sync';
 import { StoreContext, type ImportState, type StravaState, type Store, type Theme, type ThemePref } from './context';
 
@@ -185,6 +185,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const connectStrava = useCallback(() => startSignIn(), []);
+  const [stravaAthlete, setStravaAthlete] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (source !== 'strava') return;
+    dbGet<StravaTokens>(DB_STRAVA_TOKENS)
+      .then((tokens) => setStravaAthlete(tokens?.athlete?.firstName || null))
+      .catch(() => undefined);
+  }, [source]);
+
+  /**
+   * One sync, from sign-in, the hourly refresh or "Sync now". After the first,
+   * only activities since the last one are read (a week back, to catch late uploads).
+   */
+  const runStravaSync = useCallback(
+    async (tokens: StravaTokens, previous: Dataset | null) => {
+      const fresh = await freshTokens(tokens);
+      if (fresh !== tokens) await dbSet(DB_STRAVA_TOKENS, fresh);
+      const incremental = previous?.source === 'strava' && previous.activities.length > 0;
+      const after = incremental
+        ? Math.floor(new Date(previous.activities[0]!.startDate).getTime() / 1000) - 7 * 24 * 3600
+        : undefined;
+      const detailed = new Set(previous?.source === 'strava' ? previous.gear.filter(hasDetails).map((g) => g.id) : []);
+      const pull = await pullFromStrava(fresh.accessToken, { after, detailed }, (progress) =>
+        setStravaState({ status: 'syncing', progress }),
+      );
+      const next = buildStravaDataset(pull, previous);
+      await dbSet(DB_DATASET, next);
+      write(KEY_SOURCE, 'strava');
+      setData(next);
+      setStravaAthlete(fresh.athlete?.firstName || null);
+      setStravaState({ status: 'idle' });
+      await noticeNewData(next);
+    },
+    [noticeNewData],
+  );
 
   const completeStravaSignIn = useCallback(
     async (search: string) => {
@@ -198,25 +233,50 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           current && current.source !== 'sample'
             ? current
             : ((await dbGet<Dataset>(DB_DATASET).catch(() => undefined)) ?? null);
-        const pull = await pullFromStrava(tokens.accessToken, (progress) =>
-          setStravaState({ status: 'syncing', progress }),
-        );
-        const next = buildStravaDataset(pull, previous);
-        await dbSet(DB_DATASET, next);
-        write(KEY_SOURCE, 'strava');
-        setData(next);
+        await runStravaSync(tokens, previous);
         setHydrated(true);
         setReady(true);
-        setStravaState({ status: 'idle' });
-        await noticeNewData(next);
         return true;
       } catch (e) {
         setStravaState({ status: 'error', code: e instanceof StravaError ? e.code : 'failed' });
         return false;
       }
     },
-    [noticeNewData],
+    [runStravaSync],
   );
+
+  const syncStrava = useCallback(async () => {
+    const current = dataRef.current;
+    if (current?.source !== 'strava') return;
+    setStravaState({ status: 'syncing', progress: null });
+    try {
+      const tokens = await dbGet<StravaTokens>(DB_STRAVA_TOKENS);
+      if (!tokens) throw new StravaError('expired');
+      await runStravaSync(tokens, current);
+    } catch (e) {
+      setStravaState({ status: 'error', code: e instanceof StravaError ? e.code : 'failed' });
+    }
+  }, [runStravaSync]);
+
+  // Fresh data on opening the app, at most once an hour.
+  const autoSynced = useRef(false);
+  useEffect(() => {
+    if (autoSynced.current || data?.source !== 'strava' || !hydrated) return;
+    autoSynced.current = true;
+    const age = Date.now() - new Date(data.updatedAt ?? 0).getTime();
+    if (age > 60 * 60 * 1000) void syncStrava();
+  }, [data, hydrated, syncStrava]);
+
+  /** Strava forgets the approval, the tokens go; the data stays until "Remove all data". */
+  const disconnectStrava = useCallback(async () => {
+    const tokens = await dbGet<StravaTokens>(DB_STRAVA_TOKENS).catch(() => undefined);
+    if (tokens) await revokeAccess(tokens);
+    await dbDelete(DB_STRAVA_TOKENS).catch(() => undefined);
+    setStravaAthlete(null);
+    setStravaState({ status: 'idle' });
+    setData(null);
+    write(KEY_SOURCE, null);
+  }, []);
 
   const loadSample = useCallback(() => {
     const sample = sampleDataset(now);
@@ -309,12 +369,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, stravaState,
+      data, ready, stats, now, loadSample, importFile, importState,
+      connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete,
       updateSettings, assignShoes, clear, removeAllData,
       notices, markToasted, markAllRead,
       theme, themePref, setThemePref, locale, setLocale, t: MESSAGES[locale], f,
     }),
-    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, stravaState, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllRead, theme, themePref, setThemePref, locale, setLocale, f],
+    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllRead, theme, themePref, setThemePref, locale, setLocale, f],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

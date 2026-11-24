@@ -138,11 +138,25 @@ function General() {
 }
 
 function Data() {
-  const { data, importFile, importState, clear, removeAllData, t, f } = useDataset();
+  const {
+    data,
+    importFile,
+    importState,
+    clear,
+    removeAllData,
+    stravaState,
+    stravaAthlete,
+    syncStrava,
+    disconnectStrava,
+    t,
+    f,
+  } = useDataset();
   const navigate = useNavigate();
   const input = useRef<HTMLInputElement>(null);
   const [confirming, setConfirming] = useState(false);
   const reading = importState.status === 'reading';
+  const syncing = stravaState.status === 'syncing';
+  const updated = new Date(data.updatedAt ?? Date.now());
 
   const source =
     data.source === 'sample'
@@ -152,16 +166,26 @@ function Data() {
             title: t.settings.sourceExport,
             hint: t.settings.sourceExportHint(f.date(new Date(data.updatedAt ?? Date.now()))),
           }
-        : { title: t.settings.sourceStrava, hint: t.settings.sourceStravaHint };
+        : {
+            title: stravaAthlete ? t.settings.sourceStravaAs(stravaAthlete) : t.settings.sourceStrava,
+            hint: t.settings.sourceStravaHint(f.ago(updated)),
+          };
+  const error =
+    importState.status === 'error'
+      ? t.start.errors[importState.code]
+      : data.source === 'strava' && stravaState.status === 'error'
+        ? t.strava.errors[stravaState.code]
+        : undefined;
 
   return (
     <>
       <div className={s.card}>
-        <Row
-          title={source.title}
-          hint={source.hint}
-          error={importState.status === 'error' ? t.start.errors[importState.code] : undefined}
-        >
+        <Row title={source.title} hint={source.hint} error={error}>
+          {data.source === 'strava' && (
+            <button type="button" className={s.button} disabled={syncing} onClick={() => void syncStrava()}>
+              {syncing ? t.sidebar.syncing : t.settings.syncNow}
+            </button>
+          )}
           {data.source !== 'strava' && (
             <>
               <button type="button" className={s.button} disabled={reading} onClick={() => input.current?.click()}>
@@ -185,6 +209,20 @@ function Data() {
             </>
           )}
         </Row>
+        {data.source === 'strava' && (
+          <Row title={t.settings.disconnect} hint={t.settings.disconnectHint}>
+            <button
+              type="button"
+              className={s.button}
+              onClick={() => {
+                navigate('/', { replace: true });
+                void disconnectStrava();
+              }}
+            >
+              {t.settings.disconnectButton}
+            </button>
+          </Row>
+        )}
         <Row title={t.settings.changeSource} hint={t.settings.changeSourceHint}>
           <button
             type="button"

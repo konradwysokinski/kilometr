@@ -32,6 +32,8 @@ export interface Format {
   /** 21 480 m */
   metres: (n: number) => string;
   quote: (s: string) => string;
+  /** "just now", "12 minutes ago", "3 hours ago", "2 days ago" (Polish: "12 minut temu"). */
+  ago: (d: Date, now?: Date) => string;
 }
 
 export function createFormat(locale: Locale): Format {
@@ -43,6 +45,7 @@ export function createFormat(locale: Locale): Format {
   // en-GB writes "Sept"; chart labels want three letters.
   const monthShort = new Intl.DateTimeFormat(locale === 'pl' ? tag : 'en-US', { month: 'short' });
   const oneDecimal = (n: number) => (locale === 'pl' ? n.toFixed(1).replace('.', ',') : n.toFixed(1));
+  const relative = new Intl.RelativeTimeFormat(tag, { numeric: 'auto' });
   const decimal = (n: number) => (locale === 'pl' ? n.toFixed(2).replace('.', ',') : n.toFixed(2));
 
   return {
@@ -65,5 +68,12 @@ export function createFormat(locale: Locale): Format {
     kmPrecise: (n) => `${oneDecimal(n)}${NBSP}km`,
     metres: (n) => `${formatInt(n)}${NBSP}m`,
     quote: (s) => (locale === 'pl' ? `„${s}”` : `“${s}”`),
+    ago: (d, now = new Date()) => {
+      const minutes = Math.round((now.getTime() - d.getTime()) / 60_000);
+      if (minutes < 1) return locale === 'pl' ? 'przed chwilą' : 'just now';
+      if (minutes < 60) return relative.format(-minutes, 'minute');
+      if (minutes < 48 * 60) return relative.format(-Math.round(minutes / 60), 'hour');
+      return relative.format(-Math.round(minutes / 1440), 'day');
+    },
   };
 }

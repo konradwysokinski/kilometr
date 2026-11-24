@@ -50,3 +50,17 @@ describe('detectLocale', () => {
     expect(detectLocale(['de-DE'])).toBe('en');
   });
 });
+
+describe('ago', () => {
+  const now = new Date('2026-11-24T12:00:00Z');
+  const min = (m: number) => new Date(now.getTime() - m * 60_000);
+  it('says how long ago, in both languages', () => {
+    const en = createFormat('en');
+    const pl = createFormat('pl');
+    expect(en.ago(min(0), now)).toBe('just now');
+    expect(en.ago(min(12), now)).toBe('12 minutes ago');
+    expect(en.ago(min(180), now)).toBe('3 hours ago');
+    expect(pl.ago(min(12), now)).toBe('12 minut temu');
+    expect(pl.ago(min(3 * 1440), now)).toBe('3 dni temu');
+  });
+});
