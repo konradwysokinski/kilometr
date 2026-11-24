@@ -49,7 +49,7 @@ function write(key: string, value: string | null) {
 }
 
 /** A setter that also remembers the value between visits. */
-function usePersisted<T extends string>(key: string, initial: () => T, accept: (v: string) => v is T) {
+export function usePersisted<T extends string>(key: string, initial: () => T, accept: (v: string) => v is T) {
   const [value, setValue] = useState<T>(() => {
     const saved = read(key);
     return saved !== null && accept(saved) ? saved : initial();

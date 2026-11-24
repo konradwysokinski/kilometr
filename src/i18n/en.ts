@@ -172,6 +172,11 @@ export const en = {
     weekLabel: (week: number) => `W${week}`,
     summary: (weeks: number, total: string) =>
       `Stacked bar chart of running kilometres per week over the last ${weeks} weeks, coloured by shoe. ${total} in total.`,
+    lineSummary: (weeks: number, total: string) =>
+      `Line chart of running kilometres per week over the last ${weeks} weeks, one line per shoe. ${total} in total.`,
+    type: 'Chart type',
+    bars: 'Bar chart',
+    lines: 'Line chart',
   },
 
   detail: {

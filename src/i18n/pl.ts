@@ -185,6 +185,11 @@ export const pl: Messages = {
     weekLabel: (week) => `T${week}`,
     summary: (weeks, total) =>
       `Skumulowany wykres słupkowy kilometrów biegowych w ostatnich ${weeks} tygodniach, kolory według butów. Łącznie ${total}.`,
+    lineSummary: (weeks, total) =>
+      `Wykres liniowy kilometrów biegowych w ostatnich ${weeks} tygodniach, jedna linia na każdą parę butów. Łącznie ${total}.`,
+    type: 'Typ wykresu',
+    bars: 'Wykres słupkowy',
+    lines: 'Wykres liniowy',
   },
 
   detail: {
