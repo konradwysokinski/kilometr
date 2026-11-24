@@ -1,6 +1,6 @@
 .bell {
   position: absolute;
-  top: 38px;
+  top: 40px; /* the panel's top padding, so it lines up with the controls of each screen */
   right: 44px;
   z-index: 21;
   width: 40px;
@@ -27,7 +27,7 @@
 /* Open, the bell stays put as the panel's X, even when the page is scrolled. */
 .bell[data-open] {
   position: fixed;
-  top: 48px;
+  top: 50px;
   right: 54px;
 }
 
@@ -43,8 +43,10 @@
 }
 
 /*
- * Same metrics as the content panel (38px down, 44px in) so the title lines
+ * Same metrics as the content panel (40px down, 44px in) so the title lines
  * up with the bell. No scrim: the screen behind stays usable.
+ * It appears inside the app's frame (a short fade with a small shift), rather
+ * than sliding in across the rounded edge from off screen.
  */
 .panel {
   position: fixed;
@@ -53,7 +55,7 @@
   bottom: 10px;
   z-index: 20;
   width: min(420px, calc(100vw - 20px));
-  padding: 38px 44px 28px;
+  padding: 40px 44px 28px;
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--surface);
@@ -62,17 +64,22 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
-  transform: translateX(calc(100% + 20px));
+  opacity: 0;
+  transform: translateX(12px);
   visibility: hidden;
   transition:
-    transform 0.24s cubic-bezier(0.32, 0.72, 0, 1),
-    visibility 0s linear 0.24s;
+    opacity 0.14s ease-in,
+    transform 0.14s ease-in,
+    visibility 0s linear 0.14s;
 }
 
 .panel[data-open] {
+  opacity: 1;
   transform: none;
   visibility: visible;
-  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+  transition:
+    opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .panel:focus {
@@ -82,7 +89,7 @@
 @media (prefers-reduced-motion: reduce) {
   .panel,
   .panel[data-open] {
-    transition: none;
+    transform: none;
   }
 }
 
@@ -120,18 +127,18 @@
 
 @media (max-width: 640px) {
   .bell {
-    top: 26px;
+    top: 28px;
     right: 20px;
   }
 
   .bell[data-open] {
-    top: 36px;
+    top: 38px;
     right: 30px;
   }
 
   .panel {
     left: 10px;
     width: auto;
-    padding: 26px 20px 20px;
+    padding: 28px 20px 20px;
   }
 }
