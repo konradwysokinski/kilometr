@@ -1,7 +1,14 @@
+/*
+ * A card spans four rows of the parent grid (five with a footnote) and uses
+ * them as a subgrid: head, km + chip, bar, meta. Cards in one row then share
+ * row heights, so a 2-line name or a long chip in one card moves the bars of
+ * all of them together. The parent grid must set grid-auto-rows: auto.
+ */
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 10px;
   padding: 20px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-card);
@@ -9,6 +16,10 @@
   color: var(--ink);
   text-decoration: none;
   transition: border-color 0.15s ease, box-shadow 0.2s ease;
+}
+
+.withFootnote {
+  grid-row: span 5;
 }
 
 .card:hover {
@@ -21,11 +32,10 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  margin-bottom: 8px;
 }
 
 .titles {
-  /* room for a 2-line name + caption, so cards in a row stay aligned */
-  min-height: 62px;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -51,20 +61,23 @@
   text-overflow: ellipsis;
 }
 
-.wear {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .kmRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 8px;
+  gap: 4px 8px;
+  /* Numbers stay level across cards; a chip that wraps adds room above the bar instead. */
+  align-self: start;
+}
+
+/* The bar row: keep the 18px rhythm to the meta line below. */
+.kmRow + * {
+  margin-bottom: 8px;
 }
 
 .km {
+  white-space: nowrap;
   font-size: 22px;
   line-height: 28px;
   letter-spacing: -0.02em;
@@ -96,7 +109,7 @@
 }
 
 .footnote {
-  margin-top: -4px;
+  margin-top: 4px;
   padding-top: 14px;
   border-top: 1px solid var(--line-soft);
   font-size: 13px;

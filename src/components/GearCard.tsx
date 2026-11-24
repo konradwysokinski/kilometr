@@ -23,7 +23,7 @@ export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: st
         : { text: `${Math.round(g.wear.ratio * 100)}%`, tone: 'neutral' as const };
 
   return (
-    <Link to={`/gear/${g.gear.id}`} className={s.card}>
+    <Link to={`/gear/${g.gear.id}`} className={`${s.card} ${footnote ? s.withFootnote : ''}`}>
       <div className={s.head}>
         <Avatar initials={g.initials} colour={g.colour} />
         <div className={s.titles}>
@@ -32,8 +32,9 @@ export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: st
         </div>
       </div>
 
-      {g.wear && chip && (
-        <div className={s.wear}>
+      {/* Each part is its own row of the parent grid (subgrid), so bars line up across cards. */}
+      {g.wear && chip ? (
+        <>
           <div className={s.kmRow}>
             <span className={s.km}>
               {f.int(g.totalKm)}
@@ -46,7 +47,12 @@ export function GearCard({ gear: g, footnote }: { gear: GearStats; footnote?: st
             colour={gearColour(g.colour)}
             label={t.gear.ofLimit(f.int(g.totalKm), f.km(g.wear.limitKm))}
           />
-        </div>
+        </>
+      ) : (
+        <>
+          <div />
+          <div />
+        </>
       )}
 
       <div className={s.meta}>
