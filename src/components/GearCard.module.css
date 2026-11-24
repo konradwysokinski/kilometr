@@ -119,6 +119,8 @@
 .meta {
   display: flex;
   flex-wrap: wrap;
+  /* km left on the left edge, cost per km (or "Add price") on the right */
+  justify-content: space-between;
   gap: 4px 20px;
   font-size: 13px;
   line-height: 18px;
