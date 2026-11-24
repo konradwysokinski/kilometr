@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import { useDataset } from '../app/store';
 import { byLastUsed, type GearStats } from '../domain/gear';
 import { unassignedRuns } from '../domain/overview';
@@ -29,6 +29,7 @@ interface Props {
 
 export function Sidebar({ id, open, onClose }: Props) {
   const { data, stats, now, t } = useDataset();
+  const location = useLocation();
   const runsWithoutShoes = unassignedRuns(data, now).length;
   const all = [...stats.values()];
 
@@ -60,7 +61,8 @@ export function Sidebar({ id, open, onClose }: Props) {
 
       <div className={`${s.group} ${s.footer}`}>
         <SourceStatus />
-        <NavLink to="/settings" className={navClass}>
+        {/* Settings open as a modal over the current screen (see App), so the drawer closes by hand. */}
+        <NavLink to="/settings" state={{ background: location }} className={navClass} onClick={onClose}>
           <Icon name="settings" className={s.navIcon} />
           {t.nav.settings}
         </NavLink>

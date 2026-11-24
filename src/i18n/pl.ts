@@ -317,12 +317,13 @@ export const pl: Messages = {
 
   settings: {
     title: 'Ustawienia',
-    appearance: 'Wygląd',
+    close: 'Zamknij ustawienia',
+    sections: 'Sekcje ustawień',
+    general: 'Ogólne',
     theme: 'Motyw',
     themeHint: 'Systemowy przełącza się razem z ustawieniem jasny / ciemny w komputerze.',
     themes: { light: 'Jasny', dark: 'Ciemny', system: 'Systemowy' },
     language: 'Język',
-    languageRow: 'Język aplikacji',
     languageHint: 'Kilometr mówi po angielsku i po polsku.',
     data: 'Dane',
     sourceSample: 'Dane przykładowe',

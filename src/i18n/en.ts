@@ -304,12 +304,13 @@ export const en = {
 
   settings: {
     title: 'Settings',
-    appearance: 'Appearance',
+    close: 'Close settings',
+    sections: 'Settings sections',
+    general: 'General',
     theme: 'Theme',
     themeHint: "System follows your computer's light or dark setting.",
     themes: { light: 'Light', dark: 'Dark', system: 'System' },
     language: 'Language',
-    languageRow: 'App language',
     languageHint: 'Kilometr speaks English and Polish.',
     data: 'Data',
     sourceSample: 'Sample data',
