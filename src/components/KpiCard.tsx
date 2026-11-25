@@ -15,7 +15,6 @@ export function KpiCard({ label, value, sub, tone = 'default', size = 'lg' }: Pr
     <div className={s.card}>
       <span className={s.label}>{label}</span>
       <span className={`${s.value} ${size === 'md' ? s.md : ''} ${tone === 'warn' ? s.warn : ''}`}>{value}</span>
-      <span className={s.rule} aria-hidden="true" />
       <span className={s.sub}>{sub}</span>
     </div>
   );

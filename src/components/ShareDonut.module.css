@@ -3,6 +3,19 @@
   padding: 20px 22px;
   border: 1px solid var(--line);
   border-radius: var(--radius-tile);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+  min-width: 0;
+}
+
+/* Full width, so it doesn't wrap beside the donut. */
+.label {
+  grid-column: 1 / -1;
+}
+
+.text {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -16,13 +29,10 @@
   color: var(--ink-muted);
 }
 
-/* The donut hangs into the gap above the rule, so the row keeps the value's 40px. */
-.valueRow {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+/* Caption size: the line under the number stays quieter than the label above it. */
+.sub {
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .value {
@@ -35,7 +45,8 @@
 
 /* Starts at twelve o'clock and goes clockwise. */
 .donut {
-  flex: none;
+  width: 80px;
+  height: 80px;
   transform: rotate(-90deg);
 }
 
@@ -44,12 +55,9 @@
   stroke: var(--track);
 }
 
-.rule {
-  height: 1px;
-  background: var(--line-soft);
-}
-
 .sub {
+  /* No rule between the number and its line any more; a little more air instead. */
+  margin-top: 4px;
   text-wrap: pretty;
 }
 
