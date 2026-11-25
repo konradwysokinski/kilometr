@@ -199,10 +199,9 @@ export const en = {
   },
 
   chart: {
-    runByWeek: 'Running by week',
-    rideByWeek: 'Riding by week',
-    runByMonth: 'Running by month',
-    rideByMonth: 'Riding by month',
+    /** Chart title: "Running in November", "Riding in 2026". */
+    runIn: (period: string) => `Running ${period}`,
+    rideIn: (period: string) => `Riding ${period}`,
     other: 'Other',
     /** Screen reader text: "Stacked bar chart of running kilometres per week in November, coloured by shoe. 160 km in total." */
     summary: (kind: 'shoe' | 'bike', unit: 'week' | 'month', period: string, total: string) =>

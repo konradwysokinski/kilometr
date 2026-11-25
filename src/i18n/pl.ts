@@ -212,10 +212,8 @@ export const pl: Messages = {
   },
 
   chart: {
-    runByWeek: 'Bieganie w tygodniach',
-    rideByWeek: 'Jazda w tygodniach',
-    runByMonth: 'Bieganie w miesiącach',
-    rideByMonth: 'Jazda w miesiącach',
+    runIn: (period) => `Bieganie ${period}`,
+    rideIn: (period) => `Jazda ${period}`,
     other: 'Inne',
     summary: (kind, unit, period, total) =>
       `Skumulowany wykres słupkowy kilometrów ${kind === 'shoe' ? 'biegowych' : 'rowerowych'} ${unit === 'week' ? 'w kolejnych tygodniach' : 'w kolejnych miesiącach'} ${period}, kolory według ${kind === 'shoe' ? 'butów' : 'rowerów'}. Łącznie ${total}.`,

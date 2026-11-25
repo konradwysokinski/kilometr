@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { usePersisted, useStore } from '../app/store';
 import type { WeekBar, WeeklySeries } from '../domain/overview';
 import type { GearKind } from '../domain/types';
@@ -28,11 +28,18 @@ function columns(width: number, gap: number, n: number) {
   return { centre: (i: number) => i * (w + gap) + w / 2, at: (x: number) => Math.floor((x + gap / 2) / (w + gap)) };
 }
 
-/** Days a week bar covers, "2–8", or "1" for a one-day stub at the month's edge. */
+/** Days a week bar covers, "2–8", or "1" for a one-day stub. On a narrow card only the first day shows. */
 function days(bar: WeekBar) {
   const last = addDays(bar.end, -1).getDate();
   const first = bar.start.getDate();
-  return first === last ? `${first}` : `${first}–${last}`;
+  return first === last ? (
+    `${first}`
+  ) : (
+    <>
+      {first}
+      <span className={s.to}>–{last}</span>
+    </>
+  );
 }
 
 /** Tooltip date: "16–22 Nov", or "30 Nov" for a one-day stub. */
@@ -66,14 +73,15 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
   const n = bars.length;
   const unit = bars[0]?.unit ?? 'week';
   const summary = (mode === 'bars' ? t.chart.summary : t.chart.lineSummary)(kind, unit, inPeriod, f.km(total));
-  const title =
-    unit === 'week'
-      ? kind === 'shoe'
-        ? t.chart.runByWeek
-        : t.chart.rideByWeek
-      : kind === 'shoe'
-        ? t.chart.runByMonth
-        : t.chart.rideByMonth;
+  // Named after the period, like the rest of the page; the axis says weeks or months.
+  const title = (kind === 'shoe' ? t.chart.runIn : t.chart.rideIn)(inPeriod);
+  // The legend doubles as a small table: each item's km in the period, most first.
+  const legend = series
+    .map((x) => ({
+      ...x,
+      km: bars.reduce((sum, b) => sum + (b.segments.find((seg) => seg.key === x.key)?.km ?? 0), 0),
+    }))
+    .sort((a, b) => Number(a.key === 'other') - Number(b.key === 'other') || b.km - a.km);
 
   // The week being read (pointer, touch or arrow keys) and, within it, the shoe or bike under the pointer.
   const [active, setActive] = useState<number | null>(null);
@@ -186,135 +194,163 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
         <h2 id="weeks-h" className={s.title}>
           {title}
         </h2>
-        <div className={s.aside}>
-          <ul className={s.legend}>
-            {series.map((x) => (
-              <li key={x.key}>
-                <span className={s.swatch} style={{ background: gearColour(x.colour) }} aria-hidden="true" />
-                {nameOf(x.key)}
-              </li>
-            ))}
-          </ul>
-          <div role="group" aria-label={t.chart.type} className={s.toggle}>
-            <button
-              type="button"
-              aria-pressed={mode === 'bars'}
-              aria-label={t.chart.bars}
-              title={t.chart.bars}
-              onClick={() => setMode('bars')}
-            >
-              <BarsIcon />
-            </button>
-            <button
-              type="button"
-              aria-pressed={mode === 'lines'}
-              aria-label={t.chart.lines}
-              title={t.chart.lines}
-              onClick={() => setMode('lines')}
-            >
-              <LineIcon />
-            </button>
-          </div>
+        <div role="group" aria-label={t.chart.type} className={s.toggle}>
+          <button
+            type="button"
+            aria-pressed={mode === 'bars'}
+            aria-label={t.chart.bars}
+            title={t.chart.bars}
+            onClick={() => setMode('bars')}
+          >
+            <BarsIcon />
+          </button>
+          <button
+            type="button"
+            aria-pressed={mode === 'lines'}
+            aria-label={t.chart.lines}
+            title={t.chart.lines}
+            onClick={() => setMode('lines')}
+          >
+            <LineIcon />
+          </button>
         </div>
       </div>
 
-      <div ref={plotRef} className={s.plot}>
-        <div className={s.grid} aria-hidden="true">
-          {Array.from({ length: GRID_LINES }, (_, i) => (
-            <span key={i} className={s.gridLine}>
-              <span className={s.tick}>{f.int(max - (i * max) / GRID_LINES)}</span>
-            </span>
-          ))}
-          <span className={s.baseline} />
-        </div>
+      <div className={s.body}>
+        <div className={s.chart}>
+          <div ref={plotRef} className={s.plot}>
+            <div className={s.grid} aria-hidden="true">
+              {Array.from({ length: GRID_LINES }, (_, i) => (
+                <span key={i} className={s.gridLine}>
+                  <span className={s.tick}>{f.int(max - (i * max) / GRID_LINES)}</span>
+                </span>
+              ))}
+              <span className={s.baseline} />
+            </div>
 
-        <div
-          ref={areaRef}
-          role="img"
-          aria-label={`${summary} ${t.chart.explore}`}
-          tabIndex={0}
-          className={mode === 'bars' ? s.bars : s.lines}
-          data-active={active !== null || undefined}
-          style={{ height: HEIGHT }}
-          onPointerMove={track}
-          onPointerDown={track}
-          onPointerLeave={(e) => e.pointerType !== 'touch' && clear()}
-          onKeyDown={onKeyDown}
-          onFocus={(e) => {
-            if (active === null && e.currentTarget.matches(':focus-visible')) setActive(n - 1);
-          }}
-          onBlur={clear}
-        >
-          {mode === 'bars' ? (
-            bars.map((b, i) => (
-              <div key={b.label} className={s.bar} data-on={i === active || undefined}>
-                {b.segments.map((seg) => (
-                  <div
-                    key={seg.key}
-                    data-key={seg.key}
-                    className={s.seg}
-                    data-muted={(i === active && hot !== null && seg.key !== hot) || undefined}
-                    style={{
-                      height: Math.max(2, (seg.km / max) * HEIGHT - 3),
-                      background: gearColour(seg.colour),
-                    }}
-                  />
-                ))}
+            <div
+              ref={areaRef}
+              role="img"
+              aria-label={`${summary} ${t.chart.explore}`}
+              tabIndex={0}
+              className={mode === 'bars' ? s.bars : s.lines}
+              data-active={active !== null || undefined}
+              style={{ height: HEIGHT }}
+              onPointerMove={track}
+              onPointerDown={track}
+              onPointerLeave={(e) => e.pointerType !== 'touch' && clear()}
+              onKeyDown={onKeyDown}
+              onFocus={(e) => {
+                if (active === null && e.currentTarget.matches(':focus-visible')) setActive(n - 1);
+              }}
+              onBlur={clear}
+            >
+              {mode === 'bars' ? (
+                bars.map((b, i) => (
+                  <div key={b.label} className={s.bar} data-on={i === active || undefined}>
+                    {b.segments.map((seg) => (
+                      <div
+                        key={seg.key}
+                        data-key={seg.key}
+                        className={s.seg}
+                        data-muted={(hot !== null && seg.key !== hot && (active === null || i === active)) || undefined}
+                        style={{
+                          height: Math.max(2, (seg.km / max) * HEIGHT - 3),
+                          background: gearColour(seg.colour),
+                        }}
+                      />
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <Lines bars={bars} series={series} max={max} active={active} hot={hot} />
+              )}
+            </div>
+
+            {week && (
+              <div ref={tipRef} className={s.tip} aria-hidden="true">
+                <div className={s.tipHead}>{heading}</div>
+                {rows.length ? (
+                  <ul className={s.tipRows} data-picked={hot !== null || undefined}>
+                    {rows.map((r) => (
+                      <li key={r.key} className={s.tipRow} data-hot={r.key === hot || undefined}>
+                        <span className={s.swatch} style={{ background: gearColour(r.colour) }} />
+                        <span className={s.tipName}>{nameOf(r.key)}</span>
+                        <span className={s.tipKm}>{f.kmPrecise(r.km)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className={s.tipEmpty}>{empty}</div>
+                )}
+                {rows.length > 1 && (
+                  <div className={s.tipTotal}>
+                    <span>{t.chart.total}</span>
+                    <span>{f.kmPrecise(week.totalKm)}</span>
+                  </div>
+                )}
               </div>
-            ))
-          ) : (
-            <Lines bars={bars} series={series} max={max} active={active} hot={hot} />
-          )}
+            )}
+            <span className="visually-hidden" aria-live="polite">
+              {spoken}
+            </span>
+          </div>
+
+          <div
+            className={mode === 'bars' ? s.labels : `${s.labels} ${s.even}`}
+            data-dense={n > 8 || undefined}
+            aria-hidden="true"
+          >
+            {bars.map((b, i) => (
+              <span key={b.label} data-on={i === active || undefined}>
+                {b.unit === 'month' ? f.monthShort(b.start) : days(b)}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {week && (
-          <div ref={tipRef} className={s.tip} aria-hidden="true">
-            <div className={s.tipHead}>{heading}</div>
-            {rows.length ? (
-              <ul className={s.tipRows} data-picked={hot !== null || undefined}>
-                {rows.map((r) => (
-                  <li key={r.key} className={s.tipRow} data-hot={r.key === hot || undefined}>
-                    <span className={s.swatch} style={{ background: gearColour(r.colour) }} />
-                    <span className={s.tipName}>{nameOf(r.key)}</span>
-                    <span className={s.tipKm}>{f.kmPrecise(r.km)}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className={s.tipEmpty}>{empty}</div>
-            )}
-            {rows.length > 1 && (
-              <div className={s.tipTotal}>
+        {legend.length > 0 && (
+          <div className={s.legend}>
+            <ul className={s.legendRows} data-picked={hot !== null || undefined}>
+              {legend.map((x) => (
+                <li
+                  key={x.key}
+                  className={s.legendRow}
+                  data-hot={x.key === hot || undefined}
+                  onPointerEnter={(e) => e.pointerType !== 'touch' && setHot(x.key)}
+                  onPointerLeave={() => active === null && setHot(null)}
+                >
+                  <span className={s.swatch} style={{ background: gearColour(x.colour) }} aria-hidden="true" />
+                  <span className={s.legendName}>{nameOf(x.key)}</span>
+                  <span className={s.legendKm}>{f.km(x.km)}</span>
+                </li>
+              ))}
+            </ul>
+            {legend.length > 1 && (
+              <div className={s.legendTotal}>
                 <span>{t.chart.total}</span>
-                <span>{f.kmPrecise(week.totalKm)}</span>
+                <span>{f.km(total)}</span>
               </div>
             )}
           </div>
         )}
-        <span className="visually-hidden" aria-live="polite">
-          {spoken}
-        </span>
-      </div>
-
-      <div
-        className={mode === 'bars' ? s.labels : `${s.labels} ${s.even}`}
-        data-dense={n > 8 || undefined}
-        aria-hidden="true"
-      >
-        {bars.map((b, i) => (
-          <span key={b.label} data-on={i === active || undefined}>
-            {b.unit === 'month' ? f.monthShort(b.start) : days(b)}
-          </span>
-        ))}
       </div>
     </section>
   );
 }
 
+/** Gradient strength under a line: faint for every item at rest, strong for the picked one. */
+const AREA_REST = 0.1;
+const AREA_ALONE = 0.24;
+const AREA_PICKED = 0.28;
+
 /**
- * One line per series. Week i sits at the centre of an equal slot, (i + 0.5) / n,
- * so the SVG can stretch to any width; the labels row drops its gap to match.
- * Dots are HTML so they stay round when the SVG stretches.
+ * One line per series, each over a soft gradient in its colour that fades to the axis.
+ * At rest the gradients are faint, so three of them overlap as a glow, not a smear;
+ * picking an item (pointer, tooltip, legend) strengthens its own and clears the rest.
+ * "Other" gets no gradient: granite would muddy the colours under it.
+ * Week i sits at the centre of an equal slot, (i + 0.5) / n, so the SVG can stretch
+ * to any width; the labels row drops its gap to match. Dots are HTML so they stay round.
  */
 function Lines({
   bars,
@@ -329,31 +365,56 @@ function Lines({
   active: number | null;
   hot: string | null;
 }) {
+  const id = useId();
   const n = bars.length;
   const x = (i: number) => ((i + 0.5) / n) * 100;
-  // "Other" first, so the gear lines are drawn on top of it; the picked line last, on top of all.
-  const ordered = [...series].sort(
-    (a, b) => Number(a.key === hot) - Number(b.key === hot) || Number(b.key === 'other') - Number(a.key === 'other'),
+  const y = (km: number) => HEIGHT - (km / max) * HEIGHT;
+  const lines = series.map((ser) => {
+    const km = bars.map((b) => b.segments.find((seg) => seg.key === ser.key)?.km ?? 0);
+    return { ser, km, total: km.reduce((a, b) => a + b, 0) };
+  });
+  // Areas: the biggest at the back, so smaller ones stay visible in front of it.
+  const areas = lines.filter((l) => l.ser.key !== 'other').sort((a, b) => b.total - a.total);
+  const strength = (key: string) =>
+    hot !== null ? (key === hot ? AREA_PICKED : 0) : areas.length === 1 ? AREA_ALONE : AREA_REST;
+  // Lines: "Other" first, so the gear lines are drawn on top of it; the picked line last, on top of all.
+  const ordered = [...lines].sort(
+    (a, b) =>
+      Number(a.ser.key === hot) - Number(b.ser.key === hot) ||
+      Number(b.ser.key === 'other') - Number(a.ser.key === 'other'),
   );
-  const lines = ordered.map((ser) => ({
-    ser,
-    km: bars.map((b) => b.segments.find((seg) => seg.key === ser.key)?.km ?? 0),
-  }));
+  const gradient = (key: string) => `${id}-${key}`.replace(/[^a-zA-Z0-9_-]/g, '');
 
   return (
     <>
       {active !== null && <span className={s.guide} style={{ left: `${x(active)}%` }} aria-hidden="true" />}
       <svg className={s.svg} viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" aria-hidden="true">
-        {lines.map(({ ser, km }) => (
+        <defs>
+          {areas.map(({ ser }) => (
+            <linearGradient key={ser.key} id={gradient(ser.key)} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" style={{ stopColor: gearColour(ser.colour), stopOpacity: 1 }} />
+              <stop offset="1" style={{ stopColor: gearColour(ser.colour), stopOpacity: 0 }} />
+            </linearGradient>
+          ))}
+        </defs>
+        {areas.map(({ ser, km }) => (
+          <polygon
+            key={ser.key}
+            className={s.area}
+            points={`${x(0)},${HEIGHT} ${km.map((v, i) => `${x(i)},${y(v)}`).join(' ')} ${x(n - 1)},${HEIGHT}`}
+            style={{ fill: `url(#${gradient(ser.key)})`, opacity: strength(ser.key) }}
+          />
+        ))}
+        {ordered.map(({ ser, km }) => (
           <polyline
             key={ser.key}
-            points={km.map((v, i) => `${x(i)},${HEIGHT - (v / max) * HEIGHT}`).join(' ')}
+            points={km.map((v, i) => `${x(i)},${y(v)}`).join(' ')}
             style={{ stroke: gearColour(ser.colour) }}
             data-muted={(hot !== null && ser.key !== hot) || undefined}
           />
         ))}
       </svg>
-      {lines.map(({ ser, km }) =>
+      {ordered.map(({ ser, km }) =>
         km.map((v, i) => (
           <span
             key={`${ser.key}-${i}`}
@@ -364,7 +425,7 @@ function Lines({
             style={{
               left: `${x(i)}%`,
               bottom: `${(v / max) * 100}%`,
-              background: gearColour(ser.colour),
+              borderColor: gearColour(ser.colour),
             }}
           />
         )),

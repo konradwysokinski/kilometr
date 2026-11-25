@@ -1,5 +1,6 @@
 .card {
-  /* Full width under the KPI tiles. */
+  /* Full width under the KPI tiles; the legend moves under the chart when the card is narrow. */
+  container-type: inline-size;
   min-width: 0;
   padding: 24px;
   border: 1px solid var(--line-soft);
@@ -11,25 +12,43 @@
 
 .head {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 8px 16px;
 }
 
 .title {
+  min-width: 0;
   font-size: 18px;
   line-height: 24px;
   font-weight: 500;
 }
 
-.aside {
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 240px);
+  gap: 20px 40px;
+  align-items: start;
+}
+
+.chart {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px 16px;
+  flex-direction: column;
+  gap: 20px;
   min-width: 0;
+}
+
+@container (max-width: 640px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Week labels shrink to their first day ("9") when "9–15" no longer fits. */
+@container (max-width: 420px) {
+  .to {
+    display: none;
+  }
 }
 
 .toggle {
@@ -62,22 +81,58 @@
   color: var(--ink);
 }
 
+/* Legend as a small table: each item's km in the period, most first, then the total. */
 .legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.legendRows {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  font-size: 13px;
-  line-height: 18px;
+  flex-direction: column;
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  border-bottom: 1px solid var(--line-soft);
+  transition: opacity 140ms ease-out;
+}
+
+.legendRows[data-picked] .legendRow:not([data-hot]) {
+  opacity: 0.45;
+}
+
+.legendRow[data-hot] .legendName {
+  font-weight: 500;
+}
+
+.legendName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendKm {
   color: var(--ink-muted);
 }
 
-.legend li {
+.legendTotal {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 6px;
+  font-weight: 500;
 }
 
 .swatch {
@@ -147,7 +202,7 @@
 .seg {
   /* A month has only 5–6 weeks; past this width bars look heavy. The whole column still picks the week. */
   width: 100%;
-  max-width: 56px;
+  max-width: 40px;
   border-radius: var(--radius-bar-seg);
   transition: opacity 140ms ease-out;
 }
@@ -193,20 +248,27 @@
   opacity: 0.3;
 }
 
+/* Hollow, ringed in the item's colour (set inline). */
 .dot {
   position: absolute;
-  width: 7px;
-  height: 7px;
-  margin: 0 0 -3.5px -3.5px;
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  margin: 0 0 -4.5px -4.5px;
+  border: 2px solid;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--surface);
+  background: var(--surface);
   transition:
     transform 140ms ease-out,
     opacity 140ms ease-out;
 }
 
 .dot[data-on] {
-  transform: scale(1.45);
+  transform: scale(1.35);
+}
+
+.area {
+  transition: opacity 160ms ease-out;
 }
 
 /* Tooltip: placed and moved from JS (transform), so it glides from week to week. */
