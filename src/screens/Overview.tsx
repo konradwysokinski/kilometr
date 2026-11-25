@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { ShareDonut } from '../components/ShareDonut';
 import { WeeklyChart } from '../components/WeeklyChart';
-import { kmByGear, kmShare, periodGear, periodSummary, wearCost, weeklyRunKm } from '../domain/overview';
+import { kmByGear, kmShare, periodGear, periodSummary, wearCost, weeklyKm } from '../domain/overview';
 import { addDays, periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
@@ -36,7 +36,12 @@ export function Overview() {
   const wear = useMemo(() => wearCost(data, stats, period), [data, stats, period]);
   // The chart shows the 12 weeks up to the end of the selected period (or today).
   const chartEnd = (isCurrent ? now : addDays(periodEnd, -1)).getTime();
-  const weekly = useMemo(() => weeklyRunKm(data, stats, new Date(chartEnd)), [data, stats, chartEnd]);
+  // Runs by shoe, or rides by bike under the Bikes filter; never both on one chart.
+  const chartKind = filter === 'bike' ? 'bike' : 'shoe';
+  const weekly = useMemo(
+    () => weeklyKm(data, stats, new Date(chartEnd), chartKind),
+    [data, stats, chartEnd, chartKind],
+  );
 
   const bikeNames = summary.bikeIds.flatMap((id) => stats.get(id)?.shortName ?? []);
   // All gear adds both up; the split stays in the Running and Riding cards.
@@ -146,7 +151,7 @@ export function Overview() {
         />
       </section>
 
-      {showShoes && <WeeklyChart bars={weekly.bars} series={weekly.series} />}
+      <WeeklyChart kind={chartKind} bars={weekly.bars} series={weekly.series} />
 
       {showShoes && (
         <section aria-labelledby="shoes-h" className={s.section}>

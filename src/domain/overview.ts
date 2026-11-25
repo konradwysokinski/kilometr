@@ -1,6 +1,6 @@
 import { addDays, isoWeek, periodRange, startOfWeek, type Period } from '../lib/dates';
 import { byLastUsed, isRide, isRun, km, type GearStats } from './gear';
-import type { Activity, Dataset, GearColour } from './types';
+import type { Activity, Dataset, GearColour, GearKind } from './types';
 
 export const UNASSIGNED_WINDOW_DAYS = 30;
 
@@ -149,15 +149,19 @@ export interface WeeklySeries {
 }
 
 /**
- * Running km per week for the `weeks` weeks ending with the week of `end`,
- * stacked by shoe. Shoes without a hue are grouped as "Other".
+ * Km per week for the `weeks` weeks ending with the week of `end`: runs
+ * stacked by shoe, or rides stacked by bike. Gear without a hue is grouped as
+ * "Other". Runs and rides never share a chart: a 100 km ride would flatten
+ * every pair of shoes next to it.
  */
-export function weeklyRunKm(
+export function weeklyKm(
   data: Dataset,
   stats: Map<string, GearStats>,
   end: Date,
+  kind: GearKind = 'shoe',
   weeks = 12,
 ): { bars: WeekBar[]; series: WeeklySeries[] } {
+  const counts = kind === 'shoe' ? isRun : isRide;
   const first = addDays(startOfWeek(end), -(weeks - 1) * 7);
   const bars: WeekBar[] = Array.from({ length: weeks }, (_, i) => {
     const start = addDays(first, i * 7);
@@ -172,7 +176,7 @@ export function weeklyRunKm(
 
   const perWeek = bars.map(() => new Map<string, number>());
   for (const a of data.activities) {
-    if (!isRun(a)) continue;
+    if (!counts(a)) continue;
     const idx = Math.floor((new Date(a.startDate).getTime() - first.getTime()) / (7 * 86_400_000));
     if (idx < 0 || idx >= weeks) continue;
     const key = seriesKey(a);
@@ -181,7 +185,7 @@ export function weeklyRunKm(
 
   const used = new Set(perWeek.flatMap((m) => [...m.keys()]));
   const series: WeeklySeries[] = [...stats.values()]
-    .filter((s) => s.colour && used.has(s.gear.id) && s.gear.kind === 'shoe')
+    .filter((s) => s.colour && used.has(s.gear.id) && s.gear.kind === kind)
     .sort((a, b) => (a.colour ?? 0) - (b.colour ?? 0) || byLastUsed(a, b))
     .map((s) => ({ key: s.gear.id, name: s.shortName, colour: s.colour }));
   if (used.has('other')) series.push({ key: 'other', name: 'Other', colour: null });

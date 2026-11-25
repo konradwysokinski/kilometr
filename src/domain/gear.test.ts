@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats, initials, partWear, wearOf } from './gear';
-import { kmByGear, kmShare, periodGear, unassignedRuns, wearCost, weeklyRunKm } from './overview';
+import { kmByGear, kmShare, periodGear, unassignedRuns, wearCost, weeklyKm } from './overview';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -153,8 +153,15 @@ describe('sample data', () => {
   });
 
   it('stacks 12 weeks of running by shoe', () => {
-    const { bars, series } = weeklyRunKm(data, stats, now);
+    const { bars, series } = weeklyKm(data, stats, now);
     expect(bars).toHaveLength(12);
     expect(series.map((s) => s.name)).toContain('Speedgoat 5');
+    expect(series.map((s) => s.key)).not.toContain('g-cg');
+  });
+
+  it('stacks rides by bike on their own chart', () => {
+    const { bars, series } = weeklyKm(data, stats, now, 'bike');
+    expect(series.map((s) => s.key)).toEqual(['g-cg']);
+    expect(bars.reduce((sum, b) => sum + b.totalKm, 0)).toBeGreaterThan(0);
   });
 });

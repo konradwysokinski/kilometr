@@ -199,13 +199,24 @@ export const en = {
   },
 
   chart: {
-    byWeek: 'Kilometres by week',
+    runByWeek: 'Running by week',
+    rideByWeek: 'Riding by week',
     other: 'Other',
     weekLabel: (week: number) => `W${week}`,
     summary: (weeks: number, total: string) =>
       `Stacked bar chart of running kilometres per week over the last ${weeks} weeks, coloured by shoe. ${total} in total.`,
     lineSummary: (weeks: number, total: string) =>
       `Line chart of running kilometres per week over the last ${weeks} weeks, one line per shoe. ${total} in total.`,
+    rideSummary: (weeks: number, total: string) =>
+      `Stacked bar chart of riding kilometres per week over the last ${weeks} weeks, coloured by bike. ${total} in total.`,
+    rideLineSummary: (weeks: number, total: string) =>
+      `Line chart of riding kilometres per week over the last ${weeks} weeks, one line per bike. ${total} in total.`,
+    /** Tooltip heading: "Week 47 · 17–23 Nov" */
+    weekOf: (week: number, range: string) => `Week ${week} · ${range}`,
+    total: 'Total',
+    noRuns: 'No runs',
+    noRides: 'No rides',
+    explore: 'Use the left and right arrow keys to read each week.',
     type: 'Chart type',
     bars: 'Bar chart',
     lines: 'Line chart',
