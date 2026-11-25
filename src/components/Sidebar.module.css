@@ -177,24 +177,35 @@
 }
 
 .sync {
-  white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 12px;
-  height: var(--meta-row);
+  gap: 12px;
+  padding: 6px 12px;
+  min-height: var(--meta-row);
   font-size: 12px;
+  line-height: 16px;
   color: var(--ink-muted);
 }
 
+/* Wraps to a second line rather than cutting off when the sync was. */
 .sync .grow {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.syncTitle,
+.syncWhen {
+  display: block;
+}
+
+.syncWhen {
+  color: var(--ink);
 }
 
 .syncDot {
   width: 7px;
   height: 7px;
+  /* centred in the 17px icon column, so the text lines up with the nav labels */
+  margin: 0 5px;
   flex: none;
   border-radius: var(--radius-pill);
   background: var(--accent);
@@ -207,7 +218,7 @@
 }
 
 .syncError {
-  padding: 0 12px 6px 29px;
+  padding: 0 12px 6px 41px;
   font-size: 12px;
   line-height: 16px;
   color: var(--warn-ink);

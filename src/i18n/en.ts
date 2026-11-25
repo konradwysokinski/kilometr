@@ -28,6 +28,7 @@ export const en = {
     useMine: 'Use mine',
     synced: 'Synced just now',
     syncedAgo: (ago: string) => `Synced ${ago}`,
+    syncedTitle: 'Synced',
     syncing: 'Syncing…',
     syncFailed: 'Sync failed',
     syncNow: 'Sync now',

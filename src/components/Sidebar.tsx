@@ -73,7 +73,7 @@ export function Sidebar({ id, open, onClose }: Props) {
 
 /** Where the data comes from, and the way to refresh it. */
 function SourceStatus() {
-  const { data, clear, importFile, importState, stravaState, syncStrava, t, f } = useDataset();
+  const { data, clear, importFile, importState, stravaState, syncStrava, locale, t, f } = useDataset();
   const input = useRef<HTMLInputElement>(null);
   // "Synced 12 minutes ago" moves on by itself.
   const [now, setNow] = useState(() => new Date());
@@ -98,6 +98,7 @@ function SourceStatus() {
   const syncing = stravaState.status === 'syncing';
   const failed = importState.status === 'error' || (data.source === 'strava' && stravaState.status === 'error');
   const updated = data.updatedAt ? new Date(data.updatedAt) : null;
+  const twoLines = data.source === 'strava' && !syncing && stravaState.status !== 'error' && !!updated;
   const label = reading
     ? t.sidebar.reading
     : syncing
@@ -116,8 +117,16 @@ function SourceStatus() {
     <>
       <div className={s.sync}>
         <span className={`${s.syncDot} ${failed ? s.syncDotWarn : ''}`} aria-hidden="true" />
-        <span className={s.grow} role="status">
-          {label}
+        <span className={s.grow} role="status" title={updated ? updated.toLocaleString(locale) : undefined}>
+          {twoLines ? (
+            // "Synced" over "12 minutes ago": the time stays whole in the narrow sidebar.
+            <>
+              <span className={s.syncTitle}>{t.sidebar.syncedTitle}</span>{' '}
+              <span className={s.syncWhen}>{f.ago(updated!, now)}</span>
+            </>
+          ) : (
+            label
+          )}
         </span>
         {data.source === 'strava' && (
           <button

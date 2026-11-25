@@ -41,6 +41,7 @@ export const pl: Messages = {
     useMine: 'Użyj moich',
     synced: 'Zsynchronizowano przed chwilą',
     syncedAgo: (ago) => `Zsynchronizowano ${ago}`,
+    syncedTitle: 'Zsynchronizowano',
     syncing: 'Synchronizuję…',
     syncFailed: 'Synchronizacja nie powiodła się',
     syncNow: 'Synchronizuj teraz',
