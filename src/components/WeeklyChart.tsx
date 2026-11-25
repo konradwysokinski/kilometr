@@ -69,7 +69,10 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
     mode === 'bars'
       ? Math.max(...bars.map((b) => b.totalKm))
       : Math.max(...bars.flatMap((b) => b.segments.map((seg) => seg.km)));
-  const max = niceMax(peak);
+  const trend = bars.map((b) => b.trendKm);
+  const hasTrend = trend.some((v) => v !== null);
+  const trendNow = [...trend].reverse().find((v) => v !== null) ?? null;
+  const max = niceMax(Math.max(peak, ...trend.map((v) => v ?? 0)));
   const n = bars.length;
   const unit = bars[0]?.unit ?? 'week';
   const summary = (mode === 'bars' ? t.chart.summary : t.chart.lineSummary)(kind, unit, inPeriod, f.km(total));
@@ -90,6 +93,19 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
   const areaRef = useRef<HTMLDivElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
   const shown = useRef(false);
+  // The plot's width and column gap, for the trend line's points under the bars' centres.
+  const [box, setBox] = useState({ width: 0, gap: 0 });
+  useLayoutEffect(() => {
+    const area = areaRef.current;
+    if (!area) return;
+    const measure = () => setBox({ width: area.clientWidth, gap: gapOf() });
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(area);
+    return () => observer.disconnect();
+    // gapOf reads the mode's CSS; re-measure when it changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
 
   const gapOf = () =>
     mode === 'bars' && areaRef.current ? parseFloat(getComputedStyle(areaRef.current).columnGap) || 0 : 0;
@@ -185,7 +201,8 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
       : t.chart.weekOf(week.week, weekRange(week, f.dayMonth));
   const empty = kind === 'shoe' ? t.chart.noRuns : t.chart.noRides;
   const spoken = week
-    ? `${heading}: ${rows.length ? rows.map((r) => `${nameOf(r.key)} ${f.kmPrecise(r.km)}`).join(', ') : empty}`
+    ? `${heading}: ${rows.length ? rows.map((r) => `${nameOf(r.key)} ${f.kmPrecise(r.km)}`).join(', ') : empty}` +
+      (week.trendKm !== null ? `. ${t.chart.trend} ${f.kmPrecise(week.trendKm)}` : '')
     : '';
 
   return (
@@ -265,6 +282,7 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
               ) : (
                 <Lines bars={bars} series={series} max={max} active={active} hot={hot} />
               )}
+              {hasTrend && box.width > 0 && <Trend trend={trend} max={max} box={box} />}
             </div>
 
             {week && (
@@ -287,6 +305,13 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
                   <div className={s.tipTotal}>
                     <span>{t.chart.total}</span>
                     <span>{f.kmPrecise(week.totalKm)}</span>
+                  </div>
+                )}
+                {week.trendKm !== null && (
+                  <div className={s.tipTrend}>
+                    <span className={s.trendSwatch} />
+                    <span className={s.tipName}>{t.chart.trend}</span>
+                    <span className={s.tipKm}>{f.kmPrecise(week.trendKm)}</span>
                   </div>
                 )}
               </div>
@@ -330,6 +355,13 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
               <div className={s.legendTotal}>
                 <span>{t.chart.total}</span>
                 <span>{f.km(total)}</span>
+              </div>
+            )}
+            {trendNow !== null && (
+              <div className={s.legendTrend}>
+                <span className={s.trendSwatch} aria-hidden="true" />
+                <span className={s.legendName}>{t.chart.trend}</span>
+                <span className={s.legendKm}>{t.chart.perWeek(f.km(trendNow))}</span>
               </div>
             )}
           </div>
@@ -431,6 +463,21 @@ function Lines({
         )),
       )}
     </>
+  );
+}
+
+/**
+ * The 4-week average as a quiet dashed line over the bars or lines, one point
+ * under each week's centre. Drawn in real pixels (not a stretched viewBox) so
+ * the points sit over bars spaced with a gap.
+ */
+function Trend({ trend, max, box }: { trend: (number | null)[]; max: number; box: { width: number; gap: number } }) {
+  const col = columns(box.width, box.gap, trend.length);
+  const points = trend.flatMap((v, i) => (v === null ? [] : [`${col.centre(i)},${HEIGHT - (v / max) * HEIGHT}`]));
+  return (
+    <svg className={s.trend} viewBox={`0 0 ${box.width} ${HEIGHT}`} aria-hidden="true">
+      <polyline points={points.join(' ')} />
+    </svg>
   );
 }
 

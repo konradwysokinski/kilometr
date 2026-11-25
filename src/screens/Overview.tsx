@@ -46,7 +46,7 @@ export function Overview() {
     const hue = (g.gear.kind === 'bike' ? bikeHues : shoeHues).get(g.gear.id);
     return hue && hue !== g.colour ? { ...g, colour: hue } : g;
   };
-  const weekly = useMemo(() => periodKm(data, stats, period, chartKind), [data, stats, period, chartKind]);
+  const weekly = useMemo(() => periodKm(data, stats, period, chartKind, now), [data, stats, period, chartKind, now]);
 
   const bikeNames = summary.bikeIds.flatMap((id) => stats.get(id)?.shortName ?? []);
   // All gear adds both up; the split stays in the Running and Riding cards.

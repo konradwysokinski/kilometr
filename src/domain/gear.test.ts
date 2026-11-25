@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
-import { gearStats, initials, partWear, wearOf } from './gear';
+import { gearStats, initials, isRun, partWear, wearOf } from './gear';
 import {
   kmByGear,
   kmShare,
@@ -211,5 +211,24 @@ describe('sample data', () => {
     // Seven hues at most; the eighth item is Other.
     const many = new Map([...stats.values()].filter((g) => g.gear.kind === 'shoe').map((g, i) => [g.gear.id, 100 - i]));
     expect(periodHues(stats, many, 'shoe').size).toBe(Math.min(7, many.size));
+  });
+
+  it('averages the four weeks up to each week for the trend line', () => {
+    const { bars } = periodKm(data, stats, { kind: 'month', anchor: now }, 'shoe', now);
+    const last4 = (to: Date) => {
+      const from = new Date(to.getFullYear(), to.getMonth(), to.getDate() - 28, to.getHours(), to.getMinutes());
+      return (
+        data.activities
+          .filter((a) => isRun(a) && new Date(a.startDate) >= from && new Date(a.startDate) < to)
+          .reduce((sum, a) => sum + a.distance / 1000, 0) / 4
+      );
+    };
+    expect(bars[1]!.trendKm).toBeCloseTo(last4(bars[1]!.end), 5);
+    // The week running now averages up to now; the week after it hasn't started.
+    expect(bars[4]!.trendKm).toBeCloseTo(last4(now), 5);
+    expect(bars[5]!.trendKm).toBeNull();
+    // Months of a year have no trend.
+    const year = periodKm(data, stats, { kind: 'year', anchor: now }, 'shoe', now);
+    expect(year.bars.every((b) => b.trendKm === null)).toBe(true);
   });
 });

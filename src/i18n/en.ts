@@ -217,6 +217,9 @@ export const en = {
     type: 'Chart type',
     bars: 'Bar chart',
     lines: 'Line chart',
+    /** The dashed line: the average km a week over the last four weeks. */
+    trend: '4-week average',
+    perWeek: (km: string) => `${km} a week`,
   },
 
   detail: {

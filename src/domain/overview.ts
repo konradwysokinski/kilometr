@@ -177,7 +177,16 @@ export interface WeekBar {
   end: Date;
   totalKm: number;
   segments: { key: string; colour: GearColour; km: number }[];
+  /**
+   * Week bars: the average km a week over the four weeks up to the bar's end
+   * (or up to now, for the week still running), so a short stub at the month's
+   * edge still shows the pace. null for weeks not started yet and for month bars.
+   */
+  trendKm: number | null;
 }
+
+/** Weeks the trend line averages over. */
+export const TREND_WEEKS = 4;
 
 export interface WeeklySeries {
   key: string;
@@ -204,6 +213,7 @@ function periodBars(period: Period): WeekBar[] {
       end,
       totalKm: 0,
       segments: [],
+      trendKm: null,
     });
     start = end;
   }
@@ -222,6 +232,7 @@ export function periodKm(
   stats: Map<string, GearStats>,
   period: Period,
   kind: GearKind = 'shoe',
+  now = new Date(),
 ): { bars: WeekBar[]; series: WeeklySeries[] } {
   const counts = kind === 'shoe' ? isRun : isRide;
   const bars = periodBars(period);
@@ -252,6 +263,18 @@ export function periodKm(
     }
     bar.totalKm = bar.segments.reduce((sum, seg) => sum + seg.km, 0);
   });
+
+  // The 4-week trend, for week bars: the same runs (or rides), any gear.
+  if (period.kind === 'month') {
+    const dates = data.activities.filter(counts).map((a) => ({ d: new Date(a.startDate), km: km(a.distance) }));
+    for (const bar of bars) {
+      if (bar.start > now) continue;
+      const to = bar.end < now ? bar.end : now;
+      const from = new Date(to);
+      from.setDate(from.getDate() - TREND_WEEKS * 7); // calendar days, safe across a clock change
+      bar.trendKm = dates.reduce((sum, x) => (x.d >= from && x.d < to ? sum + x.km : sum), 0) / TREND_WEEKS;
+    }
+  }
 
   return { bars, series };
 }
