@@ -2,6 +2,8 @@ import { useState, type DragEvent } from 'react';
 import { useStore } from '../app/store';
 import { Icon } from '../components/Icon';
 import { LanguageSwitch } from '../components/LanguageSwitch';
+import { NewsletterForm } from '../components/NewsletterForm';
+import { newsletterEnabled } from '../lib/newsletter';
 import connectWithStrava from '../assets/strava/connect-with-strava.svg';
 import s from './Start.module.css';
 
@@ -95,6 +97,16 @@ export function Start() {
           </p>
         </section>
       </div>
+
+      {newsletterEnabled && (
+        <section aria-labelledby="news-h" className={s.news}>
+          <h2 id="news-h" className={s.newsTitle}>
+            {t.newsletter.title}
+          </h2>
+          <p className={s.newsHint}>{t.newsletter.hint}</p>
+          <NewsletterForm />
+        </section>
+      )}
 
       <footer className={s.footer}>
         <button type="button" className={s.sample} onClick={loadSample}>

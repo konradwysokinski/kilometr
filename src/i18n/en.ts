@@ -314,6 +314,17 @@ export const en = {
     openSource: 'Open source · MIT',
   },
 
+  newsletter: {
+    title: 'News from Kilometr',
+    hint: 'A few emails a year when something new ships. Sent with MailerLite; unsubscribe any time.',
+    label: 'Email address',
+    placeholder: 'you@example.com',
+    submit: 'Keep me posted',
+    sending: 'Sending…',
+    done: "Thanks, you're on the list.",
+    error: "That didn't go through. Try again in a moment.",
+  },
+
   strava: {
     connecting: 'Connecting to Strava…',
     gear: 'Reading your shoes and bikes…',
@@ -368,7 +379,7 @@ export const en = {
     cancel: 'Cancel',
     about: 'About',
     aboutHint: (version: string) =>
-      `Version ${version}. Open source under the MIT licence. Your data stays in this browser.`,
+      `Version ${version}. Open source under the MIT licence. Your data stays in this browser; the hosted app only counts visits, anonymously and without cookies.`,
     github: 'View on GitHub',
     author: 'Made by',
     authorProfile: 'GitHub profile',

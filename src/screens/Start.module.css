@@ -207,6 +207,31 @@
   filter: brightness(0.94);
 }
 
+/* Quiet, below the two ways in: the mailing list. */
+.news {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.newsTitle {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+}
+
+.newsHint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-muted);
+}
+
 .footer {
   display: flex;
   column-gap: 12px;

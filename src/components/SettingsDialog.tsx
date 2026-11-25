@@ -5,8 +5,10 @@ import { useDataset } from '../app/store';
 import { ConfirmDialog } from './ConfirmDialog';
 import { Icon } from './Icon';
 import { LanguageSwitch } from './LanguageSwitch';
+import { NewsletterForm } from './NewsletterForm';
 import { PoweredByStrava } from './PoweredByStrava';
 import { Segmented } from './Segmented';
+import { newsletterEnabled } from '../lib/newsletter';
 import { version } from '../../package.json';
 import s from './SettingsDialog.module.css';
 
@@ -282,6 +284,11 @@ function About() {
           <Icon name="external" size={14} />
         </a>
       </Row>
+      {newsletterEnabled && (
+        <Row title={t.newsletter.title} hint={t.newsletter.hint}>
+          <NewsletterForm />
+        </Row>
+      )}
       <Row title={t.settings.stravaData} hint={t.settings.stravaDataHint}>
         <PoweredByStrava />
       </Row>

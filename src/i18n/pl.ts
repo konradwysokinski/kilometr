@@ -324,6 +324,17 @@ export const pl: Messages = {
     openSource: 'Open source · MIT',
   },
 
+  newsletter: {
+    title: 'Nowości z Kilometra',
+    hint: 'Kilka maili w roku, gdy pojawi się coś nowego. Wysyłane przez MailerLite, wypiszesz się w każdej chwili.',
+    label: 'Adres e-mail',
+    placeholder: 'ty@example.com',
+    submit: 'Zapisz mnie',
+    sending: 'Wysyłam…',
+    done: 'Dzięki, jesteś na liście.',
+    error: 'Nie udało się. Spróbuj za chwilę.',
+  },
+
   strava: {
     connecting: 'Łączę ze Stravą…',
     gear: 'Wczytuję buty i rowery…',
@@ -379,7 +390,7 @@ export const pl: Messages = {
     cancel: 'Anuluj',
     about: 'O aplikacji',
     aboutHint: (version: string) =>
-      `Wersja ${version}. Open source na licencji MIT. Twoje dane zostają w tej przeglądarce.`,
+      `Wersja ${version}. Open source na licencji MIT. Twoje dane zostają w tej przeglądarce; wersja w sieci tylko anonimowo liczy odwiedziny, bez ciasteczek.`,
     github: 'Zobacz na GitHubie',
     author: 'Autor',
     authorProfile: 'Profil na GitHubie',
