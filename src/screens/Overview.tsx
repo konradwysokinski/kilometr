@@ -6,8 +6,8 @@ import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { ShareDonut } from '../components/ShareDonut';
 import { WeeklyChart } from '../components/WeeklyChart';
-import { kmByGear, kmShare, periodGear, periodSummary, wearCost, weeklyKm } from '../domain/overview';
-import { addDays, periodRange, shiftPeriod, type Period } from '../lib/dates';
+import { kmByGear, kmShare, periodGear, periodSummary, periodKm, wearCost } from '../domain/overview';
+import { periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
 type Filter = 'all' | 'shoe' | 'bike';
@@ -34,14 +34,10 @@ export function Overview() {
   const kmNote = (km: number) => (km > 0 ? t.overview.kmIn(f.km(km), inPeriod) : t.overview.notYet(inPeriod));
   const shareOf = filter === 'bike' ? bikes : shoes;
   const wear = useMemo(() => wearCost(data, stats, period), [data, stats, period]);
-  // The chart shows the 12 weeks up to the end of the selected period (or today).
-  const chartEnd = (isCurrent ? now : addDays(periodEnd, -1)).getTime();
+  // The chart covers the selected period, like everything else on the page: its weeks, or a year's months.
   // Runs by shoe, or rides by bike under the Bikes filter; never both on one chart.
   const chartKind = filter === 'bike' ? 'bike' : 'shoe';
-  const weekly = useMemo(
-    () => weeklyKm(data, stats, new Date(chartEnd), chartKind),
-    [data, stats, chartEnd, chartKind],
-  );
+  const weekly = useMemo(() => periodKm(data, stats, period, chartKind), [data, stats, period, chartKind]);
 
   const bikeNames = summary.bikeIds.flatMap((id) => stats.get(id)?.shortName ?? []);
   // All gear adds both up; the split stays in the Running and Riding cards.
@@ -151,7 +147,7 @@ export function Overview() {
         />
       </section>
 
-      <WeeklyChart kind={chartKind} bars={weekly.bars} series={weekly.series} />
+      <WeeklyChart kind={chartKind} bars={weekly.bars} series={weekly.series} inPeriod={inPeriod} />
 
       {showShoes && (
         <section aria-labelledby="shoes-h" className={s.section}>

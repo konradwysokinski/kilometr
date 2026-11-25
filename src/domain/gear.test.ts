@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats, initials, partWear, wearOf } from './gear';
-import { kmByGear, kmShare, periodGear, unassignedRuns, wearCost, weeklyKm } from './overview';
+import { kmByGear, kmShare, periodGear, periodKm, periodSummary, unassignedRuns, wearCost } from './overview';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -152,16 +152,36 @@ describe('sample data', () => {
     expect(chain.ratio).toBeLessThan(0.65);
   });
 
-  it('stacks 12 weeks of running by shoe', () => {
-    const { bars, series } = weeklyKm(data, stats, now);
-    expect(bars).toHaveLength(12);
+  it('splits the selected month into its weeks, adding up to the Running total', () => {
+    const nov = { kind: 'month' as const, anchor: now };
+    const { bars, series } = periodKm(data, stats, nov);
+    // November 2026 starts on a Sunday: 1, 2–8, 9–15, 16–22, 23–29, 30.
+    expect(bars.map((b) => [b.start.getDate(), b.end.getDate()])).toEqual([
+      [1, 2],
+      [2, 9],
+      [9, 16],
+      [16, 23],
+      [23, 30],
+      [30, 1],
+    ]);
+    expect(bars.reduce((sum, b) => sum + b.totalKm, 0)).toBeCloseTo(periodSummary(data, nov).runKm, 5);
     expect(series.map((s) => s.name)).toContain('Speedgoat 5');
     expect(series.map((s) => s.key)).not.toContain('g-cg');
   });
 
-  it('stacks rides by bike on their own chart', () => {
-    const { bars, series } = weeklyKm(data, stats, now, 'bike');
-    expect(series.map((s) => s.key)).toEqual(['g-cg']);
-    expect(bars.reduce((sum, b) => sum + b.totalKm, 0)).toBeGreaterThan(0);
+  it('splits a month with a clock change into whole weeks', () => {
+    // Clocks go back on 25 October 2026 in Europe; the 19–25 week is 169 hours long.
+    const { bars } = periodKm(data, stats, { kind: 'month', anchor: new Date('2026-10-15T12:00:00') });
+    expect(bars.map((b) => b.start.getDate())).toEqual([1, 5, 12, 19, 26]);
+  });
+
+  it('splits a year into months, and stacks rides by bike on their own chart', () => {
+    const year = { kind: 'year' as const, anchor: now };
+    const { bars, series } = periodKm(data, stats, year, 'bike');
+    expect(bars).toHaveLength(12);
+    expect(bars.every((b) => b.unit === 'month')).toBe(true);
+    // The bike in rotation by name; rides on other or no bikes as Other. No shoes.
+    expect(series.map((s) => s.key)).toEqual(['g-cg', 'other']);
+    expect(bars.reduce((sum, b) => sum + b.totalKm, 0)).toBeCloseTo(periodSummary(data, year).rideKm, 5);
   });
 });

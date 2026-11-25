@@ -214,21 +214,18 @@ export const pl: Messages = {
   chart: {
     runByWeek: 'Bieganie w tygodniach',
     rideByWeek: 'Jazda w tygodniach',
+    runByMonth: 'Bieganie w miesiącach',
+    rideByMonth: 'Jazda w miesiącach',
     other: 'Inne',
-    weekLabel: (week) => `T${week}`,
-    summary: (weeks, total) =>
-      `Skumulowany wykres słupkowy kilometrów biegowych w ostatnich ${weeks} tygodniach, kolory według butów. Łącznie ${total}.`,
-    lineSummary: (weeks, total) =>
-      `Wykres liniowy kilometrów biegowych w ostatnich ${weeks} tygodniach, jedna linia na każdą parę butów. Łącznie ${total}.`,
-    rideSummary: (weeks, total) =>
-      `Skumulowany wykres słupkowy kilometrów rowerowych w ostatnich ${weeks} tygodniach, kolory według rowerów. Łącznie ${total}.`,
-    rideLineSummary: (weeks, total) =>
-      `Wykres liniowy kilometrów rowerowych w ostatnich ${weeks} tygodniach, jedna linia na każdy rower. Łącznie ${total}.`,
+    summary: (kind, unit, period, total) =>
+      `Skumulowany wykres słupkowy kilometrów ${kind === 'shoe' ? 'biegowych' : 'rowerowych'} ${unit === 'week' ? 'w kolejnych tygodniach' : 'w kolejnych miesiącach'} ${period}, kolory według ${kind === 'shoe' ? 'butów' : 'rowerów'}. Łącznie ${total}.`,
+    lineSummary: (kind, unit, period, total) =>
+      `Wykres liniowy kilometrów ${kind === 'shoe' ? 'biegowych' : 'rowerowych'} ${unit === 'week' ? 'w kolejnych tygodniach' : 'w kolejnych miesiącach'} ${period}, jedna linia na ${kind === 'shoe' ? 'każdą parę butów' : 'każdy rower'}. Łącznie ${total}.`,
     weekOf: (week, range) => `Tydzień ${week} · ${range}`,
     total: 'Razem',
     noRuns: 'Bez biegów',
     noRides: 'Bez jazd',
-    explore: 'Strzałkami w lewo i w prawo przejdziesz po tygodniach.',
+    explore: 'Strzałkami w lewo i w prawo przejdziesz po tygodniach lub miesiącach.',
     type: 'Typ wykresu',
     bars: 'Wykres słupkowy',
     lines: 'Wykres liniowy',

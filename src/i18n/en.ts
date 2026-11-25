@@ -201,22 +201,20 @@ export const en = {
   chart: {
     runByWeek: 'Running by week',
     rideByWeek: 'Riding by week',
+    runByMonth: 'Running by month',
+    rideByMonth: 'Riding by month',
     other: 'Other',
-    weekLabel: (week: number) => `W${week}`,
-    summary: (weeks: number, total: string) =>
-      `Stacked bar chart of running kilometres per week over the last ${weeks} weeks, coloured by shoe. ${total} in total.`,
-    lineSummary: (weeks: number, total: string) =>
-      `Line chart of running kilometres per week over the last ${weeks} weeks, one line per shoe. ${total} in total.`,
-    rideSummary: (weeks: number, total: string) =>
-      `Stacked bar chart of riding kilometres per week over the last ${weeks} weeks, coloured by bike. ${total} in total.`,
-    rideLineSummary: (weeks: number, total: string) =>
-      `Line chart of riding kilometres per week over the last ${weeks} weeks, one line per bike. ${total} in total.`,
+    /** Screen reader text: "Stacked bar chart of running kilometres per week in November, coloured by shoe. 160 km in total." */
+    summary: (kind: 'shoe' | 'bike', unit: 'week' | 'month', period: string, total: string) =>
+      `Stacked bar chart of ${kind === 'shoe' ? 'running' : 'riding'} kilometres per ${unit} ${period}, coloured by ${kind}. ${total} in total.`,
+    lineSummary: (kind: 'shoe' | 'bike', unit: 'week' | 'month', period: string, total: string) =>
+      `Line chart of ${kind === 'shoe' ? 'running' : 'riding'} kilometres per ${unit} ${period}, one line per ${kind}. ${total} in total.`,
     /** Tooltip heading: "Week 47 · 17–23 Nov" */
     weekOf: (week: number, range: string) => `Week ${week} · ${range}`,
     total: 'Total',
     noRuns: 'No runs',
     noRides: 'No rides',
-    explore: 'Use the left and right arrow keys to read each week.',
+    explore: 'Use the left and right arrow keys to read each week or month.',
     type: 'Chart type',
     bars: 'Bar chart',
     lines: 'Line chart',

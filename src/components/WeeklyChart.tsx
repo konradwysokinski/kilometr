@@ -28,12 +28,17 @@ function columns(width: number, gap: number, n: number) {
   return { centre: (i: number) => i * (w + gap) + w / 2, at: (x: number) => Math.floor((x + gap / 2) / (w + gap)) };
 }
 
-/** "17–23 Nov", or "28 Sept – 4 Oct" when the week spans two months. */
-function weekRange(start: Date, dayMonth: (d: Date) => string) {
-  const end = addDays(start, 6);
-  return start.getMonth() === end.getMonth()
-    ? `${start.getDate()}–${dayMonth(end)}`
-    : `${dayMonth(start)} – ${dayMonth(end)}`;
+/** Days a week bar covers, "2–8", or "1" for a one-day stub at the month's edge. */
+function days(bar: WeekBar) {
+  const last = addDays(bar.end, -1).getDate();
+  const first = bar.start.getDate();
+  return first === last ? `${first}` : `${first}–${last}`;
+}
+
+/** Tooltip date: "16–22 Nov", or "30 Nov" for a one-day stub. */
+function weekRange(bar: WeekBar, dayMonth: (d: Date) => string) {
+  const last = addDays(bar.end, -1);
+  return bar.start.getDate() === last.getDate() ? dayMonth(last) : `${bar.start.getDate()}–${dayMonth(last)}`;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
@@ -41,11 +46,14 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), h
 interface Props {
   /** Runs by shoe, or rides by bike. */
   kind: GearKind;
+  /** A month's weeks or a year's months, from periodKm. */
   bars: WeekBar[];
   series: WeeklySeries[];
+  /** "in November", for the screen reader summary. */
+  inPeriod: string;
 }
 
-export function WeeklyChart({ kind, bars, series }: Props) {
+export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
   const { t, f } = useStore();
   const total = bars.reduce((sum, b) => sum + b.totalKm, 0);
   const [mode, setMode] = usePersisted<Mode>('kilometr.weeklyChart', () => 'bars', isMode);
@@ -56,15 +64,16 @@ export function WeeklyChart({ kind, bars, series }: Props) {
       : Math.max(...bars.flatMap((b) => b.segments.map((seg) => seg.km)));
   const max = niceMax(peak);
   const n = bars.length;
-  const summary = (
-    kind === 'shoe'
-      ? mode === 'bars'
-        ? t.chart.summary
-        : t.chart.lineSummary
-      : mode === 'bars'
-        ? t.chart.rideSummary
-        : t.chart.rideLineSummary
-  )(n, f.km(total));
+  const unit = bars[0]?.unit ?? 'week';
+  const summary = (mode === 'bars' ? t.chart.summary : t.chart.lineSummary)(kind, unit, inPeriod, f.km(total));
+  const title =
+    unit === 'week'
+      ? kind === 'shoe'
+        ? t.chart.runByWeek
+        : t.chart.rideByWeek
+      : kind === 'shoe'
+        ? t.chart.runByMonth
+        : t.chart.rideByMonth;
 
   // The week being read (pointer, touch or arrow keys) and, within it, the shoe or bike under the pointer.
   const [active, setActive] = useState<number | null>(null);
@@ -161,7 +170,11 @@ export function WeeklyChart({ kind, bars, series }: Props) {
   const nameOf = (key: string) => (key === 'other' ? t.chart.other : (series.find((x) => x.key === key)?.name ?? ''));
   const week = active === null ? null : bars[active]!;
   const rows = week ? [...week.segments].sort((a, b) => b.km - a.km) : [];
-  const heading = week ? t.chart.weekOf(week.week, weekRange(week.start, f.dayMonth)) : '';
+  const heading = !week
+    ? ''
+    : week.unit === 'month'
+      ? f.monthYear(week.start)
+      : t.chart.weekOf(week.week, weekRange(week, f.dayMonth));
   const empty = kind === 'shoe' ? t.chart.noRuns : t.chart.noRides;
   const spoken = week
     ? `${heading}: ${rows.length ? rows.map((r) => `${nameOf(r.key)} ${f.kmPrecise(r.km)}`).join(', ') : empty}`
@@ -171,7 +184,7 @@ export function WeeklyChart({ kind, bars, series }: Props) {
     <section aria-labelledby="weeks-h" className={s.card}>
       <div className={s.head}>
         <h2 id="weeks-h" className={s.title}>
-          {kind === 'shoe' ? t.chart.runByWeek : t.chart.rideByWeek}
+          {title}
         </h2>
         <div className={s.aside}>
           <ul className={s.legend}>
@@ -283,10 +296,14 @@ export function WeeklyChart({ kind, bars, series }: Props) {
         </span>
       </div>
 
-      <div className={mode === 'bars' ? s.labels : `${s.labels} ${s.even}`} aria-hidden="true">
+      <div
+        className={mode === 'bars' ? s.labels : `${s.labels} ${s.even}`}
+        data-dense={n > 8 || undefined}
+        aria-hidden="true"
+      >
         {bars.map((b, i) => (
           <span key={b.label} data-on={i === active || undefined}>
-            {t.chart.weekLabel(b.week)}
+            {b.unit === 'month' ? f.monthShort(b.start) : days(b)}
           </span>
         ))}
       </div>

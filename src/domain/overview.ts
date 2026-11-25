@@ -133,11 +133,15 @@ export function wearCost(data: Dataset, stats: Map<string, GearStats>, period: P
 }
 
 export interface WeekBar {
-  /** Stable key, e.g. "2026-W47". */
+  /** Stable key, e.g. "2026-11-03". */
   label: string;
-  /** ISO week number, for the axis label. */
+  /** A week of a month, or a month of a year. */
+  unit: 'week' | 'month';
+  /** ISO week number of `start`, for week bars. */
   week: number;
   start: Date;
+  /** Exclusive. Weeks stop at the month's edge, so the first and last can be short. */
+  end: Date;
   totalKm: number;
   segments: { key: string; colour: GearColour; km: number }[];
 }
@@ -148,26 +152,50 @@ export interface WeeklySeries {
   colour: GearColour;
 }
 
+/** A month split into its weeks (Monday to Sunday, cut at the month's edges), or a year into its months. */
+function periodBars(period: Period): WeekBar[] {
+  const [from, to] = periodRange(period);
+  const bars: WeekBar[] = [];
+  for (let start = from; start < to;) {
+    // Calendar arithmetic, not +7 × 24 h: the week the clocks change is an hour longer or shorter.
+    const monday = startOfWeek(start);
+    const nextWeek = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 7);
+    const end =
+      period.kind === 'year'
+        ? new Date(start.getFullYear(), start.getMonth() + 1, 1)
+        : nextWeek < to
+          ? nextWeek
+          : to;
+    const key = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
+    bars.push({
+      label: key,
+      unit: period.kind === 'year' ? 'month' : 'week',
+      week: isoWeek(start),
+      start,
+      end,
+      totalKm: 0,
+      segments: [],
+    });
+    start = end;
+  }
+  return bars;
+}
+
 /**
- * Km per week for the `weeks` weeks ending with the week of `end`: runs
- * stacked by shoe, or rides stacked by bike. Gear without a hue is grouped as
+ * Km in the selected period, a bar per week of a month or per month of a year:
+ * runs stacked by shoe, or rides stacked by bike. The bars add up to the
+ * period's Running (or Riding) total. Gear without a hue is grouped as
  * "Other". Runs and rides never share a chart: a 100 km ride would flatten
  * every pair of shoes next to it.
  */
-export function weeklyKm(
+export function periodKm(
   data: Dataset,
   stats: Map<string, GearStats>,
-  end: Date,
+  period: Period,
   kind: GearKind = 'shoe',
-  weeks = 12,
 ): { bars: WeekBar[]; series: WeeklySeries[] } {
   const counts = kind === 'shoe' ? isRun : isRide;
-  const first = addDays(startOfWeek(end), -(weeks - 1) * 7);
-  const bars: WeekBar[] = Array.from({ length: weeks }, (_, i) => {
-    const start = addDays(first, i * 7);
-    const week = isoWeek(start);
-    return { label: `${start.getFullYear()}-W${week}`, week, start, totalKm: 0, segments: [] };
-  });
+  const bars = periodBars(period);
 
   const seriesKey = (a: Activity) => {
     const s = a.gearId ? stats.get(a.gearId) : undefined;
@@ -177,8 +205,9 @@ export function weeklyKm(
   const perWeek = bars.map(() => new Map<string, number>());
   for (const a of data.activities) {
     if (!counts(a)) continue;
-    const idx = Math.floor((new Date(a.startDate).getTime() - first.getTime()) / (7 * 86_400_000));
-    if (idx < 0 || idx >= weeks) continue;
+    const d = new Date(a.startDate);
+    const idx = bars.findIndex((bar) => d >= bar.start && d < bar.end);
+    if (idx < 0) continue;
     const key = seriesKey(a);
     perWeek[idx]!.set(key, (perWeek[idx]!.get(key) ?? 0) + km(a.distance));
   }
