@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { unassignedNotice } from './notifications';
+import { unassignedNotice, unreadNotices } from './notifications';
 import type { Activity } from './types';
 
 const run = (id: string, km: number): Activity => ({
@@ -26,5 +26,18 @@ describe('unassignedNotice', () => {
     const next = unassignedNotice([run('a', 8), run('c', 5)], [first], now)!;
     expect(next.activityIds).toEqual(['c']);
     expect(next.km).toBe(5);
+  });
+});
+
+describe('unreadNotices', () => {
+  const now = new Date('2026-11-24T10:00:00Z');
+
+  it('stays unread until clicked or until its runs have shoes', () => {
+    const notice = unassignedNotice([run('a', 8), run('b', 6)], [], now)!;
+    expect(unreadNotices([notice], [run('a', 8), run('b', 6)])).toEqual([notice]);
+    expect(unreadNotices([{ ...notice, toasted: true }], [run('a', 8)])).toHaveLength(1);
+    expect(unreadNotices([{ ...notice, read: true }], [run('a', 8)])).toEqual([]);
+    const shod = [run('a', 8), run('b', 6)].map((a) => ({ ...a, gearId: 'g1' }));
+    expect(unreadNotices([notice], shod)).toEqual([]);
   });
 });

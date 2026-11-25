@@ -37,7 +37,10 @@ export interface Store {
   /** Newest first. */
   notices: Notice[];
   markToasted: (id: string) => void;
-  markAllRead: () => void;
+  /** The panel is open: no toasts for what it already lists. */
+  markAllToasted: () => void;
+  /** The notice was clicked; its dot goes. */
+  markRead: (id: string) => void;
   importState: ImportState;
   /** Sends the browser to Strava to approve access. */
   connectStrava: () => void;

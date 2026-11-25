@@ -25,6 +25,11 @@
   background: var(--warn);
 }
 
+/* Read, or its runs have shoes now: the dot keeps its place but goes quiet. */
+.dotRead {
+  background: var(--line);
+}
+
 .text {
   flex: 1;
   min-width: 0;

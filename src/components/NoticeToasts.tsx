@@ -13,7 +13,7 @@ const DURATION = 10_000;
  * Mounted inside the router so the action can navigate.
  */
 export function NoticeToasts({ paused }: { paused: boolean }) {
-  const { notices, markToasted } = useStore();
+  const { notices, markToasted, markRead } = useStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function NoticeToasts({ paused }: { paused: boolean }) {
             notice={n}
             onAction={() => {
               toast.dismiss(id);
-              markToasted(n.id);
+              markRead(n.id);
               navigate('/activities');
             }}
             onClose={() => {
@@ -39,7 +39,7 @@ export function NoticeToasts({ paused }: { paused: boolean }) {
         { id: n.id, duration: DURATION, onAutoClose: () => markToasted(n.id), onDismiss: () => markToasted(n.id) },
       );
     }
-  }, [notices, markToasted, navigate, paused]);
+  }, [notices, markToasted, markRead, navigate, paused]);
 
   return null;
 }

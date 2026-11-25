@@ -298,12 +298,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [saveNotices],
   );
 
-  const markAllRead = useCallback(() => {
+  // Opening the panel shows every notice, so none of them needs its toast any more.
+  // They stay unread until clicked.
+  const markAllToasted = useCallback(() => {
     const src = dataRef.current?.source;
-    if (src && noticesRef.current.some((n) => !n.read)) {
-      saveNotices(noticesRef.current.map((n) => ({ ...n, read: true, toasted: true })), src);
+    if (src && noticesRef.current.some((n) => !n.toasted)) {
+      saveNotices(noticesRef.current.map((n) => ({ ...n, toasted: true })), src);
     }
   }, [saveNotices]);
+
+  const markRead = useCallback(
+    (id: string) => {
+      const src = dataRef.current?.source;
+      if (src) saveNotices(noticesRef.current.map((n) => (n.id === id ? { ...n, read: true, toasted: true } : n)), src);
+    },
+    [saveNotices],
+  );
 
   /** Merges settings for several items and saves them (sample: settings only; export: the whole dataset). */
   const patchSettings = useCallback((patches: Record<string, GearSettings>) => {
@@ -372,10 +382,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       data, ready, stats, now, loadSample, importFile, importState,
       connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete,
       updateSettings, assignShoes, clear, removeAllData,
-      notices, markToasted, markAllRead,
+      notices, markToasted, markAllToasted, markRead,
       theme, themePref, setThemePref, locale, setLocale, t: MESSAGES[locale], f,
     }),
-    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllRead, theme, themePref, setThemePref, locale, setLocale, f],
+    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllToasted, markRead, theme, themePref, setThemePref, locale, setLocale, f],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

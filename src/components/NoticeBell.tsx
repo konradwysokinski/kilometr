@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { useStore } from '../app/store';
+import { unreadNotices } from '../domain/notifications';
 import { Icon } from './Icon';
 import { NoticeCard } from './NoticeCard';
 import s from './NoticeBell.module.css';
@@ -23,7 +24,7 @@ interface Props {
  * screen behind stays usable. While the panel is open the bell becomes its X.
  */
 export function NoticeBell({ open, onOpenChange }: Props) {
-  const { notices, markAllRead, t, f } = useStore();
+  const { data, notices, markAllToasted, markRead, t, f } = useStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const bellRef = useRef<HTMLButtonElement>(null);
@@ -31,18 +32,19 @@ export function NoticeBell({ open, onOpenChange }: Props) {
   // Where the bell is on screen when the panel opens. The X stays exactly there,
   // so nothing jumps, and the panel lines its title up with it.
   const [anchor, setAnchor] = useState({ top: 50, left: 0 });
-  const unread = notices.filter((n) => !n.read).length;
+  const unreadList = useMemo(() => unreadNotices(notices, data?.activities ?? []), [notices, data]);
+  const unread = unreadList.length;
   const label = open
     ? t.notices.closePanel
     : unread > 0
       ? `${t.notices.title}, ${t.notices.unread(unread)}`
       : t.notices.title;
 
-  // Opening the panel counts as reading it. Re-runs when saved notices finish
-  // loading; markAllRead does nothing once all are read.
+  // Opening the panel isn't reading a notice (that takes a click), but it does
+  // replace the toasts. Re-runs when saved notices finish loading.
   useEffect(() => {
-    if (open) markAllRead();
-  }, [open, markAllRead, notices]);
+    if (open) markAllToasted();
+  }, [open, markAllToasted, notices]);
 
   // The panel lists every notice, so a toast on top of it would only repeat one.
   useEffect(() => {
@@ -142,7 +144,9 @@ export function NoticeBell({ open, onOpenChange }: Props) {
                 </time>
                 <NoticeCard
                   notice={n}
+                  unread={unreadList.includes(n)}
                   onAction={() => {
+                    markRead(n.id);
                     onOpenChange(false);
                     navigate('/activities');
                   }}
