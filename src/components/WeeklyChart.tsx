@@ -183,9 +183,18 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
     let bottom = (top / max) * HEIGHT + 12;
     let left = clamp(cx - tw / 2, 0, plot.width - tw);
     if (bottom + th > room) {
-      bottom = clamp(bottom - 12 - th / 2, 0, room - th);
-      left = cx + 16 + tw <= plot.width ? cx + 16 : cx - 16 - tw;
+      const [toRight, toLeft] = [plot.width - cx - 16, cx - 16];
+      if (tw <= toRight || tw <= toLeft) {
+        bottom = clamp(bottom - 12 - th / 2, 0, room - th);
+        left = tw <= toRight ? cx + 16 : cx - 16 - tw;
+      } else {
+        // A phone: no side has room. The side with more of it, as high as the card allows, overlapping the bars.
+        bottom = Math.max(0, room - th);
+        left = toRight >= toLeft ? cx + 16 : cx - 16 - tw;
+      }
     }
+    // Never past the card's edges (on a phone they're the screen's).
+    left = clamp(left, card.left - plot.left + 8, card.right - plot.left - tw - 8);
     tip.style.transition = shown.current ? '' : 'none';
     tip.style.transform = `translate(${left}px, ${-bottom}px)`;
     shown.current = true;
