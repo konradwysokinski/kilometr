@@ -65,10 +65,10 @@ export const en = {
       `${ridesF} ${plural(rides, 'ride', 'rides')} on ${bikesF} ${plural(bikes, 'bike', 'bikes')}`,
     noRides: (period: string) => `No rides ${period}`,
     wearCost: 'Shoe wear',
-    wearOn: (priced: number, pricedF: string, pairs: number, pairsF: string) =>
+    wearOn: (period: string, priced: number, pricedF: string, pairs: number, pairsF: string) =>
       priced === pairs
-        ? `used up on ${pairsF} ${plural(pairs, 'pair', 'pairs')}`
-        : `on ${pricedF} of ${pairsF} pairs · the rest have no price`,
+        ? `Used up ${period} on ${pairsF} ${plural(pairs, 'pair', 'pairs')}`
+        : `Used up ${period} · ${pricedF} of ${pairsF} pairs priced`,
     wearNone: (period: string) => `No shoe kilometres ${period}`,
     wearNoPrices: 'Add prices to your shoes to see it',
     unassigned: (n: number, nF: string, km: string) => `${nF} ${plural(n, 'run', 'runs')} without shoes (${km})`,

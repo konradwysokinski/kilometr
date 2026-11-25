@@ -78,10 +78,10 @@ export const pl: Messages = {
       `${ridesF} ${plural(rides, 'jazda', 'jazdy', 'jazd')} na ${bikesF} ${bikes === 1 ? 'rowerze' : 'rowerach'}`,
     noRides: (period) => `Brak jazd ${period}`,
     wearCost: 'Zużycie butów',
-    wearOn: (priced, pricedF, pairs, pairsF) =>
+    wearOn: (period, priced, pricedF, pairs, pairsF) =>
       priced === pairs
-        ? `zużyte na ${pairsF} ${pairs === 1 ? 'parze' : 'parach'}`
-        : `na ${pricedF} z ${pairsF} par · reszta bez ceny`,
+        ? `Zużyte ${period} na ${pairsF} ${pairs === 1 ? 'parze' : 'parach'}`
+        : `Zużyte ${period} · ${pricedF} z ${pairsF} par z ceną`,
     wearNone: (period) => `Brak kilometrów na butach ${period}`,
     wearNoPrices: 'Dodaj ceny butów, żeby to zobaczyć',
     unassigned: (n, nF, km) => `${nF} ${plural(n, 'bieg', 'biegi', 'biegów')} bez butów (${km})`,

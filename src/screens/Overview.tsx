@@ -130,7 +130,7 @@ export function Overview() {
               ? t.overview.wearNone(inPeriod)
               : wear.priced === 0
                 ? t.overview.wearNoPrices
-                : t.overview.wearOn(wear.priced, f.int(wear.priced), wear.pairs, f.int(wear.pairs))
+                : t.overview.wearOn(inPeriod, wear.priced, f.int(wear.priced), wear.pairs, f.int(wear.pairs))
           }
         />
       </section>
