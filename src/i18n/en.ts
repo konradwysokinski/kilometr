@@ -354,8 +354,11 @@ export const en = {
       'Activities, prices, limits, retired pairs and notifications are deleted from this browser. Nothing changes in Strava, and you can import your export again at any time.',
     cancel: 'Cancel',
     about: 'About',
-    aboutHint: 'Open source under the MIT licence. Your data stays in this browser.',
+    aboutHint: (version: string) =>
+      `Version ${version}. Open source under the MIT licence. Your data stays in this browser.`,
     github: 'View on GitHub',
+    author: 'Made by',
+    authorProfile: 'GitHub profile',
     stravaData: 'Data from Strava',
     stravaDataHint:
       'Gear and activities come through the Strava API. Kilometr is an independent app, not made by Strava.',

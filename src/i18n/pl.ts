@@ -368,8 +368,11 @@ export const pl: Messages = {
       'Aktywności, ceny, limity, wycofane pary i powiadomienia znikną z tej przeglądarki. W Stravie nic się nie zmieni, a eksport możesz zaimportować ponownie w każdej chwili.',
     cancel: 'Anuluj',
     about: 'O aplikacji',
-    aboutHint: 'Open source na licencji MIT. Twoje dane zostają w tej przeglądarce.',
+    aboutHint: (version: string) =>
+      `Wersja ${version}. Open source na licencji MIT. Twoje dane zostają w tej przeglądarce.`,
     github: 'Zobacz na GitHubie',
+    author: 'Autor',
+    authorProfile: 'Profil na GitHubie',
     stravaData: 'Dane ze Stravy',
     stravaDataHint:
       'Sprzęt i aktywności przychodzą przez API Stravy. Kilometr to niezależna aplikacja, nie tworzy jej Strava.',

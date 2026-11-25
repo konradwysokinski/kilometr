@@ -7,9 +7,11 @@ import { Icon } from './Icon';
 import { LanguageSwitch } from './LanguageSwitch';
 import { PoweredByStrava } from './PoweredByStrava';
 import { Segmented } from './Segmented';
+import { version } from '../../package.json';
 import s from './SettingsDialog.module.css';
 
 const REPO = 'https://github.com/konradwysokinski/kilometr';
+const AUTHOR = { name: 'Konrad Wysokiński', url: 'https://github.com/konradwysokinski' };
 const THEMES: ThemePref[] = ['light', 'dark', 'system'];
 const SECTIONS = ['general', 'data', 'about'] as const;
 type Section = (typeof SECTIONS)[number];
@@ -268,9 +270,15 @@ function About() {
   const { t } = useDataset();
   return (
     <div className={s.card}>
-      <Row title="Kilometr" hint={t.settings.aboutHint}>
+      <Row title="Kilometr" hint={t.settings.aboutHint(version)}>
         <a className={s.button} href={REPO} target="_blank" rel="noreferrer">
           {t.settings.github}
+          <Icon name="external" size={14} />
+        </a>
+      </Row>
+      <Row title={t.settings.author} hint={AUTHOR.name}>
+        <a className={s.button} href={AUTHOR.url} target="_blank" rel="noreferrer">
+          {t.settings.authorProfile}
           <Icon name="external" size={14} />
         </a>
       </Row>
