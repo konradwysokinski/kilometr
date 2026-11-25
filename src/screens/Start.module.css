@@ -190,19 +190,21 @@
 
 /* Mock-up stand-in for Strava's official button (orange, 48px). Replace with their asset. */
 .strava {
-  height: 48px;
-  padding: 0 22px;
+  display: block;
+  padding: 0;
   border: 0;
   border-radius: 6px;
-  background: #fc5200;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
+  background: none;
   cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.strava img {
+  display: block;
 }
 
 .strava:hover {
-  background: #e34a00;
+  filter: brightness(0.94);
 }
 
 .footer {

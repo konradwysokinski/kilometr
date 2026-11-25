@@ -2,6 +2,7 @@ import { useState, type DragEvent } from 'react';
 import { useStore } from '../app/store';
 import { Icon } from '../components/Icon';
 import { LanguageSwitch } from '../components/LanguageSwitch';
+import connectWithStrava from '../assets/strava/connect-with-strava.svg';
 import s from './Start.module.css';
 
 export function Start() {
@@ -47,13 +48,12 @@ export function Start() {
           <p className={s.body}>{t.start.connectBody}</p>
           {/* Same shape as the drop zone next door, so the two cards line up. */}
           <div className={s.connect}>
-            {/* Stand-in for Strava's official "Connect with Strava" button; their asset comes in step 4. */}
+            {/* Strava's official button (developers.strava.com/guidelines): their artwork, unaltered, 48px tall. */}
             <button type="button" className={s.strava} onClick={connectStrava}>
-              {t.start.connectButton}
+              <img src={connectWithStrava} alt={t.start.connectButton} width={237} height={48} />
             </button>
           </div>
           <p className={s.note}>{t.start.connectNote}</p>
-
         </section>
 
         <section aria-labelledby="imp-h" className={s.card}>
