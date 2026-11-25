@@ -369,6 +369,9 @@ export const pl: Messages = {
     about: 'O aplikacji',
     aboutHint: 'Open source na licencji MIT. Twoje dane zostają w tej przeglądarce.',
     github: 'Zobacz na GitHubie',
+    stravaData: 'Dane ze Stravy',
+    stravaDataHint:
+      'Sprzęt i aktywności przychodzą przez API Stravy. Kilometr to niezależna aplikacja, nie tworzy jej Strava.',
   },
 
   placeholder: {

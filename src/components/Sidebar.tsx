@@ -6,6 +6,7 @@ import { unassignedRuns } from '../domain/overview';
 import type { GearKind } from '../domain/types';
 import { gearColour } from '../lib/colour';
 import { Icon, type IconName } from './Icon';
+import { PoweredByStrava } from './PoweredByStrava';
 import s from './Sidebar.module.css';
 
 const SIDEBAR_MAX = 5;
@@ -167,6 +168,7 @@ function SourceStatus() {
         )}
       </div>
       {importState.status === 'error' && <p className={s.syncError}>{t.start.errors[importState.code]}</p>}
+      {data.source === 'strava' && <PoweredByStrava className={s.powered} />}
     </>
   );
 }

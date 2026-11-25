@@ -355,6 +355,9 @@ export const en = {
     about: 'About',
     aboutHint: 'Open source under the MIT licence. Your data stays in this browser.',
     github: 'View on GitHub',
+    stravaData: 'Data from Strava',
+    stravaDataHint:
+      'Gear and activities come through the Strava API. Kilometr is an independent app, not made by Strava.',
   },
 
   placeholder: {

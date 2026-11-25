@@ -217,6 +217,11 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--warn) 18%, transparent);
 }
 
+/* Under the sync status, lined up with its text (and the nav labels). */
+.powered {
+  padding: 0 12px 8px 41px;
+}
+
 .syncError {
   padding: 0 12px 6px 41px;
   font-size: 12px;

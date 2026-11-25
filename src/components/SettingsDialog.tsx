@@ -5,6 +5,7 @@ import { useDataset } from '../app/store';
 import { ConfirmDialog } from './ConfirmDialog';
 import { Icon } from './Icon';
 import { LanguageSwitch } from './LanguageSwitch';
+import { PoweredByStrava } from './PoweredByStrava';
 import { Segmented } from './Segmented';
 import s from './SettingsDialog.module.css';
 
@@ -272,6 +273,9 @@ function About() {
           {t.settings.github}
           <Icon name="external" size={14} />
         </a>
+      </Row>
+      <Row title={t.settings.stravaData} hint={t.settings.stravaDataHint}>
+        <PoweredByStrava />
       </Row>
     </div>
   );

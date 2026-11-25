@@ -1,0 +1,21 @@
+.mark {
+  display: inline-flex;
+}
+
+.mark img {
+  display: block;
+  height: 12px;
+  width: auto;
+}
+
+.dark {
+  display: none !important;
+}
+
+[data-theme='dark'] .light {
+  display: none !important;
+}
+
+[data-theme='dark'] .dark {
+  display: block !important;
+}
