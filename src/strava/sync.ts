@@ -3,7 +3,9 @@
  * request count low: Strava allows an app 100 reads per 15 minutes and 1 000 a
  * day across all its athletes.
  *
- * First sync: 1 (athlete) + activities / 200 + up to MAX_DETAILS gear details.
+ * First sync: 1 (athlete) + a year of activities / 200 + up to MAX_DETAILS gear
+ * details. Older km come from Strava's total per item, not activity by activity:
+ * a runner with ten years on Strava would otherwise spend 25+ requests here.
  * Later syncs: 1 + 1 (new activities) + any gear details still missing.
  */
 import { StravaError } from './auth';
@@ -13,6 +15,12 @@ const API = 'https://www.strava.com/api/v3';
 const PAGE = 200;
 /** Brand and model need one request per item; the rest follow on later syncs. */
 export const MAX_DETAILS = 12;
+/** How far back the first sync reads activities: a year, from the start of that month. */
+export const HISTORY_MONTHS = 12;
+
+export function historyStart(now: Date): Date {
+  return new Date(now.getFullYear(), now.getMonth() - HISTORY_MONTHS, 1);
+}
 
 export type SyncProgress = { step: 'gear' } | { step: 'activities'; count: number };
 
@@ -42,15 +50,17 @@ export function pickDetails(athlete: StravaAthlete, activities: StravaActivity[]
 }
 
 interface PullOptions {
-  /** Unix seconds: read only activities started after this. Omit for everything. */
-  after?: number;
+  /** Unix seconds: read only activities started after this. */
+  after: number;
+  /** True when `after` is the last sync (a later sync), false for the first sync's year back. */
+  incremental: boolean;
   /** Gear whose details were read before. */
   detailed: Set<string>;
 }
 
 export async function pullFromStrava(
   accessToken: string,
-  { after, detailed }: PullOptions,
+  { after, incremental, detailed }: PullOptions,
   onProgress: (p: SyncProgress) => void,
 ): Promise<StravaPull> {
   onProgress({ step: 'gear' });
@@ -58,8 +68,10 @@ export async function pullFromStrava(
 
   const activities: StravaActivity[] = [];
   for (let page = 1; ; page++) {
-    const since = after ? `&after=${after}` : '';
-    const batch = await get<StravaActivity[]>(`/athlete/activities?per_page=${PAGE}&page=${page}${since}`, accessToken);
+    const batch = await get<StravaActivity[]>(
+      `/athlete/activities?per_page=${PAGE}&page=${page}&after=${after}`,
+      accessToken,
+    );
     activities.push(...batch);
     onProgress({ step: 'activities', count: activities.length });
     if (batch.length < PAGE) break;
@@ -78,5 +90,7 @@ export async function pullFromStrava(
     );
   }
 
-  return { athlete, details, activities, incremental: after !== undefined };
+  return incremental
+    ? { athlete, details, activities, incremental }
+    : { athlete, details, activities, historyFrom: new Date(after * 1000).toISOString() };
 }

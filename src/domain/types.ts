@@ -13,6 +13,12 @@ export interface Gear {
   retired: boolean;
   /** Strava API only: true once the gear's details (brand, model, retired) were read. */
   detailed?: boolean;
+  /**
+   * Strava API only: km on this item from before `Dataset.historyFrom`, which
+   * weren't read activity by activity. Strava's own total for the item minus
+   * the activities Kilometr has; counted in the item's total and wear.
+   */
+  kmBefore?: number;
 }
 
 export interface Activity {
@@ -76,6 +82,11 @@ export interface Dataset {
    */
   assignments?: Record<string, string>;
   source: 'sample' | 'export' | 'strava';
+  /**
+   * Strava API only: activities before this ISO date weren't read (the first
+   * sync reads a year back to spare Strava's request limits). Missing: all of them were.
+   */
+  historyFrom?: string;
   /** ISO date of the last import or sync. */
   updatedAt?: string;
 }

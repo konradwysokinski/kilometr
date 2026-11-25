@@ -84,7 +84,8 @@ function terrainLabel(roadKm: number, trailKm: number, totalKm: number): 'Road' 
 }
 
 function statsFor(gear: Gear, activities: Activity[], settings: GearSettings, now: Date) {
-  let totalKm = 0;
+  // Km from before the activities Kilometr has (a Strava sync reads a year back).
+  let totalKm = gear.kmBefore ?? 0;
   let longestKm = 0;
   let elevationGain = 0;
   let roadKm = 0;

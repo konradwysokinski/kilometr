@@ -11,6 +11,8 @@ export interface StravaSummaryGear {
   /** Strava's display name: the nickname if one is set, otherwise brand + model. */
   name: string;
   retired?: boolean;
+  /** Metres: Strava's total for the item, over all its activities. */
+  distance?: number;
 }
 
 export interface StravaDetailedGear extends StravaSummaryGear {
@@ -86,6 +88,34 @@ export function mapGear(kind: GearKind, summary: StravaSummaryGear, detail?: Str
   return { gear, nickname };
 }
 
+/**
+ * Km each item has from before the activities read: Strava's total minus what
+ * the activities add up to. Recomputed every sync, so an old activity moved to
+ * other gear in Strava shows up too. Shoes picked in Kilometr aren't in
+ * Strava's total, so they're left out of the sum.
+ */
+export function withKmBefore(
+  gear: Gear[],
+  athlete: StravaAthlete,
+  activities: Activity[],
+  assignments: Record<string, string> | undefined,
+): Gear[] {
+  const total = new Map(
+    [...(athlete.shoes ?? []), ...(athlete.bikes ?? [])].map((g) => [g.id, (g.distance ?? 0) / 1000]),
+  );
+  const read = new Map<string, number>();
+  for (const a of activities) {
+    if (!a.gearId || assignments?.[a.id] === a.gearId) continue;
+    read.set(a.gearId, (read.get(a.gearId) ?? 0) + a.distance / 1000);
+  }
+  return gear.map((g) => {
+    const { kmBefore: _, ...rest } = g;
+    const before = (total.get(g.id) ?? 0) - (read.get(g.id) ?? 0);
+    // Under 100 m is rounding between Strava's total and the activities.
+    return before >= 0.1 ? { ...rest, kmBefore: before } : rest;
+  });
+}
+
 /** Read from Strava's gear details already (data from before the flag existed has a brand). */
 export const hasDetails = (g: Gear) => !!g.detailed || !!g.brand;
 
@@ -96,6 +126,8 @@ export interface StravaPull {
   activities: StravaActivity[];
   /** True when only activities after the last sync were read; they're merged into the old ones. */
   incremental?: boolean;
+  /** First sync: the activities start here (ISO); older km come from each item's `distance`. */
+  historyFrom?: string;
 }
 
 /**
@@ -135,6 +167,7 @@ export function buildStravaDataset(pull: StravaPull, previous: Dataset | null, n
   );
   for (const a of pulled) byId.set(a.id, a);
   const activities = [...byId.values()].sort((a, b) => b.startDate.localeCompare(a.startDate));
+  const historyFrom = pull.incremental && previous?.source === 'strava' ? previous.historyFrom : pull.historyFrom;
 
   let settings: Record<string, GearSettings> = {};
   let assignments: Record<string, string> | undefined;
@@ -158,7 +191,8 @@ export function buildStravaDataset(pull: StravaPull, previous: Dataset | null, n
   const next: Dataset = {
     source: 'strava',
     updatedAt: now.toISOString(),
-    gear,
+    ...(historyFrom && { historyFrom }),
+    gear: historyFrom ? withKmBefore(gear, pull.athlete, activities, assignments) : gear,
     activities,
     settings,
     parts:

@@ -37,6 +37,7 @@ API (own app, OAuth):
 - `GET /athlete/activities` → per activity: `gear_id`, `distance`, `total_elevation_gain`, `sport_type` (`Run`, `TrailRun`, `Ride`, `GravelRide`, …), `start_date`, `name`.
 - `PUT /activities/{id}` with `gear_id` → assign shoes (needs `activity:write` scope).
 - No bike components in the API.
+- Request budget: the first sync reads activities a year back (from the start of that month, `historyStart` in `src/strava/sync.ts`), about 1 + 2–3 pages + up to 12 gear details. Older km per item come from Strava's gear `distance` minus the activities read (`Gear.kmBefore`, recomputed every sync; `Dataset.historyFrom` marks the window). Activity-based stats (count, longest, elevation, terrain) cover the window only. Data synced before this keeps its full history.
 
 Export .zip:
 - `activities.csv`: columns incl. "Activity Gear", "Distance", "Elevation Gain", "Activity Type", "Activity Date", "Activity Name".

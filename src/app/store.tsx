@@ -20,7 +20,7 @@ import { ExportError } from '../import/stravaExport';
 import { dbDelete, dbGet, dbSet } from '../lib/db';
 import { buildStravaDataset, hasDetails } from '../strava/mapping';
 import { finishSignIn, freshTokens, revokeAccess, startSignIn, StravaError, type StravaTokens } from '../strava/auth';
-import { pullFromStrava } from '../strava/sync';
+import { historyStart, pullFromStrava } from '../strava/sync';
 import { StoreContext, type ImportState, type StravaState, type Store, type Theme, type ThemePref } from './context';
 
 const KEY_SOURCE = 'kilometr.source';
@@ -197,17 +197,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   /**
    * One sync, from sign-in, the hourly refresh or "Sync now". After the first,
    * only activities since the last one are read (a week back, to catch late uploads).
+   * The first reads a year back.
    */
   const runStravaSync = useCallback(
     async (tokens: StravaTokens, previous: Dataset | null) => {
       const fresh = await freshTokens(tokens);
       if (fresh !== tokens) await dbSet(DB_STRAVA_TOKENS, fresh);
       const incremental = previous?.source === 'strava' && previous.activities.length > 0;
+      // The first sync reads a year back; older km come from Strava's total per item.
       const after = incremental
         ? Math.floor(new Date(previous.activities[0]!.startDate).getTime() / 1000) - 7 * 24 * 3600
-        : undefined;
+        : Math.floor(historyStart(new Date()).getTime() / 1000);
       const detailed = new Set(previous?.source === 'strava' ? previous.gear.filter(hasDetails).map((g) => g.id) : []);
-      const pull = await pullFromStrava(fresh.accessToken, { after, detailed }, (progress) =>
+      const pull = await pullFromStrava(fresh.accessToken, { after, incremental, detailed }, (progress) =>
         setStravaState({ status: 'syncing', progress }),
       );
       const next = buildStravaDataset(pull, previous);

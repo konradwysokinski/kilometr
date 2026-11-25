@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Dataset } from '../domain/types';
 import { buildStravaDataset, mapActivity, mapGear, type StravaPull } from './mapping';
-import { MAX_DETAILS, pickDetails } from './sync';
+import { historyStart, MAX_DETAILS, pickDetails } from './sync';
 
 const run = (id: number, gear: string | null, sport = 'Run') => ({
   id,
@@ -127,5 +127,61 @@ describe('pickDetails', () => {
     expect(ids.length).toBe(MAX_DETAILS);
     expect(ids.slice(0, 2)).toEqual(['g3', 'g15']); // run 2 is newer than run 1
     expect(ids).not.toContain('g0');
+  });
+});
+
+describe('first sync reads a year back', () => {
+  const now = new Date('2026-11-24T12:00:00Z');
+  const yearPull: StravaPull = {
+    ...pull,
+    athlete: {
+      ...pull.athlete,
+      // g1: 10 km read + 700 km before; g2: all of it read; b1: never used in the year.
+      shoes: [
+        { id: 'g1', name: 'Mud ones', distance: 710_000 },
+        { id: 'g2', name: 'Nike Pegasus 41', retired: true, distance: 10_000 },
+      ],
+      bikes: [{ id: 'b1', name: 'Canyon Grail CF SL', distance: 3_214_000 }],
+    },
+    historyFrom: '2025-11-01T00:00:00.000Z',
+  };
+
+  it('starts at the beginning of the month a year ago', () => {
+    expect(historyStart(new Date(2026, 10, 24))).toEqual(new Date(2025, 10, 1));
+  });
+
+  it("takes older km from Strava's total per item", () => {
+    const d = buildStravaDataset(yearPull, null, now);
+    expect(d.historyFrom).toBe('2025-11-01T00:00:00.000Z');
+    expect(d.gear.find((g) => g.id === 'g1')!.kmBefore).toBeCloseTo(700, 5);
+    expect(d.gear.find((g) => g.id === 'g2')!.kmBefore).toBeUndefined();
+    expect(d.gear.find((g) => g.id === 'b1')!.kmBefore).toBeCloseTo(3214, 5);
+  });
+
+  it('keeps the window and recounts older km on later syncs', () => {
+    const first = buildStravaDataset(yearPull, null, now);
+    const athlete = { ...yearPull.athlete, shoes: [{ id: 'g1', name: 'Mud ones', distance: 720_000 }] };
+    const next = buildStravaDataset(
+      { athlete, details: {}, activities: [run(105, 'g1')], incremental: true },
+      first,
+      now,
+    );
+    expect(next.historyFrom).toBe(first.historyFrom);
+    expect(next.gear.find((g) => g.id === 'g1')!.kmBefore).toBeCloseTo(700, 5);
+  });
+
+  it("leaves shoes picked in Kilometr out, since Strava's total doesn't have them", () => {
+    const d = buildStravaDataset(
+      yearPull,
+      { ...buildStravaDataset(yearPull, null, now), assignments: { '103': 'g1' } },
+      now,
+    );
+    expect(d.activities.find((a) => a.id === '103')!.gearId).toBe('g1');
+    expect(d.gear.find((g) => g.id === 'g1')!.kmBefore).toBeCloseTo(700, 5);
+  });
+
+  it('reads nothing extra when the whole history is there', () => {
+    expect(buildStravaDataset(pull, null, now).historyFrom).toBeUndefined();
+    expect(buildStravaDataset(pull, null, now).gear.every((g) => g.kmBefore === undefined)).toBe(true);
   });
 });
