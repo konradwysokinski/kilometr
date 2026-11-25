@@ -9,6 +9,8 @@
   display: grid;
   grid-row: span 4;
   grid-template-rows: subgrid;
+  /* One column that may shrink below its content, so a long name or nickname ellipsizes instead of spilling out. */
+  grid-template-columns: minmax(0, 1fr);
   row-gap: 10px;
   padding: 20px;
   border: 1px solid var(--line-soft);
