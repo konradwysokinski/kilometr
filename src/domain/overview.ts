@@ -178,15 +178,17 @@ export interface WeekBar {
   totalKm: number;
   segments: { key: string; colour: GearColour; km: number }[];
   /**
-   * Week bars: the average km a week over the four weeks up to the bar's end
-   * (or up to now, for the week still running), so a short stub at the month's
-   * edge still shows the pace. null for weeks not started yet and for month bars.
+   * The trend: for a week, the average km a week over the four weeks up to its
+   * end; for a month of a year, the average km a month over the three months up
+   * to its end. The bar still running counts up to now, so a short stub at the
+   * month's edge still shows the pace. null for bars not started yet.
    */
   trendKm: number | null;
 }
 
-/** Weeks the trend line averages over. */
+/** What the trend line averages over: four weeks for week bars, three months for month bars. */
 export const TREND_WEEKS = 4;
+export const TREND_MONTHS = 3;
 
 export interface WeeklySeries {
   key: string;
@@ -264,16 +266,16 @@ export function periodKm(
     bar.totalKm = bar.segments.reduce((sum, seg) => sum + seg.km, 0);
   });
 
-  // The 4-week trend, for week bars: the same runs (or rides), any gear.
-  if (period.kind === 'month') {
-    const dates = data.activities.filter(counts).map((a) => ({ d: new Date(a.startDate), km: km(a.distance) }));
-    for (const bar of bars) {
-      if (bar.start > now) continue;
-      const to = bar.end < now ? bar.end : now;
-      const from = new Date(to);
-      from.setDate(from.getDate() - TREND_WEEKS * 7); // calendar days, safe across a clock change
-      bar.trendKm = dates.reduce((sum, x) => (x.d >= from && x.d < to ? sum + x.km : sum), 0) / TREND_WEEKS;
-    }
+  // The trend: the same runs (or rides), any gear. Calendar arithmetic, safe across a clock change.
+  const dates = data.activities.filter(counts).map((a) => ({ d: new Date(a.startDate), km: km(a.distance) }));
+  const spans = period.kind === 'year' ? TREND_MONTHS : TREND_WEEKS;
+  for (const bar of bars) {
+    if (bar.start > now) continue;
+    const to = bar.end < now ? bar.end : now;
+    const from = new Date(to);
+    if (period.kind === 'year') from.setMonth(from.getMonth() - TREND_MONTHS);
+    else from.setDate(from.getDate() - TREND_WEEKS * 7);
+    bar.trendKm = dates.reduce((sum, x) => (x.d >= from && x.d < to ? sum + x.km : sum), 0) / spans;
   }
 
   return { bars, series };

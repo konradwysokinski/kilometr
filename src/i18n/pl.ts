@@ -227,8 +227,8 @@ export const pl: Messages = {
     type: 'Typ wykresu',
     bars: 'Wykres słupkowy',
     lines: 'Wykres liniowy',
-    trend: 'Średnia z 4 tygodni',
-    perWeek: (km: string) => `${km} na tydzień`,
+    trend: (unit: 'week' | 'month') => (unit === 'week' ? 'Średnia z 4 tygodni' : 'Średnia z 3 miesięcy'),
+    per: (unit: 'week' | 'month', km: string) => `${km} na ${unit === 'week' ? 'tydzień' : 'miesiąc'}`,
   },
 
   detail: {

@@ -227,8 +227,13 @@ describe('sample data', () => {
     // The week running now averages up to now; the week after it hasn't started.
     expect(bars[4]!.trendKm).toBeCloseTo(last4(now), 5);
     expect(bars[5]!.trendKm).toBeNull();
-    // Months of a year have no trend.
-    const year = periodKm(data, stats, { kind: 'year', anchor: now }, 'shoe', now);
-    expect(year.bars.every((b) => b.trendKm === null)).toBe(true);
+    // A year's months: the average month over the three months up to each; none after this month.
+    const year = periodKm(data, stats, { kind: 'year', anchor: now }, 'shoe', now).bars;
+    const kmBetween = (from: Date, to: Date) =>
+      data.activities
+        .filter((a) => isRun(a) && new Date(a.startDate) >= from && new Date(a.startDate) < to)
+        .reduce((sum, a) => sum + a.distance / 1000, 0);
+    expect(year[6]!.trendKm).toBeCloseTo(kmBetween(new Date(2026, 4, 1), new Date(2026, 7, 1)) / 3, 5);
+    expect(year[11]!.trendKm).toBeNull();
   });
 });

@@ -202,7 +202,7 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
   const empty = kind === 'shoe' ? t.chart.noRuns : t.chart.noRides;
   const spoken = week
     ? `${heading}: ${rows.length ? rows.map((r) => `${nameOf(r.key)} ${f.kmPrecise(r.km)}`).join(', ') : empty}` +
-      (week.trendKm !== null ? `. ${t.chart.trend} ${f.kmPrecise(week.trendKm)}` : '')
+      (week.trendKm !== null ? `. ${t.chart.trend(unit)} ${f.kmPrecise(week.trendKm)}` : '')
     : '';
 
   return (
@@ -310,7 +310,7 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
                 {week.trendKm !== null && (
                   <div className={s.tipTrend}>
                     <span className={s.trendSwatch} />
-                    <span className={s.tipName}>{t.chart.trend}</span>
+                    <span className={s.tipName}>{t.chart.trend(unit)}</span>
                     <span className={s.tipKm}>{f.kmPrecise(week.trendKm)}</span>
                   </div>
                 )}
@@ -360,8 +360,8 @@ export function WeeklyChart({ kind, bars, series, inPeriod }: Props) {
             {trendNow !== null && (
               <div className={s.legendTrend}>
                 <span className={s.trendSwatch} aria-hidden="true" />
-                <span className={s.legendName}>{t.chart.trend}</span>
-                <span className={s.legendKm}>{t.chart.perWeek(f.km(trendNow))}</span>
+                <span className={s.legendName}>{t.chart.trend(unit)}</span>
+                <span className={s.legendKm}>{t.chart.per(unit, f.km(trendNow))}</span>
               </div>
             )}
           </div>

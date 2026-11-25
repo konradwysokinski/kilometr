@@ -218,8 +218,8 @@ export const en = {
     bars: 'Bar chart',
     lines: 'Line chart',
     /** The dashed line: the average km a week over the last four weeks. */
-    trend: '4-week average',
-    perWeek: (km: string) => `${km} a week`,
+    trend: (unit: 'week' | 'month'): string => (unit === 'week' ? '4-week average' : '3-month average'),
+    per: (unit: 'week' | 'month', km: string) => `${km} a ${unit}`,
   },
 
   detail: {
