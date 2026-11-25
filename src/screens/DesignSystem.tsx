@@ -16,7 +16,7 @@ import { gearStats } from '../domain/gear';
 import { kmByGear, kmShare, periodGear, periodKm, periodSummary } from '../domain/overview';
 import { gearColour } from '../lib/colour';
 import dialog from '../components/ConfirmDialog.module.css';
-import news from '../components/NewsletterForm.module.css';
+import price from '../components/PriceDialog.module.css';
 import overview from './Overview.module.css';
 import s from './DesignSystem.module.css';
 
@@ -225,10 +225,18 @@ export function DesignSystem() {
           </Example>
 
           <Example title={t.ds.input}>
-            <label className={s.field}>
-              <span className={s.muted}>{t.ds.inputLabel}</span>
-              <input className={news.input} inputMode="decimal" placeholder="599" />
-            </label>
+            {/* The price dialog's own field: a 44px input with its unit inside. */}
+            <div className={`${price.field} ${s.field}`}>
+              <label htmlFor="ds-price" className={price.label}>
+                {t.ds.inputLabel}
+              </label>
+              <div className={price.inputWrap}>
+                <input id="ds-price" className={price.input} inputMode="decimal" placeholder="599" />
+                <span className={price.unit} aria-hidden="true">
+                  {t.price.currency}
+                </span>
+              </div>
+            </div>
           </Example>
 
           <Example title={t.ds.avatars}>
