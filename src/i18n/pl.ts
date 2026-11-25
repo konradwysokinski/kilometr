@@ -90,6 +90,9 @@ export const pl: Messages = {
     shoesInRotation: 'Buty w rotacji',
     shoesInRotationHint: 'używane w ostatnich 60 dniach',
     noShoesUsed: 'Brak biegów w butach w ostatnich 60 dniach.',
+    shoesUsed: (period) => `Buty używane ${period}`,
+    noShoesIn: (period) => `Brak aktywności w butach ${period}.`,
+    kmIn: (km, period) => `${km} ${period}`,
   },
 
   shoes: {

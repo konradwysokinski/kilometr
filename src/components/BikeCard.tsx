@@ -11,9 +11,11 @@ interface Props {
   bike: GearStats;
   parts: BikePart[];
   activities: Activity[];
+  /** Km in a past period, shown before the total ("84 km in May · 3 214 km in total"). */
+  note?: string;
 }
 
-export function BikeCard({ bike, parts, activities }: Props) {
+export function BikeCard({ bike, parts, activities, note }: Props) {
   const { t, f } = useStore();
   const headingId = `bike-${bike.gear.id}`;
   return (
@@ -26,7 +28,7 @@ export function BikeCard({ bike, parts, activities }: Props) {
               {bike.name}
             </Link>
           </h2>
-          <div className={s.caption}>{t.gear.inTotal(f.km(bike.totalKm))}</div>
+          <div className={s.caption}>{[note, t.gear.inTotal(f.km(bike.totalKm))].filter(Boolean).join(' · ')}</div>
         </div>
       </div>
       {FEATURES.bikeParts ? (

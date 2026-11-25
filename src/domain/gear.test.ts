@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats, initials, partWear, wearOf } from './gear';
-import { unassignedRuns, wearCost, weeklyRunKm } from './overview';
+import { kmByGear, unassignedRuns, wearCost, weeklyRunKm } from './overview';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -122,6 +122,11 @@ describe('sample data', () => {
     );
     expect(wear.priced).toBe(3); // Genesis has no price; the bike isn't counted
     expect(wear.pairs).toBe(4);
+    // Gear used in November, most km first: the bike leads, then the pairs.
+    const used = kmByGear(data, nov);
+    expect([...used.keys()][0]).toBe('g-cg');
+    expect(used.get('g-hs5')).toBeCloseTo(kmIn('g-hs5'), 5);
+    expect([...used.values()]).toEqual([...used.values()].sort((a, b) => b - a));
     const runs = unassignedRuns(data, now);
     expect(runs).toHaveLength(2);
     expect(runs.reduce((s, a) => s + a.distance, 0) / 1000).toBeCloseTo(14.6, 1);

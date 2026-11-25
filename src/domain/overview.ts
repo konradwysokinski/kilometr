@@ -41,6 +41,16 @@ export function unassignedRuns(data: Dataset, now: Date): Activity[] {
   return data.activities.filter((a) => isRun(a) && !a.gearId && new Date(a.startDate) >= from);
 }
 
+/** Km per gear item in the period, most first. Overview lists past periods by it. */
+export function kmByGear(data: Dataset, period: Period): Map<string, number> {
+  const range = periodRange(period);
+  const totals = new Map<string, number>();
+  for (const a of data.activities) {
+    if (a.gearId && inRange(a, range)) totals.set(a.gearId, (totals.get(a.gearId) ?? 0) + km(a.distance));
+  }
+  return new Map([...totals].sort((a, b) => b[1] - a[1]));
+}
+
 export interface WearCost {
   /** PLN of shoe value used up in the period. */
   amount: number;
@@ -58,12 +68,7 @@ export interface WearCost {
  * Bikes have no limit, so they're left out.
  */
 export function wearCost(data: Dataset, stats: Map<string, GearStats>, period: Period): WearCost {
-  const range = periodRange(period);
-  const kmByPair = new Map<string, number>();
-  for (const a of data.activities) {
-    if (!a.gearId || !inRange(a, range) || stats.get(a.gearId)?.gear.kind !== 'shoe') continue;
-    kmByPair.set(a.gearId, (kmByPair.get(a.gearId) ?? 0) + km(a.distance));
-  }
+  const kmByPair = [...kmByGear(data, period)].filter(([id]) => stats.get(id)?.gear.kind === 'shoe');
   let amount = 0;
   let priced = 0;
   for (const [id, pairKm] of kmByPair) {
@@ -72,7 +77,7 @@ export function wearCost(data: Dataset, stats: Map<string, GearStats>, period: P
     amount += (pairKm * g.settings.price) / g.wear.limitKm;
     priced++;
   }
-  return { amount, priced, pairs: kmByPair.size };
+  return { amount, priced, pairs: kmByPair.length };
 }
 
 export interface WeekBar {

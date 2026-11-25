@@ -77,6 +77,9 @@ export const en = {
     shoesInRotation: 'Shoes in rotation',
     shoesInRotationHint: 'used in the last 60 days',
     noShoesUsed: 'No runs with shoes in the last 60 days.',
+    shoesUsed: (period: string) => `Shoes used ${period}`,
+    noShoesIn: (period: string) => `No activities with shoes ${period}.`,
+    kmIn: (km: string, period: string) => `${km} ${period}`,
   },
 
   shoes: {

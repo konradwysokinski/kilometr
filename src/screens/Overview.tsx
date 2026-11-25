@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { WeeklyChart } from '../components/WeeklyChart';
 import { byLastUsed } from '../domain/gear';
-import { periodSummary, wearCost, weeklyRunKm } from '../domain/overview';
+import { kmByGear, periodSummary, wearCost, weeklyRunKm } from '../domain/overview';
 import { addDays, periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
@@ -25,9 +25,15 @@ export function Overview() {
       : t.period.inYear(period.anchor.getFullYear());
 
   const summary = useMemo(() => periodSummary(data, period), [data, period]);
-  const rotation = [...stats.values()].filter((g) => g.inRotation).sort(byLastUsed);
-  const shoes = rotation.filter((g) => g.gear.kind === 'shoe');
-  const bikes = rotation.filter((g) => g.gear.kind === 'bike');
+  // Now: the rotation (used in the last 60 days). A past period: the gear used
+  // in it, most km first, with those km on each card.
+  const usedKm = useMemo(() => kmByGear(data, period), [data, period]);
+  const listed = isCurrent
+    ? [...stats.values()].filter((g) => g.inRotation).sort(byLastUsed)
+    : [...usedKm.keys()].flatMap((id) => stats.get(id) ?? []);
+  const shoes = listed.filter((g) => g.gear.kind === 'shoe');
+  const bikes = listed.filter((g) => g.gear.kind === 'bike');
+  const kmNote = (id: string) => (isCurrent ? undefined : t.overview.kmIn(f.km(usedKm.get(id) ?? 0), inPeriod));
   const wear = useMemo(() => wearCost(data, stats, period), [data, stats, period]);
   // The chart shows the 12 weeks up to the end of the selected period (or today).
   const chartEnd = (isCurrent ? now : addDays(periodEnd, -1)).getTime();
@@ -139,17 +145,23 @@ export function Overview() {
         <section aria-labelledby="shoes-h" className={s.section}>
           <div className={s.sectionHead}>
             <h2 id="shoes-h" className={s.sectionTitle}>
-              {t.overview.shoesInRotation} <span className={s.sectionHint}>{t.overview.shoesInRotationHint}</span>
+              {isCurrent ? (
+                <>
+                  {t.overview.shoesInRotation} <span className={s.sectionHint}>{t.overview.shoesInRotationHint}</span>
+                </>
+              ) : (
+                t.overview.shoesUsed(inPeriod)
+              )}
             </h2>
           </div>
           {shoes.length > 0 ? (
             <div className={s.grid}>
               {shoes.map((g) => (
-                <GearCard key={g.gear.id} gear={g} />
+                <GearCard key={g.gear.id} gear={g} footnote={kmNote(g.gear.id)} />
               ))}
             </div>
           ) : (
-            <p className={s.empty}>{t.overview.noShoesUsed}</p>
+            <p className={s.empty}>{isCurrent ? t.overview.noShoesUsed : t.overview.noShoesIn(inPeriod)}</p>
           )}
         </section>
       )}
@@ -161,6 +173,7 @@ export function Overview() {
             <BikeCard
               key={b.gear.id}
               bike={b}
+              note={kmNote(b.gear.id)}
               parts={data.parts.filter((p) => p.bikeId === b.gear.id)}
               activities={data.activities}
             />
