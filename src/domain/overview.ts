@@ -41,18 +41,38 @@ export function unassignedRuns(data: Dataset, now: Date): Activity[] {
   return data.activities.filter((a) => isRun(a) && !a.gearId && new Date(a.startDate) >= from);
 }
 
-/** Total price over total km, across priced shoes in rotation. */
-export function averageCostPerKm(shoes: GearStats[]): number | null {
-  const priced = shoes.filter((s) => s.settings.price && s.totalKm > 0);
-  if (priced.length === 0) return null;
-  const price = priced.reduce((s, g) => s + g.settings.price!, 0);
-  const total = priced.reduce((s, g) => s + g.totalKm, 0);
-  return price / total;
+export interface WearCost {
+  /** PLN of shoe value used up in the period. */
+  amount: number;
+  /** Pairs used in the period that have a price. */
+  priced: number;
+  /** All pairs used in the period. */
+  pairs: number;
 }
 
-/** The shoe in rotation with the fewest km left. */
-export function nextToRetire(shoes: GearStats[]): GearStats | null {
-  return shoes.filter((s) => s.wear).sort((a, b) => a.wear!.leftKm - b.wear!.leftKm)[0] ?? null;
+/**
+ * How much shoe value the period used up: for each pair, its km in the period
+ * times its price per km of its limit (599 PLN over 800 km = 0.75 PLN a km).
+ * Unlike price ÷ km run so far, this doesn't keep falling as a pair ages, and
+ * it covers the same period as the Running and Riding numbers next to it.
+ * Bikes have no limit, so they're left out.
+ */
+export function wearCost(data: Dataset, stats: Map<string, GearStats>, period: Period): WearCost {
+  const range = periodRange(period);
+  const kmByPair = new Map<string, number>();
+  for (const a of data.activities) {
+    if (!a.gearId || !inRange(a, range) || stats.get(a.gearId)?.gear.kind !== 'shoe') continue;
+    kmByPair.set(a.gearId, (kmByPair.get(a.gearId) ?? 0) + km(a.distance));
+  }
+  let amount = 0;
+  let priced = 0;
+  for (const [id, pairKm] of kmByPair) {
+    const g = stats.get(id)!;
+    if (!g.settings.price || !g.wear) continue;
+    amount += (pairKm * g.settings.price) / g.wear.limitKm;
+    priced++;
+  }
+  return { amount, priced, pairs: kmByPair.size };
 }
 
 export interface WeekBar {

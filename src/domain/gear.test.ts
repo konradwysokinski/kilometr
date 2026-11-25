@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats, initials, partWear, wearOf } from './gear';
-import { averageCostPerKm, nextToRetire, unassignedRuns, weeklyRunKm } from './overview';
+import { unassignedRuns, wearCost, weeklyRunKm } from './overview';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -109,9 +109,19 @@ describe('sample data', () => {
   });
 
   it('derives the overview numbers', () => {
-    const shoes = [...stats.values()].filter((s) => s.inRotation && s.gear.kind === 'shoe');
-    expect(averageCostPerKm(shoes)).toBeCloseTo(1947 / 1336, 5);
-    expect(nextToRetire(shoes)?.gear.id).toBe('g-hs5');
+    // Shoe wear in November: each pair's km that month × its price ÷ its limit.
+    const nov = { kind: 'month' as const, anchor: now };
+    const kmIn = (id: string) =>
+      data.activities
+        .filter((a) => a.gearId === id && a.startDate >= '2026-11-01' && a.startDate < '2026-12-01')
+        .reduce((s, a) => s + a.distance / 1000, 0);
+    const wear = wearCost(data, stats, nov);
+    expect(wear.amount).toBeCloseTo(
+      (kmIn('g-hs5') * 599) / 800 + (kmIn('g-np41') * 549) / 700 + (kmIn('g-ses4') * 799) / 600,
+      5,
+    );
+    expect(wear.priced).toBe(3); // Genesis has no price; the bike isn't counted
+    expect(wear.pairs).toBe(4);
     const runs = unassignedRuns(data, now);
     expect(runs).toHaveLength(2);
     expect(runs.reduce((s, a) => s + a.distance, 0) / 1000).toBeCloseTo(14.6, 1);

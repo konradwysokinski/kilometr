@@ -77,12 +77,13 @@ export const pl: Messages = {
     ridesOnBikes: (rides, ridesF, bikes, bikesF) =>
       `${ridesF} ${plural(rides, 'jazda', 'jazdy', 'jazd')} na ${bikesF} ${bikes === 1 ? 'rowerze' : 'rowerach'}`,
     noRides: (period) => `Brak jazd ${period}`,
-    costPerKm: 'Koszt za km',
-    costAverage: 'Średnio dla butów z ceną',
-    costMissing: 'Dodaj ceny butów',
-    nextToRetire: 'Następne do wymiany',
-    leftOn: (name) => `zostało w ${name}`,
-    noShoesInRotation: 'Brak butów w rotacji',
+    wearCost: 'Zużycie butów',
+    wearOn: (priced, pricedF, pairs, pairsF) =>
+      priced === pairs
+        ? `zużyte na ${pairsF} ${pairs === 1 ? 'parze' : 'parach'}`
+        : `na ${pricedF} z ${pairsF} par · reszta bez ceny`,
+    wearNone: (period) => `Brak kilometrów na butach ${period}`,
+    wearNoPrices: 'Dodaj ceny butów, żeby to zobaczyć',
     unassigned: (n, nF, km) => `${nF} ${plural(n, 'bieg', 'biegi', 'biegów')} bez butów (${km})`,
     unassignedHint: 'Z ostatnich 30 dni, nie liczą się na żadnej parze',
     assignShoes: 'Przypisz ›',

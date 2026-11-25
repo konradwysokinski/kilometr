@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { WeeklyChart } from '../components/WeeklyChart';
 import { byLastUsed } from '../domain/gear';
-import { averageCostPerKm, nextToRetire, periodSummary, weeklyRunKm } from '../domain/overview';
+import { periodSummary, wearCost, weeklyRunKm } from '../domain/overview';
 import { addDays, periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
@@ -28,8 +28,7 @@ export function Overview() {
   const rotation = [...stats.values()].filter((g) => g.inRotation).sort(byLastUsed);
   const shoes = rotation.filter((g) => g.gear.kind === 'shoe');
   const bikes = rotation.filter((g) => g.gear.kind === 'bike');
-  const costPerKm = averageCostPerKm(shoes);
-  const retireNext = nextToRetire(shoes);
+  const wear = useMemo(() => wearCost(data, stats, period), [data, stats, period]);
   // The chart shows the 12 weeks up to the end of the selected period (or today).
   const chartEnd = (isCurrent ? now : addDays(periodEnd, -1)).getTime();
   const weekly = useMemo(() => weeklyRunKm(data, stats, new Date(chartEnd)), [data, stats, chartEnd]);
@@ -122,16 +121,17 @@ export function Overview() {
           )}
         />
         <KpiCard label={t.overview.riding} value={f.km(summary.rideKm)} sub={ridingSub} />
+        {/* Shoe value used up in the period (km × price ÷ limit), next to the km it came from. */}
         <KpiCard
-          label={t.overview.costPerKm}
-          value={costPerKm !== null ? f.money(costPerKm) : '—'}
-          sub={costPerKm !== null ? t.overview.costAverage : t.overview.costMissing}
-        />
-        <KpiCard
-          label={t.overview.nextToRetire}
-          value={retireNext?.wear ? f.km(retireNext.wear.leftKm) : '—'}
-          sub={retireNext ? t.overview.leftOn(retireNext.shortName) : t.overview.noShoesInRotation}
-          tone={retireNext?.wear && retireNext.wear.state !== 'ok' ? 'warn' : 'default'}
+          label={t.overview.wearCost}
+          value={wear.priced > 0 ? f.price(Math.round(wear.amount)) : '—'}
+          sub={
+            wear.pairs === 0
+              ? t.overview.wearNone(inPeriod)
+              : wear.priced === 0
+                ? t.overview.wearNoPrices
+                : t.overview.wearOn(wear.priced, f.int(wear.priced), wear.pairs, f.int(wear.pairs))
+          }
         />
       </section>
 

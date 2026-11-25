@@ -64,12 +64,13 @@ export const en = {
     ridesOnBikes: (rides: number, ridesF: string, bikes: number, bikesF: string) =>
       `${ridesF} ${plural(rides, 'ride', 'rides')} on ${bikesF} ${plural(bikes, 'bike', 'bikes')}`,
     noRides: (period: string) => `No rides ${period}`,
-    costPerKm: 'Cost per km',
-    costAverage: 'Average across priced shoes',
-    costMissing: 'Add prices to your shoes',
-    nextToRetire: 'Next to retire',
-    leftOn: (name: string) => `left on ${name}`,
-    noShoesInRotation: 'No shoes in rotation',
+    wearCost: 'Shoe wear',
+    wearOn: (priced: number, pricedF: string, pairs: number, pairsF: string) =>
+      priced === pairs
+        ? `used up on ${pairsF} ${plural(pairs, 'pair', 'pairs')}`
+        : `on ${pricedF} of ${pairsF} pairs · the rest have no price`,
+    wearNone: (period: string) => `No shoe kilometres ${period}`,
+    wearNoPrices: 'Add prices to your shoes to see it',
     unassigned: (n: number, nF: string, km: string) => `${nF} ${plural(n, 'run', 'runs')} without shoes (${km})`,
     unassignedHint: 'From the last 30 days, not counted on any pair',
     assignShoes: 'Assign ›',
