@@ -51,6 +51,58 @@ export function kmByGear(data: Dataset, period: Period): Map<string, number> {
   return new Map([...totals].sort((a, b) => b[1] - a[1]));
 }
 
+export interface PeriodGear {
+  gear: GearStats;
+  /** Km in the period; 0 for rotation gear not used in it yet. */
+  km: number;
+}
+
+/**
+ * The gear Overview lists for a period: what was used in it, most km first.
+ * For the period still running, gear in rotation that hasn't been used in it
+ * yet follows, so the list isn't empty on the 1st of the month.
+ */
+export function periodGear(stats: Map<string, GearStats>, usedKm: Map<string, number>, current: boolean): PeriodGear[] {
+  const used = [...usedKm].flatMap(([id, km]) => {
+    const gear = stats.get(id);
+    return gear ? [{ gear, km }] : [];
+  });
+  if (!current) return used;
+  const idle = [...stats.values()]
+    .filter((g) => g.inRotation && !usedKm.has(g.gear.id))
+    .sort(byLastUsed)
+    .map((gear) => ({ gear, km: 0 }));
+  return [...used, ...idle];
+}
+
+export interface ShareSlice {
+  key: string;
+  name: string;
+  colour: GearColour;
+  km: number;
+  share: number;
+}
+
+/**
+ * How the period's km split between items, for the donut: the `top` items with
+ * the most km, the rest as one "Other" slice (key 'other', granite).
+ */
+export function kmShare(list: PeriodGear[], top = 3): ShareSlice[] {
+  const used = list.filter((x) => x.km > 0);
+  const total = used.reduce((s, x) => s + x.km, 0);
+  if (total === 0) return [];
+  const slices: ShareSlice[] = used.slice(0, top).map(({ gear, km }) => ({
+    key: gear.gear.id,
+    name: gear.shortName,
+    colour: gear.colour,
+    km,
+    share: km / total,
+  }));
+  const rest = used.slice(top).reduce((s, x) => s + x.km, 0);
+  if (rest > 0) slices.push({ key: 'other', name: 'Other', colour: null, km: rest, share: rest / total });
+  return slices;
+}
+
 export interface WearCost {
   /** PLN of shoe value used up in the period. */
   amount: number;

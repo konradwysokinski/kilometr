@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats, initials, partWear, wearOf } from './gear';
-import { kmByGear, unassignedRuns, wearCost, weeklyRunKm } from './overview';
+import { kmByGear, kmShare, periodGear, unassignedRuns, wearCost, weeklyRunKm } from './overview';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -127,6 +127,20 @@ describe('sample data', () => {
     expect([...used.keys()][0]).toBe('g-cg');
     expect(used.get('g-hs5')).toBeCloseTo(kmIn('g-hs5'), 5);
     expect([...used.values()]).toEqual([...used.values()].sort((a, b) => b - a));
+
+    // Overview lists that gear; a past period adds nothing else.
+    expect(periodGear(stats, used, false).map((x) => x.gear.gear.id)).toEqual([...used.keys()]);
+    // The running period adds rotation gear not used in it yet, at 0 km.
+    const october = kmByGear(data, { kind: 'month', anchor: new Date('2026-10-15T12:00:00Z') });
+    const withIdle = periodGear(stats, new Map([...october].filter(([id]) => id !== 'g-sg')), true);
+    expect(withIdle.at(-1)).toMatchObject({ gear: { gear: { id: 'g-sg' } }, km: 0 });
+
+    // The donut: three biggest pairs, the rest as Other, shares adding up to 1.
+    const pairs = periodGear(stats, used, false).filter((x) => x.gear.gear.kind === 'shoe');
+    const slices = kmShare(pairs, 3);
+    expect(slices.map((x) => x.key)).toEqual([...pairs.slice(0, 3).map((x) => x.gear.gear.id), 'other']);
+    expect(slices.reduce((sum, x) => sum + x.share, 0)).toBeCloseTo(1, 10);
+    expect(kmShare([])).toEqual([]);
     const runs = unassignedRuns(data, now);
     expect(runs).toHaveLength(2);
     expect(runs.reduce((s, a) => s + a.distance, 0) / 1000).toBeCloseTo(14.6, 1);

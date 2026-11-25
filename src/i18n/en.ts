@@ -74,12 +74,14 @@ export const en = {
     unassigned: (n: number, nF: string, km: string) => `${nF} ${plural(n, 'run', 'runs')} without shoes (${km})`,
     unassignedHint: 'From the last 30 days, not counted on any pair',
     assignShoes: 'Assign ›',
-    shoesInRotation: 'Shoes in rotation',
-    shoesInRotationHint: 'used in the last 60 days',
-    noShoesUsed: 'No runs with shoes in the last 60 days.',
-    shoesUsed: (period: string) => `Shoes used ${period}`,
+    shoesIn: (period: string) => `Shoes ${period}`,
+    bikesIn: (period: string) => `Bikes ${period}`,
     noShoesIn: (period: string) => `No activities with shoes ${period}.`,
     kmIn: (km: string, period: string) => `${km} ${period}`,
+    notYet: (period: string) => `Not used ${period} yet`,
+    sharePairs: 'Kilometres by pair',
+    shareBikes: 'Kilometres by bike',
+    shareTop: (name: string) => `Most on ${name}`,
   },
 
   shoes: {

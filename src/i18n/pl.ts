@@ -87,12 +87,14 @@ export const pl: Messages = {
     unassigned: (n, nF, km) => `${nF} ${plural(n, 'bieg', 'biegi', 'biegów')} bez butów (${km})`,
     unassignedHint: 'Z ostatnich 30 dni, nie liczą się na żadnej parze',
     assignShoes: 'Przypisz ›',
-    shoesInRotation: 'Buty w rotacji',
-    shoesInRotationHint: 'używane w ostatnich 60 dniach',
-    noShoesUsed: 'Brak biegów w butach w ostatnich 60 dniach.',
-    shoesUsed: (period) => `Buty używane ${period}`,
+    shoesIn: (period) => `Buty ${period}`,
+    bikesIn: (period) => `Rowery ${period}`,
     noShoesIn: (period) => `Brak aktywności w butach ${period}.`,
     kmIn: (km, period) => `${km} ${period}`,
+    notYet: (period) => `Jeszcze nie ${period}`,
+    sharePairs: 'Kilometry według par',
+    shareBikes: 'Kilometry według rowerów',
+    shareTop: (name) => `Najwięcej na ${name}`,
   },
 
   shoes: {

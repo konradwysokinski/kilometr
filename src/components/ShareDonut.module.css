@@ -1,0 +1,63 @@
+/* Same frame and rhythm as KpiCard, so it sits in the KPI row as its fourth tile. */
+.card {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-tile);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.label,
+.sub {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+/* The donut hangs into the gap above the rule, so the row keeps the value's 40px. */
+.valueRow {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.value {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* Starts at twelve o'clock and goes clockwise. */
+.donut {
+  flex: none;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: none;
+  stroke: var(--track);
+}
+
+.rule {
+  height: 1px;
+  background: var(--line-soft);
+}
+
+.sub {
+  text-wrap: pretty;
+}
+
+.swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: 0;
+}

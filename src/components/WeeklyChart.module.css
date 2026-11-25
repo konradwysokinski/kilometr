@@ -1,5 +1,5 @@
 .card {
-  flex: 2 1 420px;
+  /* Full width under the KPI tiles. */
   min-width: 0;
   padding: 24px;
   border: 1px solid var(--line-soft);

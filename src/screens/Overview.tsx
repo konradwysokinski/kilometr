@@ -4,9 +4,9 @@ import { BikeCard } from '../components/BikeCard';
 import { GearCard } from '../components/GearCard';
 import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
+import { ShareDonut } from '../components/ShareDonut';
 import { WeeklyChart } from '../components/WeeklyChart';
-import { byLastUsed } from '../domain/gear';
-import { kmByGear, periodSummary, wearCost, weeklyRunKm } from '../domain/overview';
+import { kmByGear, kmShare, periodGear, periodSummary, wearCost, weeklyRunKm } from '../domain/overview';
 import { addDays, periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
@@ -25,15 +25,14 @@ export function Overview() {
       : t.period.inYear(period.anchor.getFullYear());
 
   const summary = useMemo(() => periodSummary(data, period), [data, period]);
-  // Now: the rotation (used in the last 60 days). A past period: the gear used
-  // in it, most km first, with those km on each card.
+  // The gear used in the period, most km first, with those km on each card
+  // (plus, for the running period, rotation gear not used in it yet).
   const usedKm = useMemo(() => kmByGear(data, period), [data, period]);
-  const listed = isCurrent
-    ? [...stats.values()].filter((g) => g.inRotation).sort(byLastUsed)
-    : [...usedKm.keys()].flatMap((id) => stats.get(id) ?? []);
-  const shoes = listed.filter((g) => g.gear.kind === 'shoe');
-  const bikes = listed.filter((g) => g.gear.kind === 'bike');
-  const kmNote = (id: string) => (isCurrent ? undefined : t.overview.kmIn(f.km(usedKm.get(id) ?? 0), inPeriod));
+  const listed = useMemo(() => periodGear(stats, usedKm, isCurrent), [stats, usedKm, isCurrent]);
+  const shoes = listed.filter((x) => x.gear.gear.kind === 'shoe');
+  const bikes = listed.filter((x) => x.gear.gear.kind === 'bike');
+  const kmNote = (km: number) => (km > 0 ? t.overview.kmIn(f.km(km), inPeriod) : t.overview.notYet(inPeriod));
+  const shareOf = filter === 'bike' ? bikes : shoes;
   const wear = useMemo(() => wearCost(data, stats, period), [data, stats, period]);
   // The chart shows the 12 weeks up to the end of the selected period (or today).
   const chartEnd = (isCurrent ? now : addDays(periodEnd, -1)).getTime();
@@ -139,46 +138,52 @@ export function Overview() {
                 : t.overview.wearOn(inPeriod, wear.priced, f.int(wear.priced), wear.pairs, f.int(wear.pairs))
           }
         />
+        <ShareDonut
+          label={filter === 'bike' ? t.overview.shareBikes : t.overview.sharePairs}
+          slices={kmShare(shareOf)}
+          sub={t.overview.shareTop}
+          empty={filter === 'bike' ? t.overview.noRides(inPeriod) : t.overview.wearNone(inPeriod)}
+        />
       </section>
+
+      {showShoes && <WeeklyChart bars={weekly.bars} series={weekly.series} />}
 
       {showShoes && (
         <section aria-labelledby="shoes-h" className={s.section}>
-          <div className={s.sectionHead}>
-            <h2 id="shoes-h" className={s.sectionTitle}>
-              {isCurrent ? (
-                <>
-                  {t.overview.shoesInRotation} <span className={s.sectionHint}>{t.overview.shoesInRotationHint}</span>
-                </>
-              ) : (
-                t.overview.shoesUsed(inPeriod)
-              )}
-            </h2>
-          </div>
+          <h2 id="shoes-h" className={s.sectionTitle}>
+            {t.overview.shoesIn(inPeriod)}
+          </h2>
           {shoes.length > 0 ? (
             <div className={s.grid}>
-              {shoes.map((g) => (
-                <GearCard key={g.gear.id} gear={g} footnote={kmNote(g.gear.id)} />
+              {shoes.map((x) => (
+                <GearCard key={x.gear.gear.id} gear={x.gear} footnote={kmNote(x.km)} />
               ))}
             </div>
           ) : (
-            <p className={s.empty}>{isCurrent ? t.overview.noShoesUsed : t.overview.noShoesIn(inPeriod)}</p>
+            <p className={s.empty}>{t.overview.noShoesIn(inPeriod)}</p>
           )}
         </section>
       )}
 
-      <div className={s.row}>
-        {showShoes && <WeeklyChart bars={weekly.bars} series={weekly.series} />}
-        {showBikes &&
-          bikes.map((b) => (
-            <BikeCard
-              key={b.gear.id}
-              bike={b}
-              note={kmNote(b.gear.id)}
-              parts={data.parts.filter((p) => p.bikeId === b.gear.id)}
-              activities={data.activities}
-            />
-          ))}
-      </div>
+      {/* Bikes get a section only when there are some to show; many athletes only run. */}
+      {showBikes && bikes.length > 0 && (
+        <section aria-labelledby="bikes-h" className={s.section}>
+          <h2 id="bikes-h" className={s.sectionTitle}>
+            {t.overview.bikesIn(inPeriod)}
+          </h2>
+          <div className={s.bikeGrid}>
+            {bikes.map((x) => (
+              <BikeCard
+                key={x.gear.gear.id}
+                bike={x.gear}
+                note={kmNote(x.km)}
+                parts={data.parts.filter((p) => p.bikeId === x.gear.gear.id)}
+                activities={data.activities}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }
