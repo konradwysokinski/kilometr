@@ -163,7 +163,7 @@ Calm, quiet desktop utility. A tinted sidebar, one white content panel floating 
 
 Gear colour rules:
 - An item takes the first free hue when it enters rotation and keeps it while in rotation; the user can change it. Implemented by saving the hue in the item's settings once assigned (`colour`), so nothing reshuffles when another item leaves.
-- Out of rotation, retired, unassigned and "Other" in charts → `--gear-other`. Exception: on a period's chart and donut, gear used in that period but out of rotation now borrows a hue (first one no rotation item holds), so a past month names its pairs (`periodHues`, Konrad 2026-11-25).
+- Out of rotation, retired, unassigned and "Other" in charts → `--gear-other`. Exception: on a period's chart, donut and Overview cards, gear used in that period but out of rotation now borrows a hue (first one no rotation item holds), so a past month names its pairs (`periodHues`, Konrad 2026-11-25).
 - More than 7 in rotation: charts colour the 7 with the most km in the period, the rest grouped as "Other".
 - Colour is never the only identifier: every coloured mark sits next to a name or avatar. Never use a gear colour for anything else.
 - Tints: avatar background `linear-gradient(135deg, <gear>38, <gear>1A)` (22% → 10% alpha), initials in `--gear-n-ink`. Selected pill: border `1.5px solid <gear>`, background `<gear>1F` (12%).

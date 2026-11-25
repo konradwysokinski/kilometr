@@ -7,6 +7,7 @@ import { KpiCard } from '../components/KpiCard';
 import { ShareDonut } from '../components/ShareDonut';
 import { WeeklyChart } from '../components/WeeklyChart';
 import { kmByGear, kmShare, periodGear, periodHues, periodSummary, periodKm, wearCost } from '../domain/overview';
+import type { GearStats } from '../domain/gear';
 import { periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
@@ -37,8 +38,14 @@ export function Overview() {
   // The chart covers the selected period, like everything else on the page: its weeks, or a year's months.
   // Runs by shoe, or rides by bike under the Bikes filter; never both on one chart.
   const chartKind = filter === 'bike' ? 'bike' : 'shoe';
-  // The chart and the donut share hues, so a past period's pairs out of rotation get named ones.
-  const hues = useMemo(() => periodHues(stats, usedKm, chartKind), [stats, usedKm, chartKind]);
+  // The chart, the donut and the cards share hues, so a past period's gear out of rotation gets named ones.
+  const shoeHues = useMemo(() => periodHues(stats, usedKm, 'shoe'), [stats, usedKm]);
+  const bikeHues = useMemo(() => periodHues(stats, usedKm, 'bike'), [stats, usedKm]);
+  const hues = chartKind === 'bike' ? bikeHues : shoeHues;
+  const inPeriodHue = (g: GearStats) => {
+    const hue = (g.gear.kind === 'bike' ? bikeHues : shoeHues).get(g.gear.id);
+    return hue && hue !== g.colour ? { ...g, colour: hue } : g;
+  };
   const weekly = useMemo(() => periodKm(data, stats, period, chartKind), [data, stats, period, chartKind]);
 
   const bikeNames = summary.bikeIds.flatMap((id) => stats.get(id)?.shortName ?? []);
@@ -159,7 +166,7 @@ export function Overview() {
           {shoes.length > 0 ? (
             <div className={s.grid}>
               {shoes.map((x) => (
-                <GearCard key={x.gear.gear.id} gear={x.gear} footnote={kmNote(x.km)} />
+                <GearCard key={x.gear.gear.id} gear={inPeriodHue(x.gear)} footnote={kmNote(x.km)} />
               ))}
             </div>
           ) : (
@@ -178,7 +185,7 @@ export function Overview() {
             {bikes.map((x) => (
               <BikeCard
                 key={x.gear.gear.id}
-                bike={x.gear}
+                bike={inPeriodHue(x.gear)}
                 note={kmNote(x.km)}
                 parts={data.parts.filter((p) => p.bikeId === x.gear.gear.id)}
                 activities={data.activities}
