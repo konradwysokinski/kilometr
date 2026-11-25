@@ -278,6 +278,11 @@ function About() {
           <Icon name="external" size={14} />
         </a>
       </Row>
+      <Row title={t.ds.title} hint={t.settings.designSystemHint}>
+        <a className={s.button} href="/design-system">
+          {t.settings.designSystemOpen}
+        </a>
+      </Row>
       <Row title={t.settings.author} hint={AUTHOR.name}>
         <a className={s.button} href={AUTHOR.url} target="_blank" rel="noreferrer">
           {t.settings.authorProfile}

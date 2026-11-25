@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate, type Location }
 import { Toaster } from 'sonner';
 import { Activities } from '../screens/Activities';
 import { Bikes } from '../screens/Bikes';
+import { DesignSystem } from '../screens/DesignSystem';
 import { GearDetail } from '../screens/GearDetail';
 import { Overview } from '../screens/Overview';
 import { Placeholder } from '../screens/Placeholder';
@@ -32,6 +33,13 @@ export function App() {
   );
 }
 
+/** /design-system, or /ds as a short alias that settles on the full name. */
+const isDesignSystem = (() => {
+  const path = window.location.pathname.replace(/\/$/, '');
+  if (path === '/ds') window.history.replaceState(null, '', '/design-system');
+  return path === '/ds' || path === '/design-system';
+})();
+
 function Screens() {
   const { data, ready } = useStore();
   const [atCallback, setAtCallback] = useState(() => window.location.pathname === CALLBACK_PATH);
@@ -42,6 +50,14 @@ function Screens() {
 
   // Strava's redirect back, before anything else: it may bring the first data.
   if (atCallback) return <StravaCallback onDone={leaveCallback} />;
+  // The design system needs no data of the visitor's; links in the app reach it with a full page load.
+  if (isDesignSystem) {
+    return (
+      <BrowserRouter>
+        <DesignSystem />
+      </BrowserRouter>
+    );
+  }
   if (!ready) return null;
   if (!data) return <Start />;
 

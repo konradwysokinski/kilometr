@@ -77,6 +77,8 @@ Next (not designed yet):
 
 14. Mailing list and analytics (built, Konrad 2026-11-25): Kilometr has no accounts, so an email someone leaves is the only way to reach them. "News from Kilometr" form on Start (under the two cards) and in Settings › About, posting straight from the browser to a MailerLite embedded form (`src/lib/newsletter.ts`, `NewsletterForm`); hidden until `VITE_MAILERLITE_ACCOUNT` and `VITE_MAILERLITE_FORM` are set (Vercel env, see `.env.example`). Visits: Vercel Web Analytics script, production only, no cookies (`src/main.tsx`; switch on in Vercel → Analytics); About says so. Strava connections are counted in Strava's API dashboard.
 
+15. Design system page (built, Konrad 2026-11-25): `/design-system` (`/ds` is an alias), `src/screens/DesignSystem.tsx`. A living style guide rendered from the app's own CSS variables and components on sample data, so it can't drift; needs no data of the visitor's (routed before Start in `App.tsx`). Principles, colours (values read live per theme), type scale, spacing, radii, shadows, then components: buttons, pills and segmented, chips, input, avatars, wear bar, KPI tiles with the donut, gear cards (priced pairs only, so nothing writes data), the chart. Theme and EN | PL switches on the page. Linked from Settings › About. The older design-system artifact on claude.ai is superseded by it.
+
 ### Build queue (agreed with Konrad, in this order)
 
 1. Shoes screen (all pairs, incl. out of rotation)
