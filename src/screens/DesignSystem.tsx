@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import tokensCss from '../styles/tokens.css?raw';
 import { useStore } from '../app/store';
 import type { Theme } from '../app/context';
 import { Avatar } from '../components/Avatar';
@@ -85,23 +86,51 @@ export function DesignSystem() {
         </Section>
 
         <Section title={t.ds.colours} hint={t.ds.coloursHint}>
-          <Swatches title={t.ds.ground} names={GROUND} />
-          <Swatches title={t.ds.text} names={TEXT} />
-          <Swatches title={t.ds.brand} names={BRAND} />
-          <Swatches title={t.ds.states} names={STATES} />
-          <Swatches title={t.ds.gear} hint={t.ds.gearHint} names={GEAR} />
+          <div className={s.table} role="table" aria-label={t.ds.colours}>
+            <div className={`${s.tr} ${s.th}`} role="row">
+              <span role="columnheader">{t.ds.name}</span>
+              <span role="columnheader">{t.settings.themes.light}</span>
+              <span role="columnheader">{t.settings.themes.dark}</span>
+            </div>
+            <Variables title={t.ds.ground} names={GROUND} />
+            <Variables title={t.ds.text} names={TEXT} />
+            <Variables title={t.ds.brand} names={BRAND} />
+            <Variables title={t.ds.states} names={STATES} />
+            <Variables title={t.ds.gear} hint={t.ds.gearHint} names={GEAR} />
+          </div>
         </Section>
 
         <Section title={t.ds.type} hint={t.ds.typeHint}>
-          <div className={s.typeList}>
+          <div className={s.table} role="table" aria-label={t.ds.type}>
+            <div className={`${s.typeTr} ${s.th}`} role="row">
+              <span role="columnheader">{t.ds.style}</span>
+              <span role="columnheader">{t.ds.size}</span>
+              <span role="columnheader">{t.ds.weight}</span>
+              <span role="columnheader">{t.ds.tracking}</span>
+            </div>
             {TYPE.map((x) => (
-              <div key={x.name} className={s.typeRow}>
-                <span className={s.typeSpec}>
-                  <span className={s.typeName}>{x.name}</span>
-                  {x.spec}
+              <div key={x.name} className={s.typeTr} role="row">
+                <span className={s.typeCell} role="cell">
+                  <span
+                    className={s.typeSample}
+                    style={{
+                      font: `${x.weight} ${x.size}px/${x.line}px var(--font-${x.serif ? 'serif' : 'sans'})`,
+                      letterSpacing: x.tracking,
+                    }}
+                  >
+                    {x.serif ? 'Kilometr' : x.name.startsWith('kpi') ? '736 km' : t.ds.sample}
+                  </span>
+                  <span className={s.varName}>{x.name}</span>
                 </span>
-                <span className={s.typeSample} style={x.style}>
-                  {x.name === 'wordmark' ? 'Kilometr' : x.name.startsWith('kpi') ? '736 km' : t.ds.sample}
+                <span className={s.mono} role="cell">
+                  {x.size} / {x.line}
+                </span>
+                <span className={s.mono} role="cell">
+                  {x.weight}
+                  {x.serif ? ' serif' : ''}
+                </span>
+                <span className={s.mono} role="cell">
+                  {x.tracking}
                 </span>
               </div>
             ))}
@@ -110,12 +139,18 @@ export function DesignSystem() {
 
         <div className={s.split}>
           <Section title={t.ds.spacing} hint={t.ds.spacingHint}>
-            <div className={s.spaces}>
+            <div className={s.table} role="table" aria-label={t.ds.spacing}>
               {SPACES.map((n) => (
-                <div key={n} className={s.space}>
-                  <span className={s.spaceBar} style={{ width: `var(--space-${n})` }} />
-                  <code>--space-{n}</code>
-                  <span className={s.muted}>{n * 4}px</span>
+                <div key={n} className={s.spaceTr} role="row">
+                  <span className={s.varName} role="cell">
+                    space-{n}
+                  </span>
+                  <span className={s.mono} role="cell">
+                    {n * 4}
+                  </span>
+                  <span role="cell">
+                    <span className={s.spaceBar} style={{ width: `var(--space-${n})` }} />
+                  </span>
                 </div>
               ))}
             </div>
@@ -264,7 +299,6 @@ export function DesignSystem() {
   );
 }
 
-// Constants, so the swatches' effect doesn't re-run on every render.
 const GROUND = ['canvas', 'surface', 'surface-sunken', 'line', 'line-soft', 'track', 'grid'];
 const TEXT = ['ink', 'ink-muted'];
 const BRAND = ['accent', 'accent-hover', 'accent-soft', 'on-accent'];
@@ -280,20 +314,16 @@ const RADII = [
 ] as const;
 
 const TYPE = [
-  { name: 'wordmark', spec: '30/34 · 400 serif', style: { font: '400 30px/34px var(--font-serif)' } },
-  { name: 'kpi-xl', spec: '40/46 · 400', style: { font: '400 40px/46px var(--font-sans)', letterSpacing: '-0.02em' } },
-  { name: 'kpi', spec: '34/40 · 400', style: { font: '400 34px/40px var(--font-sans)', letterSpacing: '-0.02em' } },
-  { name: 'title', spec: '30/36 · 500', style: { font: '500 30px/36px var(--font-sans)', letterSpacing: '-0.02em' } },
-  {
-    name: 'card-number',
-    spec: '22/28 · 400',
-    style: { font: '400 22px/28px var(--font-sans)', letterSpacing: '-0.02em' },
-  },
-  { name: 'heading', spec: '18/24 · 500', style: { font: '500 18px/24px var(--font-sans)' } },
-  { name: 'heading-sm', spec: '16/22 · 500', style: { font: '500 16px/22px var(--font-sans)' } },
-  { name: 'body', spec: '14/20 · 400', style: { font: '400 14px/20px var(--font-sans)' } },
-  { name: 'caption', spec: '13/18 · 400', style: { font: '400 13px/18px var(--font-sans)' } },
-  { name: 'small', spec: '12/16 · 400–500', style: { font: '400 12px/16px var(--font-sans)' } },
+  { name: 'wordmark', size: 30, line: 34, weight: 400, tracking: '0', serif: true },
+  { name: 'kpi-xl', size: 40, line: 46, weight: 400, tracking: '-0.02em' },
+  { name: 'kpi', size: 34, line: 40, weight: 400, tracking: '-0.02em' },
+  { name: 'title', size: 30, line: 36, weight: 500, tracking: '-0.02em' },
+  { name: 'card-number', size: 22, line: 28, weight: 400, tracking: '-0.02em' },
+  { name: 'heading', size: 18, line: 24, weight: 500, tracking: '0' },
+  { name: 'heading-sm', size: 16, line: 22, weight: 500, tracking: '0' },
+  { name: 'body', size: 14, line: 20, weight: 400, tracking: '0' },
+  { name: 'caption', size: 13, line: 18, weight: 400, tracking: '0' },
+  { name: 'small', size: 12, line: 16, weight: 400, tracking: '0' },
 ];
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
@@ -320,36 +350,46 @@ function Example({ title, hint, children }: { title: string; hint?: string; chil
   );
 }
 
-/** One group of colour tokens; the values are read from the live CSS, so they follow the theme. */
-function Swatches({ title, hint, names }: { title: string; hint?: string; names: string[] }) {
-  const [values, setValues] = useState<Record<string, string>>({});
-  // The store sets data-theme in an effect after this renders, so read again whenever it changes.
-  useEffect(() => {
-    const root = document.documentElement;
-    const read = () => {
-      const style = getComputedStyle(root);
-      setValues(Object.fromEntries(names.map((n) => [n, style.getPropertyValue(`--${n}`).trim()])));
-    };
-    read();
-    const observer = new MutationObserver(read);
-    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => observer.disconnect();
-  }, [names]);
+/**
+ * Both themes' values, straight from tokens.css (the file the app loads), so the
+ * table shows light and dark side by side like a design tool's variables.
+ */
+function readTheme(selector: string): Record<string, string> {
+  const at = tokensCss.indexOf(selector);
+  const body = at < 0 ? '' : tokensCss.slice(tokensCss.indexOf('{', at) + 1, tokensCss.indexOf('\n}', at));
+  return Object.fromEntries([...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map((m) => [m[1]!, m[2]!.trim()]));
+}
+const LIGHT = readTheme(':root');
+const DARK = { ...LIGHT, ...readTheme("[data-theme='dark']") };
+
+/** One collection of colour variables: a heading row, then name, light and dark per token. */
+function Variables({ title, hint, names }: { title: string; hint?: string; names: string[] }) {
   return (
-    <div className={s.swatchGroup}>
-      <div>
-        <h3 className={s.exampleTitle}>{title}</h3>
-        {hint && <p className={s.muted}>{hint}</p>}
+    <>
+      <div className={s.group} role="row">
+        <span role="cell">
+          {title}
+          {hint && <span className={s.groupHint}>{hint}</span>}
+        </span>
       </div>
-      <div className={s.swatches}>
-        {names.map((n) => (
-          <div key={n} className={s.swatch}>
-            <span className={s.chipColour} style={{ background: `var(--${n})` }} />
-            <code>--{n}</code>
-            <span className={s.muted}>{values[n] ?? ''}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+      {names.map((n) => (
+        <div key={n} className={s.tr} role="row">
+          <span className={s.varName} role="cell">
+            {n}
+          </span>
+          <Value value={LIGHT[n]} />
+          <Value value={DARK[n]} />
+        </div>
+      ))}
+    </>
+  );
+}
+
+function Value({ value = '' }: { value?: string }) {
+  return (
+    <span className={s.value} role="cell">
+      <span className={s.chipColour} style={{ background: value }} aria-hidden="true" />
+      <span className={s.mono}>{value.startsWith('#') ? value.slice(1).toUpperCase() : value}</span>
+    </span>
   );
 }
