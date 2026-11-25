@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { KpiCard } from '../components/KpiCard';
 import { ShareDonut } from '../components/ShareDonut';
 import { WeeklyChart } from '../components/WeeklyChart';
-import { kmByGear, kmShare, periodGear, periodSummary, periodKm, wearCost } from '../domain/overview';
+import { kmByGear, kmShare, periodGear, periodHues, periodSummary, periodKm, wearCost } from '../domain/overview';
 import { periodRange, shiftPeriod, type Period } from '../lib/dates';
 import s from './Overview.module.css';
 
@@ -37,6 +37,8 @@ export function Overview() {
   // The chart covers the selected period, like everything else on the page: its weeks, or a year's months.
   // Runs by shoe, or rides by bike under the Bikes filter; never both on one chart.
   const chartKind = filter === 'bike' ? 'bike' : 'shoe';
+  // The chart and the donut share hues, so a past period's pairs out of rotation get named ones.
+  const hues = useMemo(() => periodHues(stats, usedKm, chartKind), [stats, usedKm, chartKind]);
   const weekly = useMemo(() => periodKm(data, stats, period, chartKind), [data, stats, period, chartKind]);
 
   const bikeNames = summary.bikeIds.flatMap((id) => stats.get(id)?.shortName ?? []);
@@ -141,7 +143,7 @@ export function Overview() {
         />
         <ShareDonut
           label={filter === 'bike' ? t.overview.shareBikes : t.overview.sharePairs}
-          slices={kmShare(shareOf)}
+          slices={kmShare(shareOf, 3, hues)}
           sub={t.overview.shareTop}
           empty={filter === 'bike' ? t.overview.noRides(inPeriod) : t.overview.wearNone(inPeriod)}
         />

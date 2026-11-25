@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { sampleDataset } from '../data/sample';
 import { gearStats, initials, partWear, wearOf } from './gear';
-import { kmByGear, kmShare, periodGear, periodKm, periodSummary, unassignedRuns, wearCost } from './overview';
+import {
+  kmByGear,
+  kmShare,
+  periodGear,
+  periodHues,
+  periodKm,
+  periodSummary,
+  unassignedRuns,
+  wearCost,
+} from './overview';
 
 const now = new Date('2026-11-24T12:00:00');
 const data = sampleDataset(now);
@@ -180,8 +189,27 @@ describe('sample data', () => {
     const { bars, series } = periodKm(data, stats, year, 'bike');
     expect(bars).toHaveLength(12);
     expect(bars.every((b) => b.unit === 'month')).toBe(true);
-    // The bike in rotation by name; rides on other or no bikes as Other. No shoes.
-    expect(series.map((s) => s.key)).toEqual(['g-cg', 'other']);
+    // Every bike ridden that year by name, the one out of rotation in a spare hue. No shoes.
+    expect(series.map((s) => [s.key, s.colour])).toEqual([
+      ['g-cg', 5],
+      ['g-sa', 6],
+    ]);
     expect(bars.reduce((sum, b) => sum + b.totalKm, 0)).toBeCloseTo(periodSummary(data, year).rideKm, 5);
+  });
+
+  it('names pairs out of rotation in a past period, in hues no rotation item holds', () => {
+    const hues = periodHues(
+      stats,
+      new Map([
+        ['g-ab12', 40],
+        ['g-hs5', 30],
+      ]),
+      'shoe',
+    );
+    expect(hues.get('g-hs5')).toBe(1); // its own
+    expect(hues.get('g-ab12')).toBe(6); // 1–5 are held by gear in rotation
+    // Seven hues at most; the eighth item is Other.
+    const many = new Map([...stats.values()].filter((g) => g.gear.kind === 'shoe').map((g, i) => [g.gear.id, 100 - i]));
+    expect(periodHues(stats, many, 'shoe').size).toBe(Math.min(7, many.size));
   });
 });

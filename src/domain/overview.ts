@@ -1,6 +1,6 @@
 import { addDays, isoWeek, periodRange, startOfWeek, type Period } from '../lib/dates';
 import { byLastUsed, isRide, isRun, km, type GearStats } from './gear';
-import type { Activity, Dataset, GearColour, GearKind } from './types';
+import type { Activity, Dataset, GearColour, GearHue, GearKind } from './types';
 
 export const UNASSIGNED_WINDOW_DAYS = 30;
 
@@ -75,6 +75,38 @@ export function periodGear(stats: Map<string, GearStats>, usedKm: Map<string, nu
   return [...used, ...idle];
 }
 
+const HUES: GearHue[] = [1, 2, 3, 4, 5, 6, 7];
+
+/**
+ * Hues for the period's charts. Gear in rotation keeps its own. Gear out of
+ * rotation now but used in the period (last June's pair) borrows a hue, so a
+ * past month doesn't hide half its km under "Other": first hues no item in
+ * rotation holds, then ones not on this chart. Most km first; once the seven
+ * hues are taken, the rest is "Other".
+ */
+export function periodHues(
+  stats: Map<string, GearStats>,
+  usedKm: Map<string, number>,
+  kind: GearKind,
+): Map<string, GearHue> {
+  const used = [...usedKm.keys()].flatMap((id) => {
+    const g = stats.get(id);
+    return g && g.gear.kind === kind ? [g] : [];
+  });
+  const hues = new Map<string, GearHue>();
+  for (const g of used) if (g.colour) hues.set(g.gear.id, g.colour);
+  const held = new Set([...stats.values()].flatMap((g) => (g.colour ? [g.colour] : [])));
+  const spare = [...HUES.filter((h) => !held.has(h)), ...HUES.filter((h) => held.has(h))];
+  for (const g of used) {
+    if (hues.has(g.gear.id)) continue;
+    const taken = new Set(hues.values());
+    const hue = spare.find((h) => !taken.has(h));
+    if (!hue) break;
+    hues.set(g.gear.id, hue);
+  }
+  return hues;
+}
+
 export interface ShareSlice {
   key: string;
   name: string;
@@ -85,16 +117,17 @@ export interface ShareSlice {
 
 /**
  * How the period's km split between items, for the donut: the `top` items with
- * the most km, the rest as one "Other" slice (key 'other', granite).
+ * the most km, the rest as one "Other" slice (key 'other', granite). `hues`
+ * from `periodHues`, so the slices match the chart beside them.
  */
-export function kmShare(list: PeriodGear[], top = 3): ShareSlice[] {
+export function kmShare(list: PeriodGear[], top = 3, hues?: Map<string, GearHue>): ShareSlice[] {
   const used = list.filter((x) => x.km > 0);
   const total = used.reduce((s, x) => s + x.km, 0);
   if (total === 0) return [];
   const slices: ShareSlice[] = used.slice(0, top).map(({ gear, km }) => ({
     key: gear.gear.id,
     name: gear.shortName,
-    colour: gear.colour,
+    colour: hues?.get(gear.gear.id) ?? gear.colour,
     km,
     share: km / total,
   }));
@@ -161,11 +194,7 @@ function periodBars(period: Period): WeekBar[] {
     const monday = startOfWeek(start);
     const nextWeek = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 7);
     const end =
-      period.kind === 'year'
-        ? new Date(start.getFullYear(), start.getMonth() + 1, 1)
-        : nextWeek < to
-          ? nextWeek
-          : to;
+      period.kind === 'year' ? new Date(start.getFullYear(), start.getMonth() + 1, 1) : nextWeek < to ? nextWeek : to;
     const key = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
     bars.push({
       label: key,
@@ -184,8 +213,8 @@ function periodBars(period: Period): WeekBar[] {
 /**
  * Km in the selected period, a bar per week of a month or per month of a year:
  * runs stacked by shoe, or rides stacked by bike. The bars add up to the
- * period's Running (or Riding) total. Gear without a hue is grouped as
- * "Other". Runs and rides never share a chart: a 100 km ride would flatten
+ * period's Running (or Riding) total. Gear gets its hue from `periodHues`;
+ * runs without shoes and anything past seven items are "Other". Runs and rides never share a chart: a 100 km ride would flatten
  * every pair of shoes next to it.
  */
 export function periodKm(
@@ -196,11 +225,8 @@ export function periodKm(
 ): { bars: WeekBar[]; series: WeeklySeries[] } {
   const counts = kind === 'shoe' ? isRun : isRide;
   const bars = periodBars(period);
-
-  const seriesKey = (a: Activity) => {
-    const s = a.gearId ? stats.get(a.gearId) : undefined;
-    return s?.colour ? s.gear.id : 'other';
-  };
+  const hues = periodHues(stats, kmByGear(data, period), kind);
+  const seriesKey = (a: Activity) => (a.gearId && hues.has(a.gearId) ? a.gearId : 'other');
 
   const perWeek = bars.map(() => new Map<string, number>());
   for (const a of data.activities) {
@@ -213,10 +239,10 @@ export function periodKm(
   }
 
   const used = new Set(perWeek.flatMap((m) => [...m.keys()]));
-  const series: WeeklySeries[] = [...stats.values()]
-    .filter((s) => s.colour && used.has(s.gear.id) && s.gear.kind === kind)
-    .sort((a, b) => (a.colour ?? 0) - (b.colour ?? 0) || byLastUsed(a, b))
-    .map((s) => ({ key: s.gear.id, name: s.shortName, colour: s.colour }));
+  const series: WeeklySeries[] = [...hues]
+    .filter(([id]) => used.has(id))
+    .sort((a, b) => a[1] - b[1])
+    .map(([id, colour]) => ({ key: id, name: stats.get(id)!.shortName, colour }));
   if (used.has('other')) series.push({ key: 'other', name: 'Other', colour: null });
 
   bars.forEach((bar, i) => {
