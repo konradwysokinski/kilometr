@@ -311,8 +311,21 @@
   color: var(--ink);
 }
 
-.item:hover {
+.item:hover:not(.open) {
   background: linear-gradient(90deg, transparent, var(--hover) 8%, var(--hover) 92%, transparent);
+}
+
+/*
+ * Open: the row and its details become one tile in the hover's own tint, so the
+ * two never sit on top of each other in different greys. The negative margin
+ * keeps the columns in line with the rows around it.
+ */
+.open {
+  margin: 4px -12px;
+  padding: 0 12px;
+  border-bottom-color: transparent;
+  border-radius: var(--radius-tile);
+  background: var(--hover);
 }
 
 .date {
@@ -395,10 +408,9 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin: 2px 0 14px 68px;
-  padding: 16px 18px;
-  border-radius: var(--radius-tile);
-  background: var(--surface-sunken);
+  margin: 0 0 0 68px;
+  padding: 12px 0 16px;
+  border-top: 1px solid var(--line-soft);
   animation: reveal 0.18s ease-out;
 }
 
@@ -442,7 +454,7 @@
   justify-content: space-between;
   gap: 6px 16px;
   padding-top: 12px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--line-soft);
 }
 
 .detailMeta {
