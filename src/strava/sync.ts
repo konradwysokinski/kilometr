@@ -7,6 +7,7 @@
  * details. Older km come from Strava's total per item, not activity by activity:
  * a runner with ten years on Strava would otherwise spend 25+ requests here.
  * Later syncs: 1 + 1 (new activities) + any gear details still missing.
+ * A full history refresh (Settings): 1 + all activities / 200, on request only.
  */
 import { StravaError } from './auth';
 import type { StravaActivity, StravaAthlete, StravaDetailedGear, StravaPull } from './mapping';
@@ -50,8 +51,8 @@ export function pickDetails(athlete: StravaAthlete, activities: StravaActivity[]
 }
 
 interface PullOptions {
-  /** Unix seconds: read only activities started after this. */
-  after: number;
+  /** Unix seconds: read only activities started after this. Omit to read the whole history. */
+  after?: number;
   /** True when `after` is the last sync (a later sync), false for the first sync's year back. */
   incremental: boolean;
   /** Gear whose details were read before. */
@@ -68,10 +69,8 @@ export async function pullFromStrava(
 
   const activities: StravaActivity[] = [];
   for (let page = 1; ; page++) {
-    const batch = await get<StravaActivity[]>(
-      `/athlete/activities?per_page=${PAGE}&page=${page}&after=${after}`,
-      accessToken,
-    );
+    const since = after !== undefined ? `&after=${after}` : '';
+    const batch = await get<StravaActivity[]>(`/athlete/activities?per_page=${PAGE}&page=${page}${since}`, accessToken);
     activities.push(...batch);
     onProgress({ step: 'activities', count: activities.length });
     if (batch.length < PAGE) break;
@@ -90,7 +89,9 @@ export async function pullFromStrava(
     );
   }
 
-  return incremental
-    ? { athlete, details, activities, incremental }
-    : { athlete, details, activities, historyFrom: new Date(after * 1000).toISOString() };
+  if (incremental) return { athlete, details, activities, incremental };
+  // The first sync's year back marks where the activities start; a full refresh reads them all.
+  return after !== undefined
+    ? { athlete, details, activities, historyFrom: new Date(after * 1000).toISOString() }
+    : { athlete, details, activities };
 }

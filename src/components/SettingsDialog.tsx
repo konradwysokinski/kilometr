@@ -152,6 +152,7 @@ function Data() {
     stravaState,
     stravaAthlete,
     syncStrava,
+    refreshHistory,
     disconnectStrava,
     t,
     f,
@@ -214,6 +215,20 @@ function Data() {
             </>
           )}
         </Row>
+        {data.source === 'strava' && (
+          // Costs a request per 200 activities from the app's shared Strava limit, so only on request.
+          <Row
+            title={t.settings.refreshHistory}
+            hint={t.settings.refreshHistoryHint(
+              f.int(data.activities.length),
+              f.int(Math.ceil(data.activities.length / 200) + 1),
+            )}
+          >
+            <button type="button" className={s.button} disabled={syncing} onClick={() => void refreshHistory()}>
+              {syncing ? t.sidebar.syncing : t.settings.refreshHistoryButton}
+            </button>
+          </Row>
+        )}
         {data.source === 'strava' && (
           <Row title={t.settings.disconnect} hint={t.settings.disconnectHint}>
             <button

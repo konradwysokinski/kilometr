@@ -48,6 +48,8 @@ export interface Store {
   completeStravaSignIn: (search: string) => Promise<boolean>;
   /** Reads what's new in Strava (also runs on its own when the data is over an hour old). */
   syncStrava: () => Promise<void>;
+  /** Reads every activity from Strava again (Settings), instead of only the new ones. */
+  refreshHistory: () => Promise<void>;
   /** Asks Strava to forget the approval, drops the tokens and goes back to Start; the data stays. */
   disconnectStrava: () => Promise<void>;
   stravaState: StravaState;

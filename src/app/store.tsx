@@ -200,14 +200,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
    * The first reads a year back.
    */
   const runStravaSync = useCallback(
-    async (tokens: StravaTokens, previous: Dataset | null) => {
+    async (tokens: StravaTokens, previous: Dataset | null, full = false) => {
       const fresh = await freshTokens(tokens);
       if (fresh !== tokens) await dbSet(DB_STRAVA_TOKENS, fresh);
-      const incremental = previous?.source === 'strava' && previous.activities.length > 0;
+      const incremental = !full && previous?.source === 'strava' && previous.activities.length > 0;
       // The first sync reads a year back; older km come from Strava's total per item.
-      const after = incremental
-        ? Math.floor(new Date(previous.activities[0]!.startDate).getTime() / 1000) - 7 * 24 * 3600
-        : Math.floor(historyStart(new Date()).getTime() / 1000);
+      // A full refresh reads every activity again (new fields such as moving time reach old ones too).
+      const after = full
+        ? undefined
+        : incremental
+          ? Math.floor(new Date(previous.activities[0]!.startDate).getTime() / 1000) - 7 * 24 * 3600
+          : Math.floor(historyStart(new Date()).getTime() / 1000);
       const detailed = new Set(previous?.source === 'strava' ? previous.gear.filter(hasDetails).map((g) => g.id) : []);
       const pull = await pullFromStrava(fresh.accessToken, { after, incremental, detailed }, (progress) =>
         setStravaState({ status: 'syncing', progress }),
@@ -247,18 +250,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [runStravaSync],
   );
 
-  const syncStrava = useCallback(async () => {
-    const current = dataRef.current;
-    if (current?.source !== 'strava') return;
-    setStravaState({ status: 'syncing', progress: null });
-    try {
-      const tokens = await dbGet<StravaTokens>(DB_STRAVA_TOKENS);
-      if (!tokens) throw new StravaError('expired');
-      await runStravaSync(tokens, current);
-    } catch (e) {
-      setStravaState({ status: 'error', code: e instanceof StravaError ? e.code : 'failed' });
-    }
-  }, [runStravaSync]);
+  const syncWith = useCallback(
+    async (full: boolean) => {
+      const current = dataRef.current;
+      if (current?.source !== 'strava') return;
+      setStravaState({ status: 'syncing', progress: null });
+      try {
+        const tokens = await dbGet<StravaTokens>(DB_STRAVA_TOKENS);
+        if (!tokens) throw new StravaError('expired');
+        await runStravaSync(tokens, current, full);
+      } catch (e) {
+        setStravaState({ status: 'error', code: e instanceof StravaError ? e.code : 'failed' });
+      }
+    },
+    [runStravaSync],
+  );
+  const syncStrava = useCallback(() => syncWith(false), [syncWith]);
+  /** Settings: read every activity again, about activities / 200 requests. */
+  const refreshHistory = useCallback(() => syncWith(true), [syncWith]);
 
   // Fresh data on opening the app, at most once an hour.
   const autoSynced = useRef(false);
@@ -382,12 +391,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       data, ready, stats, now, loadSample, importFile, importState,
-      connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete,
+      connectStrava, completeStravaSignIn, syncStrava, refreshHistory, disconnectStrava, stravaState, stravaAthlete,
       updateSettings, assignShoes, clear, removeAllData,
       notices, markToasted, markAllToasted, markRead,
       theme, themePref, setThemePref, locale, setLocale, t: MESSAGES[locale], f,
     }),
-    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, syncStrava, disconnectStrava, stravaState, stravaAthlete, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllToasted, markRead, theme, themePref, setThemePref, locale, setLocale, f],
+    [data, ready, stats, now, loadSample, importFile, importState, connectStrava, completeStravaSignIn, syncStrava, refreshHistory, disconnectStrava, stravaState, stravaAthlete, updateSettings, assignShoes, clear, removeAllData, notices, markToasted, markAllToasted, markRead, theme, themePref, setThemePref, locale, setLocale, f],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
