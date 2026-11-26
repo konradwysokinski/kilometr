@@ -124,8 +124,23 @@ function activitiesFor(plan: Plan, now: Date, rand: () => number): Activity[] {
       distance,
       elevationGain: Math.round((distance / 1000) * climb * (0.6 + rand() * 0.8)),
       gearId: plan.gear.id,
+      ...pacing(sportType, distance, i),
     };
   });
+}
+
+/**
+ * Moving time and heart rate, varied by the activity's index rather than the
+ * random generator, so adding them didn't reshuffle the rest of the sample.
+ */
+function pacing(sportType: SportType, distance: number, i: number) {
+  const ride = sportType === 'Ride' || sportType === 'GravelRide' || sportType === 'MountainBikeRide';
+  const wobble = ((i * 37) % 41) / 40; // 0–1
+  const secPerKm = ride ? 3600 / (24 + wobble * 6) : (sportType === 'TrailRun' ? 380 : 300) + wobble * 45;
+  return {
+    movingTime: Math.round((distance / 1000) * secPerKm),
+    averageHeartrate: Math.round((ride ? 128 : 142) + wobble * 18),
+  };
 }
 
 /** Two recent runs with no shoes (most people have default shoes set in Strava). */
@@ -145,6 +160,7 @@ function unassigned(now: Date): Activity[] {
       distance: Math.round(k * 1000),
       elevationGain: Math.round(k * (sportType === 'TrailRun' ? 35 : 6)),
       gearId: null,
+      ...pacing(sportType, k * 1000, i),
     };
   });
 }

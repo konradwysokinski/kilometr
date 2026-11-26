@@ -87,6 +87,21 @@ describe('surface (Dirt Distance)', () => {
   });
 });
 
+describe('moving time and heart rate', () => {
+  const rows = [
+    'Activity ID,Activity Date,Activity Name,Activity Type,Distance,Activity Gear,Distance,Elevation Gain,Moving Time,Average Heart Rate',
+    '301,"Nov 23, 2026, 7:12:45 AM",Easy run,Run,"10.00",Mud ones,10000.0,80.0,3120.0,146.3',
+    '302,"Nov 21, 2026, 7:12:45 AM",No strap,Run,"8.00",Mud ones,8000.0,40.0,2520.0,',
+  ].join('\n');
+  const byId = new Map(parseStravaExport({ activities: rows, shoes: SHOES }).activities.map((a) => [a.id, a]));
+
+  it('keeps them, and leaves the heart rate out when there was no sensor', () => {
+    expect(byId.get('301')).toMatchObject({ movingTime: 3120, averageHeartrate: 146.3 });
+    expect(byId.get('302')!.movingTime).toBe(2520);
+    expect('averageHeartrate' in byId.get('302')!).toBe(false);
+  });
+});
+
 describe('readExportZip', () => {
   async function zip(files: Record<string, string>) {
     const writer = new ZipWriter(new BlobWriter('application/zip'));

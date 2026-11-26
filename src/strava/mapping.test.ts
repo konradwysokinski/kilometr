@@ -41,6 +41,14 @@ describe('mapActivity', () => {
     expect(mapActivity(run(2, null, 'EMountainBikeRide'))?.sportType).toBe('MountainBikeRide');
     expect(mapActivity(run(3, null, 'Swim'))).toBeNull();
   });
+
+  it('keeps moving time and heart rate when Strava has them', () => {
+    expect(mapActivity({ ...run(4, 'g1'), moving_time: 3000, average_heartrate: 151.2 })).toMatchObject({
+      movingTime: 3000,
+      averageHeartrate: 151.2,
+    });
+    expect('averageHeartrate' in mapActivity(run(5, 'g1'))!).toBe(false);
+  });
 });
 
 describe('mapGear', () => {

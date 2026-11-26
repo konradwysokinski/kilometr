@@ -38,6 +38,9 @@ export interface StravaActivity {
   /** Metres. */
   total_elevation_gain?: number;
   gear_id?: string | null;
+  /** Seconds. */
+  moving_time?: number;
+  average_heartrate?: number;
 }
 
 /** Sport types Kilometr tracks; everything else (swims, workouts…) has no gear to count. */
@@ -66,6 +69,8 @@ export function mapActivity(a: StravaActivity): Activity | null {
     distance: a.distance,
     elevationGain: a.total_elevation_gain ?? 0,
     gearId: a.gear_id ?? null,
+    ...(a.moving_time && { movingTime: a.moving_time }),
+    ...(a.average_heartrate && { averageHeartrate: a.average_heartrate }),
   };
 }
 

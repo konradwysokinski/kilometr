@@ -39,6 +39,10 @@ export interface Activity {
    * type decides (TrailRun = trail, Run = road).
    */
   dirtDistance?: number | null;
+  /** Seconds in motion (Strava's moving time). Missing in data read before it was kept. */
+  movingTime?: number;
+  /** Beats per minute, when the activity was recorded with a heart rate sensor. */
+  averageHeartrate?: number;
 }
 
 /** Things only the user knows, stored locally. */
