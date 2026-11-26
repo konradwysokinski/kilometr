@@ -40,6 +40,15 @@ describe('format', () => {
     expect(createFormat('pl').price(599)).toBe('599\u00a0zł');
     expect(createFormat('en').price(1299.5)).toBe('1299.50\u00a0PLN');
   });
+
+  it('formats time, pace, speed and heart rate', () => {
+    const f = createFormat('pl');
+    expect(f.duration(3125)).toBe('52:05');
+    expect(f.duration(3852)).toBe('1:04:12');
+    expect(f.pace(312)).toBe('5:12\u00a0/km');
+    expect(f.speed(28.44)).toBe('28,4\u00a0km/h');
+    expect(createFormat('en').bpm(148.4)).toBe('148\u00a0bpm');
+  });
 });
 
 describe('detectLocale', () => {

@@ -34,6 +34,23 @@ export interface Format {
   quote: (s: string) => string;
   /** "just now", "12 minutes ago", "3 hours ago", "2 days ago" (Polish: "12 minut temu"). */
   ago: (d: Date, now?: Date) => string;
+  /** Seconds as "52:30" or "1:04:12". */
+  duration: (seconds: number) => string;
+  /** Seconds per km as "5:12 /km". */
+  pace: (secondsPerKm: number) => string;
+  /** 28.4 km/h / 28,4 km/h */
+  speed: (kmPerHour: number) => string;
+  /** 148 bpm */
+  bpm: (n: number) => string;
+}
+
+/** 3125 → "52:05", 3852 → "1:04:12". */
+function clock(seconds: number): string {
+  const total = Math.round(seconds);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = String(total % 60).padStart(2, '0');
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`;
 }
 
 export function createFormat(locale: Locale): Format {
@@ -75,5 +92,9 @@ export function createFormat(locale: Locale): Format {
       if (minutes < 48 * 60) return relative.format(-Math.round(minutes / 60), 'hour');
       return relative.format(-Math.round(minutes / 1440), 'day');
     },
+    duration: clock,
+    pace: (secondsPerKm) => `${clock(secondsPerKm)}${NBSP}/km`,
+    speed: (kmPerHour) => `${oneDecimal(kmPerHour)}${NBSP}km/h`,
+    bpm: (n) => `${formatInt(n)}${NBSP}bpm`,
   };
 }

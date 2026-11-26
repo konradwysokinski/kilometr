@@ -1,8 +1,8 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useId, useMemo, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router';
 import { useDataset } from '../app/store';
 import { ListSection } from '../components/ListSection';
-import { groupByMonth } from '../domain/activities';
+import { activityDetail, groupByMonth } from '../domain/activities';
 import { shoeChoices, suggestShoe } from '../domain/assign';
 import { isRide, isRun, km, type GearStats } from '../domain/gear';
 import { unassignedRuns } from '../domain/overview';
@@ -171,6 +171,8 @@ function AllActivities() {
   const { data, stats, t, f } = useDataset();
   const [filter, setFilter] = useState<Filter>('all');
   const [shown, setShown] = useState(MONTHS_STEP);
+  // One activity open at a time: opening another closes the last.
+  const [open, setOpen] = useState<string | null>(null);
 
   const runs = useMemo(() => data.activities.filter(isRun), [data.activities]);
   const rides = useMemo(() => data.activities.filter(isRide), [data.activities]);
@@ -215,7 +217,13 @@ function AllActivities() {
           </div>
           <ul className={s.rows}>
             {m.activities.map((a) => (
-              <ActivityRow key={a.id} activity={a} gear={a.gearId ? stats.get(a.gearId) : undefined} />
+              <ActivityRow
+                key={a.id}
+                activity={a}
+                gear={a.gearId ? stats.get(a.gearId) : undefined}
+                open={open === a.id}
+                onToggle={() => setOpen((id) => (id === a.id ? null : a.id))}
+              />
             ))}
           </ul>
         </section>
@@ -232,25 +240,106 @@ function AllActivities() {
   );
 }
 
-function ActivityRow({ activity: a, gear }: { activity: Activity; gear: GearStats | undefined }) {
+/**
+ * A row that opens in place to show the details: tap or click anywhere on it
+ * (the name is the button, stretched over the row), so it works the same on
+ * phones, where a hover would never show.
+ */
+function ActivityRow({
+  activity: a,
+  gear,
+  open,
+  onToggle,
+}: {
+  activity: Activity;
+  gear: GearStats | undefined;
+  open: boolean;
+  onToggle: () => void;
+}) {
   const { t, f } = useDataset();
+  const panelId = useId();
   return (
-    <li className={s.row}>
-      <time className={s.date} dateTime={a.startDate}>
-        {f.dayMonth(new Date(a.startDate))}
-      </time>
-      <span className={s.rowName} title={t.activities.types[a.sportType]}>
-        {a.name}
-      </span>
-      {gear ? (
-        <Link to={`/gear/${gear.gear.id}`} className={s.gear}>
-          <span className={s.swatch} style={{ '--c': gearColour(gear.colour) } as CSSProperties} aria-hidden="true" />
-          {gear.shortName}
-        </Link>
-      ) : (
-        <span className={`${s.gear} ${s.noGear}`}>{isRide(a) ? t.activities.noBike : t.activities.noShoes}</span>
-      )}
-      <span className={s.km}>{f.kmPrecise(km(a.distance))}</span>
+    <li className={`${s.item} ${open ? s.open : ''}`}>
+      <div className={s.row}>
+        <time className={s.date} dateTime={a.startDate}>
+          {f.dayMonth(new Date(a.startDate))}
+        </time>
+        <button
+          type="button"
+          className={s.rowName}
+          title={t.activities.types[a.sportType]}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={onToggle}
+        >
+          {a.name}
+        </button>
+        {gear ? (
+          <Link to={`/gear/${gear.gear.id}`} className={s.gear}>
+            <span className={s.swatch} style={{ '--c': gearColour(gear.colour) } as CSSProperties} aria-hidden="true" />
+            {gear.shortName}
+          </Link>
+        ) : (
+          <span className={`${s.gear} ${s.noGear}`}>{isRide(a) ? t.activities.noBike : t.activities.noShoes}</span>
+        )}
+        <span className={s.km}>{f.kmPrecise(km(a.distance))}</span>
+        <svg className={s.chevron} width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+          <path d="M4 5.5l3 3 3-3" />
+        </svg>
+      </div>
+      {open && <ActivityDetails id={panelId} activity={a} gear={gear} />}
     </li>
+  );
+}
+
+function ActivityDetails({ id, activity: a, gear }: { id: string; activity: Activity; gear: GearStats | undefined }) {
+  const { data, t, f } = useDataset();
+  const d = activityDetail(data, a, gear);
+  const ride = isRide(a);
+  const stats = [
+    d.pace !== null && { label: t.activities.pace, value: f.pace(d.pace) },
+    d.speed !== null && { label: t.activities.speed, value: f.speed(d.speed) },
+    d.movingTime !== null && { label: t.activities.movingTime, value: f.duration(d.movingTime) },
+    { label: t.activities.elevation, value: f.metres(a.elevationGain) },
+    d.heartRate !== null && { label: t.activities.heartRate, value: f.bpm(d.heartRate) },
+  ].filter((x): x is { label: string; value: string } => !!x);
+  const gearLine =
+    gear && d.gearKm !== null
+      ? [
+          t.activities.gearAfter(ride, f.km(d.gearKm), gear.wear ? f.km(gear.wear.limitKm) : null),
+          d.wearCost !== null ? t.activities.wearCost(f.money(d.wearCost)) : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      : null;
+
+  return (
+    <div id={id} role="region" aria-label={t.activities.details(a.name)} className={s.details}>
+      <dl className={s.stats}>
+        {stats.map((x) => (
+          <div key={x.label} className={s.stat}>
+            <dt>{x.label}</dt>
+            <dd>{x.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {d.movingTime === null && <p className={s.muted}>{t.activities.noTime}</p>}
+      <div className={s.detailFoot}>
+        <span className={s.detailMeta}>
+          {[
+            t.activities.types[a.sportType],
+            d.unpaved !== null ? t.activities.unpaved(Math.round(d.unpaved * 100)) : null,
+            gear && gearLine ? `${gear.shortName}: ${gearLine}` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </span>
+        {d.stravaUrl && (
+          <a className={s.strava} href={d.stravaUrl} target="_blank" rel="noreferrer">
+            {t.activities.viewOnStrava}
+          </a>
+        )}
+      </div>
+    </div>
   );
 }

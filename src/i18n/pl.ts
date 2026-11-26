@@ -165,6 +165,18 @@ export const pl: Messages = {
     noBike: 'Bez roweru',
     older: 'Pokaż starsze miesiące',
     empty: 'Brak biegów i jazd.',
+    details: (name: string) => `Szczegóły: ${name}`,
+    pace: 'Tempo',
+    speed: 'Prędkość',
+    movingTime: 'Czas ruchu',
+    elevation: 'Przewyższenie',
+    heartRate: 'Średnie tętno',
+    unpaved: (pct: number) => `${pct}% poza asfaltem`,
+    gearAfter: (ride: boolean, kmF: string, limitF: string | null) =>
+      `${limitF ? `${kmF} z ${limitF}` : kmF} po ${ride ? 'tej jeździe' : 'tym biegu'}`,
+    wearCost: (money: string) => `${money} jego wartości`,
+    viewOnStrava: 'View on Strava',
+    noTime: 'Czas i tętno pojawią się po odświeżeniu całej historii w Ustawieniach.',
     types: {
       Run: 'Bieg',
       TrailRun: 'Bieg w terenie',
@@ -392,6 +404,10 @@ export const pl: Messages = {
     cancel: 'Anuluj',
     designSystemHint: 'Tokeny i komponenty Kilometra, prosto z jego kodu.',
     designSystemOpen: 'Otwórz',
+    refreshHistory: 'Cała historia',
+    refreshHistoryHint: (activities: string, requests: string) =>
+      `Pobiera ponownie wszystkie aktywności ze Stravy (${activities}), około ${requests} zapytań. Starsze dostaną czas ruchu i tętno.`,
+    refreshHistoryButton: 'Odśwież historię',
     about: 'O aplikacji',
     aboutHint: (version: string) =>
       `Wersja ${version}. Open source na licencji MIT. Twoje dane zostają w tej przeglądarce; wersja w sieci tylko anonimowo liczy odwiedziny, bez ciasteczek.`,

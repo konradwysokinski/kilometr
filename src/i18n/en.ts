@@ -152,6 +152,18 @@ export const en = {
     noBike: 'No bike',
     older: 'Show older months',
     empty: 'No runs or rides yet.',
+    details: (name: string) => `Details of ${name}`,
+    pace: 'Pace',
+    speed: 'Speed',
+    movingTime: 'Moving time',
+    elevation: 'Elevation gain',
+    heartRate: 'Avg heart rate',
+    unpaved: (pct: number) => `${pct}% unpaved`,
+    gearAfter: (ride: boolean, kmF: string, limitF: string | null) =>
+      `${limitF ? `${kmF} of ${limitF}` : kmF} after this ${ride ? 'ride' : 'run'}`,
+    wearCost: (money: string) => `${money} of its value`,
+    viewOnStrava: 'View on Strava',
+    noTime: 'Time and heart rate arrive with a full history refresh in Settings.',
     types: {
       Run: 'Run',
       TrailRun: 'Trail run',
@@ -382,6 +394,10 @@ export const en = {
     cancel: 'Cancel',
     designSystemHint: 'The tokens and components behind Kilometr, live from its code.',
     designSystemOpen: 'Open',
+    refreshHistory: 'Full history',
+    refreshHistoryHint: (activities: string, requests: string) =>
+      `Reads all ${activities} activities from Strava again, about ${requests} requests. Older ones get moving time and heart rate.`,
+    refreshHistoryButton: 'Refresh history',
     about: 'About',
     aboutHint: (version: string) =>
       `Version ${version}. Open source under the MIT licence. Your data stays in this browser; the hosted app only counts visits, anonymously and without cookies.`,
