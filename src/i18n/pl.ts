@@ -408,6 +408,8 @@ export const pl: Messages = {
     refreshHistoryHint: (activities: string, requests: string) =>
       `Pobiera ponownie wszystkie aktywności ze Stravy (${activities}), około ${requests} zapytań. Starsze dostaną czas ruchu i tętno.`,
     refreshHistoryButton: 'Odśwież historię',
+    refreshProgress: (read: string, total: string) =>
+      `Pobieram aktywności: ${read} z około ${total}. Nie zamykaj Kilometra, dopóki nie skończy.`,
     about: 'O aplikacji',
     aboutHint: (version: string) =>
       `Wersja ${version}. Open source na licencji MIT. Twoje dane zostają w tej przeglądarce; wersja w sieci tylko anonimowo liczy odwiedziny, bez ciasteczek.`,

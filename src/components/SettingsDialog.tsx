@@ -219,10 +219,15 @@ function Data() {
           // Costs a request per 200 activities from the app's shared Strava limit, so only on request.
           <Row
             title={t.settings.refreshHistory}
-            hint={t.settings.refreshHistoryHint(
-              f.int(data.activities.length),
-              f.int(Math.ceil(data.activities.length / 200) + 1),
-            )}
+            hint={
+              // A full read takes a few minutes (Strava sends 200 activities every few seconds), so show how far it is.
+              syncing && stravaState.progress?.step === 'activities'
+                ? t.settings.refreshProgress(f.int(stravaState.progress.count), f.int(data.activities.length))
+                : t.settings.refreshHistoryHint(
+                    f.int(data.activities.length),
+                    f.int(Math.ceil(data.activities.length / 200) + 1),
+                  )
+            }
           >
             <button type="button" className={s.button} disabled={syncing} onClick={() => void refreshHistory()}>
               {syncing ? t.sidebar.syncing : t.settings.refreshHistoryButton}

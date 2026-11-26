@@ -398,6 +398,8 @@ export const en = {
     refreshHistoryHint: (activities: string, requests: string) =>
       `Reads all ${activities} activities from Strava again, about ${requests} requests. Older ones get moving time and heart rate.`,
     refreshHistoryButton: 'Refresh history',
+    refreshProgress: (read: string, total: string) =>
+      `Reading activities: ${read} of about ${total}. Keep Kilometr open until it's done.`,
     about: 'About',
     aboutHint: (version: string) =>
       `Version ${version}. Open source under the MIT licence. Your data stays in this browser; the hosted app only counts visits, anonymously and without cookies.`,

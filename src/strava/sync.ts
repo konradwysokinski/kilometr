@@ -7,7 +7,7 @@
  * details. Older km come from Strava's total per item, not activity by activity:
  * a runner with ten years on Strava would otherwise spend 25+ requests here.
  * Later syncs: 1 + 1 (new activities) + any gear details still missing.
- * A full history refresh (Settings): 1 + all activities / 200, on request only.
+ * A full history refresh (Settings): 1 + all activities / 200, on request only; Strava answers a page every few seconds, so about 2–3 minutes for 5 000 activities.
  */
 import { StravaError } from './auth';
 import type { StravaActivity, StravaAthlete, StravaDetailedGear, StravaPull } from './mapping';
